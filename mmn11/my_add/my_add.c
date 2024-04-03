@@ -6,16 +6,33 @@ The binary and decimal representation of the sum of the two input numbers. */
 
 #include <stdio.h>
 
+/* Print base 2 number */
+unsigned int printInBase2(unsigned int);
+
+/* Preform addition of two binary numbers using bitwise operations */
+unsigned int my_add(unsigned int, unsigned int);
+
+unsigned int printInBase2(unsigned int number)
+{
+    int j = 0;
+
+    for (j = 31; j >= 0; j--)
+    {
+        printf("%u", (number >> j) & 1);
+    }
+
+    return 0;
+}
+
 unsigned int my_add(unsigned int a, unsigned int b)
 {
     unsigned int carry = 0, result = 0, originalA = a, originalB = b; /* Carry, end result and original values*/
     int i = 0;                                                        /* Bit position */
-    int j = 0;                                                        /* Loop counter */
 
     while (a != 0 || b != 0)
     {
-        unsigned int aBit = a & 1; /*Rightmost bit of a */
-        unsigned int bBit = b & 1; /*Rightmost bit of b */
+        unsigned int aBit = a & 1; /* Rightmost bit of a */
+        unsigned int bBit = b & 1; /* Rightmost bit of b */
         unsigned int sum = aBit ^ bBit ^ carry;
         carry = (aBit & bBit) | (aBit & carry) | (bBit & carry);
 
@@ -32,22 +49,15 @@ unsigned int my_add(unsigned int a, unsigned int b)
     }
 
     printf("Operand A in 2 base: ");
-    for (j = 31; j >= 0; j--)
-    {
-        printf("%u", (originalA >> j) & 1);
-    }
+    printInBase2(originalA);
 
     printf("\nOperand B in 2 base: ");
-    for (j = 31; j >= 0; j--)
-    {
-        printf("%u", (originalB >> j) & 1);
-    }
+    printInBase2(originalB);
 
-    printf("\nResult in 2 base:    ");
-    for (j = 31; j >= 0; j--)
-    {
-        printf("%u", (result >> j) & 1);
-    }
+    printf("\nResult in 2 base: ");
+    printInBase2(result);
+
+    printf("\n%u", result);
 
     return result;
 }

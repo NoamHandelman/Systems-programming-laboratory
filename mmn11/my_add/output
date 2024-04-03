@@ -1,0 +1,8 @@
+Please enter two non-negative integers (up to 6 digits): You entered:
+Operand A in 10 base = 42
+Operand B in 10 base = 123
+Operand A in 2 base: 00000000000000000000000000101010
+Operand B in 2 base: 00000000000000000000000001111011
+Result in 2 base: 00000000000000000000000010100101
+165
+Result in base 10: 165
