@@ -16,7 +16,7 @@ unsigned int printInBase2(unsigned int number)
 {
     int j = 0;
 
-    for (j = 31; j >= 0; j--)
+    for (j = (sizeof(number) * 8) - 1; j >= 0; j--)
     {
         printf("%u", (number >> j) & 1);
     }
@@ -56,8 +56,6 @@ unsigned int my_add(unsigned int a, unsigned int b)
 
     printf("\nResult in 2 base: ");
     printInBase2(result);
-
-    printf("\n%u", result);
 
     return result;
 }
