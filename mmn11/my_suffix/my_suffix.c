@@ -9,9 +9,10 @@ int suffix(char[], char);
 int suffix(char str[], char c)
 {
     int count = 0;         /* counter for suffixes starting with c */
-    int len = strlen(str); /* length of string */
+    int len = strlen(str); /* length of sıtring */
+    int i;
 
-    for (int i = 0; i < len; i++)
+    for (i = 0; i < len; i++)
     {
         if (str[i] == c)
         {
@@ -30,10 +31,12 @@ int main()
     char temp;
 
     printf("Enter a character followed and then a string (max 127 characters): ");
-    
-    c = getchar();
-    
-    while((temp = getchar()) != '\n' && temp != EOF && index < 127)
+
+    c = getchar(); /* get first char */
+
+    getchar(); /* get new line */
+
+    while ((temp = getchar()) != '\n' && temp != EOF && index < 127)
     {
         str[index++] = temp;
     }
@@ -41,9 +44,7 @@ int main()
 
     printf("You entered: '%c' and \"%s\"\n", c, str);
 
-    int matches = suffix(str, c);
-
-    printf("Number of suffixes starting with '%c': %d\n", c, matches);
+    printf("Number of suffixes starting with '%c': %d\n", c, suffix(str, c));
 
     return 0;
 }
