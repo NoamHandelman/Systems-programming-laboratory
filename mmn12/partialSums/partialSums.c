@@ -25,7 +25,7 @@ int *partialSums(int *initialArray, int size)
 {
     int sum = 0;
     int i;
-    int *partialSum = malloc(size * sizeof(int)); /* Allocate memory for the partial sum array */
+    int *partialSum = (int *)malloc(size * sizeof(int)); /* Allocate memory for the partial sum array */
 
     if (partialSum == NULL) /* Check if memory allocation failed */
     {
@@ -53,7 +53,7 @@ int main()
     scanf("%d", &size);
     printf("You entered %d\n", size);
 
-    initialArray = malloc(size * sizeof(int)); /* Allocate memory for the initial array */
+    initialArray = (int *)malloc(size * sizeof(int)); /* Allocate memory for the initial array */
     if (initialArray == NULL)
     {
         printf("Memory allocation failed\n");
