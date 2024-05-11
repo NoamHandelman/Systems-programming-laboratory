@@ -1,0 +1,15 @@
+Please enter the size of the array:
+You entered 5
+Enter the array elements:
+Please enter element number 1:
+You entered 1
+Please enter element number 2:
+You entered 2
+Please enter element number 3:
+You entered 3
+Please enter element number 4:
+You entered 4
+Please enter element number 5:
+You entered 5
+The original array is: 1 2 3 4 5 
+The partial sums array is: 1 3 6 10 15 

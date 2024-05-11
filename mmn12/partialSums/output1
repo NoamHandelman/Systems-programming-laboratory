@@ -1,0 +1,21 @@
+Please enter the size of the array:
+You entered 8
+Enter the array elements:
+Please enter element number 1:
+You entered 3
+Please enter element number 2:
+You entered 5
+Please enter element number 3:
+You entered 1
+Please enter element number 4:
+You entered -15
+Please enter element number 5:
+You entered 10
+Please enter element number 6:
+You entered -1
+Please enter element number 7:
+You entered 10
+Please enter element number 8:
+You entered 14
+The original array is: 3 5 1 -15 10 -1 10 14 
+The partial sums array is: 3 8 9 -6 4 3 13 27 
