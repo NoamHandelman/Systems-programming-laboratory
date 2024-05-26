@@ -8,6 +8,7 @@
             "args": [
                 "-ansi",
                 "-Wall",
+                "-pedantic",
                 "${file}",
                 "-o",
                 "${fileDirname}/${fileBasenameNoExtension}"
