@@ -1,10 +1,19 @@
 #include "set.h"
 
-void init_set(set *s)
+void init_sets(set *s)
 {
     int i;
     for (i = 0; i < SET_SIZE / 8; i++)
         s->data[i] = 0;
+}
+
+void init_sets(set *set_array[], int size)
+{
+    int i;
+    for (i = 0; i < size; i++)
+    {
+        init_set(set_array[i]);
+    }
 }
 
 void read_set(set *s, int numbers[], int size)

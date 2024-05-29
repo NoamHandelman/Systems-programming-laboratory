@@ -3,12 +3,13 @@
 #include <string.h>
 
 #define SET_SIZE 128
+
 typedef struct
 {
     unsigned char data[SET_SIZE / 8];
 } set;
 
-void init_set(set *);
+void init_sets(set *[], int);
 void read_set(set *, int[], int);
 void print_set(const set *);
 void union_set(set *, const set *, const set *);
