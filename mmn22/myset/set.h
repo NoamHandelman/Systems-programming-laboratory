@@ -3,6 +3,7 @@
 #include <string.h>
 
 #define SET_SIZE 128
+#define SETS_NUMBER 6
 
 typedef struct
 {
