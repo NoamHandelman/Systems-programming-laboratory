@@ -25,7 +25,7 @@ int parse_command(char *input, set *sets)
     const char *set_names[SETS_NUMBER] = {"SETA", "SETB", "SETC", "SETD", "SETE", "SETF"};
     char command[20];
     char args[1000];
-    char *token;
+    char *token, *check_extra;
     token = NULL;
     printf("input: %s\n", input);
     if (sscanf(input, "%s %[^\n]", command, args) < 1)
@@ -34,11 +34,13 @@ int parse_command(char *input, set *sets)
     }
 
     printf("command: %s\n", command);
+    printf("args: %s\n", args);
 
     if (strcmp(command, "read_set") == 0)
     {
         char setName[10];
         int values[128], count = 0, num;
+        char extra;
         int setIndex;
         token = strtok(args, " ,");
         if (token)
@@ -51,19 +53,43 @@ int parse_command(char *input, set *sets)
                 return 0;
             }
             token = strtok(NULL, ",");
-            while (token && sscanf(token, "%d", &num) && num != -1)
+            while (token)
             {
-                if (num < 0 || num > 127)
+                if (sscanf(token, "%d%c", &num, &extra) == 2)
                 {
-                    printf("Invalid set member - value out of range\n");
+                    printf("Invalid set member - not an integer or extra characters present\n");
                     return 0;
                 }
-                values[count++] = num;
-                token = strtok(NULL, ",");
+                else if (sscanf(token, "%d", &num) == 1)
+                {
+                    if (num != -1 && (num < 0 || num > 127))
+                    {
+                        printf("Invalid set member - value out of range\n");
+                        return 0;
+                    }
+                    values[count++] = num;
+                    if (num == -1)
+                    {
+                        break;
+                    }
+                    token = strtok(NULL, ",");
+                }
+                else
+                {
+                    printf("Invalid set member - not an integer\n");
+                    return 0;
+                }
             }
-            if (num != -1)
+            if (values[count - 1] != -1)
             {
                 printf("List of set members is not terminated correctly\n");
+                return 0;
+            }
+            count--;
+            check_extra = strtok(NULL, ",");
+            if (check_extra)
+            {
+                printf("Invalid input - extraneous text after command\n");
                 return 0;
             }
             read_set(&sets[setIndex], values, count);
@@ -71,12 +97,28 @@ int parse_command(char *input, set *sets)
     }
     else if (strcmp(command, "print_set") == 0)
     {
-        int setIndex = get_set_index(args, set_names);
+        int setIndex;
+        token = strtok(args, " ,");
+        if (!token)
+        {
+            printf("Invalid command format - set name required\n");
+            return 0;
+        }
+
+        check_extra = strtok(NULL, " ,");
+        if (check_extra)
+        {
+            printf("Invalid input - extraneous text after command\n");
+            return 0;
+        }
+
+        setIndex = get_set_index(token, set_names);
         if (setIndex == -1)
         {
             printf("Undefined set name\n");
             return 0;
         }
+
         print_set(&sets[setIndex]);
     }
     else if (strcmp(command, "union_set") == 0 || strcmp(command, "intersect_set") == 0 ||
@@ -89,20 +131,28 @@ int parse_command(char *input, set *sets)
         setName1 = strtok(args, ", ");
         setName2 = strtok(NULL, ", ");
         resultName = strtok(NULL, ", ");
+
+        if (!setName1 || !setName2 || !resultName)
+        {
+            printf("Missing parameter\n");
+            return 0;
+        }
         printf("setName1: %s\n", setName1);
         printf("setName2: %s\n", setName2);
         printf("resultName: %s\n", resultName);
-        if (!setName1 || !setName2 || !resultName)
-        {
-            printf("Invalid command format\n");
-            return 0;
-        }
+
         setIndex1 = get_set_index(setName1, set_names);
         setIndex2 = get_set_index(setName2, set_names);
         resultIndex = get_set_index(resultName, set_names);
         printf("setIndex1: %d\n", setIndex1);
         printf("setIndex2: %d\n", setIndex2);
         printf("resultIndex: %d\n", resultIndex);
+        check_extra = strtok(NULL, ",");
+        if (check_extra)
+        {
+            printf("Invalid input - extraneous text after command\n");
+            return 0;
+        }
         if (setIndex1 == -1 || setIndex2 == -1 || resultIndex == -1)
         {
             printf("Undefined set name\n");
