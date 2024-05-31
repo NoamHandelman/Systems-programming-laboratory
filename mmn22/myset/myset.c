@@ -1,6 +1,9 @@
 #include "set.h"
+#define INITIAL_BUF_SIZE 128
 
 int get_set_index(const char *set_name, const char *sets[]);
+int parse_command(char *input, set *sets);
+char *read_input(void);
 
 int get_set_index(const char *set_name, const char *sets[])
 {
@@ -23,12 +26,14 @@ int parse_command(char *input, set *sets)
     char command[20];
     char args[1000];
     char *token;
-    token= NULL;
+    token = NULL;
     printf("input: %s\n", input);
     if (sscanf(input, "%s %[^\n]", command, args) < 1)
     {
         return 0;
     }
+
+    printf("command: %s\n", command);
 
     if (strcmp(command, "read_set") == 0)
     {
@@ -131,22 +136,78 @@ int parse_command(char *input, set *sets)
     return 0;
 }
 
+char *read_input(void)
+{
+
+    char *input = (char *)malloc(INITIAL_BUF_SIZE);
+    int current_size = INITIAL_BUF_SIZE;
+    int len = 0;
+    int ch;
+
+    if (input == NULL)
+    {
+        perror("Failed to allocate memory");
+        return NULL;
+    }
+
+    while ((ch = getchar()) != '\n' && ch != EOF)
+    {
+        if (len == current_size - 1)
+        {
+            char *new_input;
+            current_size *= 2;
+            new_input = (char *)realloc(input, current_size);
+            if (new_input == NULL)
+            {
+                free(input);
+                perror("Failed to reallocate memory");
+                return NULL;
+            }
+            input = new_input;
+        }
+        input[len++] = ch;
+    }
+    input[len] = '\0';
+
+    if (ch == EOF)
+    {
+        free(input);
+        return NULL;
+    }
+
+    return input;
+}
+
 int main(void)
 {
     set sets[SETS_NUMBER];
-    char input[1024];
+    char *input;
+    int result;
+
     init_sets(sets, SETS_NUMBER);
 
     while (1)
     {
         printf("> ");
-        if (fgets(input, sizeof(input), stdin) == NULL)
+        input = read_input();
+        if (!input)
         {
-            printf("Error reading input\n");
+            printf("Error: End of file encountered or failed to read input.\n");
+            break;
+        }
+
+        if (strlen(input) == 0)
+        {
+            printf("Error: No input entered. Please try again.\n");
             continue;
         }
-        if (parse_command(input, sets) == -1)
+
+        result = parse_command(input, sets);
+        free(input);
+
+        if (result == -1)
         {
+            printf("Exit program...\n");
             break;
         }
     }
