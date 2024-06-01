@@ -28,8 +28,9 @@ int parse_command(char *input, set *sets)
     char *token, *check_extra;
     token = NULL;
     printf("input: %s\n", input);
-    if (sscanf(input, "%s %[^\n]", command, args) < 1)
+    if (sscanf(input, "%s %[^\n]", command, args) < 2)
     {
+        printf("Invalid command format - command name or sets name are missing\n");
         return 0;
     }
 
@@ -189,6 +190,10 @@ int parse_command(char *input, set *sets)
     else if (strcmp(command, "stop") == 0)
     {
         return -1;
+    }
+    else if (command[strlen(command) - 1] == ',')
+    {
+        printf("Invalid command format - comma at the end of the command\n");
     }
     else
     {
