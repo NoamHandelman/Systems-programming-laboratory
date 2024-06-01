@@ -33,6 +33,12 @@ int parse_command(char *input, set *sets)
         return 0;
     }
 
+    if (strstr(input, ",,"))
+    {
+        printf("Invalid input - consecutive commas detected\n");
+        return 0;
+    }
+
     printf("command: %s\n", command);
     printf("args: %s\n", args);
 
@@ -55,7 +61,12 @@ int parse_command(char *input, set *sets)
             token = strtok(NULL, ",");
             while (token)
             {
-                if (sscanf(token, "%d%c", &num, &extra) == 2)
+                if (token[0] == '\0')
+                {
+                    printf("Invalid input - consecutive commas detected\n");
+                    return 0;
+                }
+                else if (sscanf(token, "%d%c", &num, &extra) == 2)
                 {
                     printf("Invalid set member - not an integer or extra characters present\n");
                     return 0;
