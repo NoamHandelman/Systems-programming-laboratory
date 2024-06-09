@@ -1,0 +1,16 @@
+1 appears in file data1.txt - 1 time
+2 appears in file data1.txt - 1 time
+3 appears in file data1.txt - 1 time
+4 appears in file data1.txt - 1 time
+5 appears in file data1.txt - 1 time
+6 appears in file data1.txt - 2 times
+7 appears in file data1.txt - 2 times
+8 appears in file data1.txt - 1 time
+9 appears in file data1.txt - 1 time
+10 appears in file data1.txt - 1 time
+17 appears in file data1.txt - 1 time
+18 appears in file data1.txt - 1 time
+19 appears in file data1.txt - 1 time
+20 appears in file data1.txt - 1 time
+25 appears in file data1.txt - 1 time
+26 appears in file data1.txt - 1 time

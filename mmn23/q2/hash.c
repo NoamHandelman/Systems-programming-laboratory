@@ -1,3 +1,7 @@
+/**
+ * This program reads a list of files and counts the number of times each number between 0 and 28 appears in each file.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -18,10 +22,19 @@ typedef struct
     Node *head;
 } HashTable;
 
+/* Initialize  all nodes in the table to be null*/
 void init_table(HashTable *);
+
+/* Function to increase the count of some number that detected */
 void add_count(HashTable *, int, const char *);
+
+/** Function that responsible on files handling */
 void read_file(HashTable *, const char *);
+
+/* Function to print the table */
 void print_table(HashTable *);
+
+/* Function to free the memory allocated for the table */
 void free_table(HashTable *);
 
 void init_table(HashTable *table)
@@ -138,7 +151,7 @@ int main(int argc, char *argv[])
 
     if (argc < 2)
     {
-        fprintf(stderr, "No input files specified.\n");
+        fprintf(stderr, "%s", "No input files specified.\n");
         return 1;
     }
 
