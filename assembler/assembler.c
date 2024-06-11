@@ -2,8 +2,10 @@
 
 int main(int argc, char *argv[])
 {
+    FILE *am_file;
+
     while (--argc > 0)
     {
-        handle_mcro(argv[argc]);
+        exec_preproc(argv[argc]);
     }
 }
