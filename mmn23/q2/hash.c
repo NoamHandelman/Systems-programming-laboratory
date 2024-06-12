@@ -7,12 +7,11 @@
 #include <string.h>
 
 #define MAX_VALUE 28
-#define MAX_FILENAME 100
 
 /*Structures for linked list node and hash table*/
 typedef struct Node
 {
-    char filename[MAX_FILENAME];
+    char *filename;
     int count;
     struct Node *next;
 } Node;
@@ -24,6 +23,9 @@ typedef struct
 
 /* Initialize  all nodes in the table to be null*/
 void init_table(HashTable *);
+
+/* Function to allocate memory for the filename */
+char *allocate_filename(const char *);
 
 /* Function to increase the count of some number that detected */
 void add_count(HashTable *, int, const char *);
@@ -44,6 +46,18 @@ void init_table(HashTable *table)
     {
         table[i].head = NULL;
     }
+}
+
+char *allocate_filename(const char *filename)
+{
+    char *new_filename = (char *)malloc(strlen(filename) + 1);
+    if (new_filename == NULL)
+    {
+        fprintf(stderr, "Memory allocation error.\n");
+        exit(1);
+    }
+    strcpy(new_filename, filename);
+    return new_filename;
 }
 
 void add_count(HashTable *table, int value, const char *filename)
@@ -70,7 +84,7 @@ void add_count(HashTable *table, int value, const char *filename)
         fprintf(stderr, "Memory allocation error.\n");
         exit(1);
     }
-    strcpy(new_node->filename, filename);
+    new_node->filename = allocate_filename(filename);
     new_node->count = 1;
     new_node->next = NULL;
 
@@ -138,6 +152,7 @@ void free_table(HashTable *table)
         {
             Node *temp = current;
             current = current->next;
+            free(temp->filename);
             free(temp);
         }
         table[i].head = NULL;

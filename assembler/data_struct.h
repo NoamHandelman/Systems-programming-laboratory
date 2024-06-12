@@ -1,6 +1,7 @@
 typedef struct
 {
     char *name;
+    char *content;
+    
 
-    /* data */
 } Mcro;
