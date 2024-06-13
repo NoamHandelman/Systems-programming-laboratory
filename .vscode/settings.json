@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "stdio.h": "c"
+        "stdio.h": "c",
+        "data_struct.h": "c",
+        "pre_proc.h": "c"
     }
 }

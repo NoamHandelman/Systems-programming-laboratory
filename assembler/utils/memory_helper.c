@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
+#include "../headers/memory_helper.h"
 
 void *allocate_memory(size_t size)
 {
