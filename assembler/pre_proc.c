@@ -1,6 +1,7 @@
 #include "headers/globals.h"
 #include "headers/pre_proc.h"
 #include "headers/memory_helper.h"
+#include "headers/strings_helper.h"
 
 Macro *create_macro(const char *name)
 {
@@ -134,6 +135,13 @@ char *exec_preproc(const char *input_filename)
                 macro_name = strtok(NULL, " \t\n");
                 if (macro_name)
                 {
+                    char *rest;
+                    rest = strstr(line_copy, macro_name) + strlen(macro_name);
+                    printf("rest: %s\n", rest);
+                    if (check_for_extra_chars(rest))
+                    {
+                        return handle_preproc_error("Extra characters after macro name", macro_list, am_filename, as_file, am_file);
+                    }
                     if (!validate_macro(macro_name))
                     {
                         return handle_preproc_error("Invalid macro name", macro_list, am_filename, as_file, am_file);
@@ -153,6 +161,12 @@ char *exec_preproc(const char *input_filename)
             }
             else if (strcmp(token, "endmacr") == 0)
             {
+                char *rest;
+                rest = strstr(line_copy, "endmacr") + strlen("endmacr");
+                if (check_for_extra_chars(rest))
+                {
+                    return handle_preproc_error("Extra characters after endmacr", macro_list, am_filename, as_file, am_file);
+                }
                 in_macro = 0;
                 current_macro = NULL;
             }
