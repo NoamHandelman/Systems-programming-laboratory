@@ -2,7 +2,7 @@
 #include <string.h>
 #include "./data_struct.h"
 
-int exec_preproc(const char *);
+char *exec_preproc(const char *);
 
 Macro *create_macro(const char *);
 
@@ -13,3 +13,5 @@ void add_macro(Macro **, Macro *);
 void free_macros(Macro *);
 
 Macro *find_macro(Macro *, const char *);
+
+void *handle_preproc_error(const char *, Macro *, char *, FILE *, FILE *);

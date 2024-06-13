@@ -1,24 +1,29 @@
 #include "headers/pre_proc.h"
+#include "headers/memory_helper.h"
 
 int main(int argc, char *argv[])
 {
     int i;
-
-    printf("argc: %d\n", argc);
+    char *am_file;
 
     if (argc < 2)
     {
         fprintf(stderr, "No input files\n");
+        return 1;
     }
 
     for (i = 1; i < argc; i++)
     {
-        if (!exec_preproc(argv[i]))
+        am_file = exec_preproc(argv[i]);
+        if (!am_file)
         {
             fprintf(stderr, "Failed to process file %s\n", argv[i]);
             continue;
         }
+
+        free(am_file);
     }
 
+    printf("Done assembler process\n");
     return 0;
 }

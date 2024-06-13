@@ -76,7 +76,17 @@ int validate_macro(const char *name)
     return 1;
 }
 
-int exec_preproc(const char *input_filename)
+void *handle_preproc_error(const char *message, Macro *macro_list, char *am_filename, FILE *as_file, FILE *am_file)
+{
+    fprintf(stderr, "%s\n", message);
+    free_macros(macro_list);
+    free(am_filename);
+    fclose(as_file);
+    fclose(am_file);
+    return NULL;
+}
+
+char *exec_preproc(const char *input_filename)
 {
     FILE *as_file, *am_file = NULL;
     char line[MAX_LINE_LENGTH];
@@ -126,34 +136,19 @@ int exec_preproc(const char *input_filename)
                 {
                     if (!validate_macro(macro_name))
                     {
-                        fprintf(stderr, "Invalid macro name\n");
-                        free_macros(macro_list);
-                        free(am_filename);
-                        fclose(as_file);
-                        fclose(am_file);
-                        return 0;
+                        return handle_preproc_error("Invalid macro name", macro_list, am_filename, as_file, am_file);
                     }
                     current_macro = create_macro(macro_name);
                     if (!current_macro)
                     {
-                        fprintf(stderr, "Failed to create macro\n");
-                        free_macros(macro_list);
-                        free(am_filename);
-                        fclose(as_file);
-                        fclose(am_file);
-                        return 0;
+                        return handle_preproc_error("Failed to create macro", macro_list, am_filename, as_file, am_file);
                     }
                     add_macro(&macro_list, current_macro);
                     in_macro = 1;
                 }
                 else
                 {
-                    fprintf(stderr, "Invalid macro definition\n");
-                    free_macros(macro_list);
-                    free(am_filename);
-                    fclose(as_file);
-                    fclose(am_file);
-                    return 0;
+                    return handle_preproc_error("No macro name provided", macro_list, am_filename, as_file, am_file);
                 }
             }
             else if (strcmp(token, "endmacr") == 0)
@@ -191,6 +186,6 @@ int exec_preproc(const char *input_filename)
 
     fclose(as_file);
     fclose(am_file);
-    free(am_filename);
-    return 1;
+    free_macros(macro_list);
+    return am_filename;
 }
