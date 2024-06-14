@@ -15,3 +15,5 @@ void free_macros(Macro *);
 Macro *find_macro(Macro *, const char *);
 
 void *handle_preproc_error(const char *, Macro *, char *, FILE *, FILE *);
+
+int validate_macro(const char *);

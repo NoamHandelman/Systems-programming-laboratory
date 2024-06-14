@@ -1,4 +1,4 @@
-#include "../headers/memory_helper.h"
+#include "../headers/memory.h"
 
 void *allocate_memory(size_t size)
 {

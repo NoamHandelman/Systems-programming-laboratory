@@ -1,7 +1,8 @@
 #include "headers/globals.h"
 #include "headers/pre_proc.h"
-#include "headers/memory_helper.h"
-#include "headers/strings_helper.h"
+#include "headers/memory.h"
+#include "headers/strings.h"
+#include "headers/lexer.h"
 
 Macro *create_macro(const char *name)
 {
@@ -71,9 +72,11 @@ Macro *find_macro(Macro *head, const char *name)
 
 int validate_macro(const char *name)
 {
-    /**
-     * Check if the macro name is valid
-     */
+    printf("name: %s\n", name);
+    if (get_opcode(name) >= 0 || get_register(name) >= 0 || is_valid_instruction(name))
+    {
+        return 0;
+    }
     return 1;
 }
 

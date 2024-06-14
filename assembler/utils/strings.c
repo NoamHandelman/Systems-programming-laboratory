@@ -1,4 +1,4 @@
-#include "../headers/strings_helper.h"
+#include "../headers/strings.h"
 #include <stdio.h>
 
 int check_for_extra_chars(char *token_end)

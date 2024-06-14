@@ -8,7 +8,7 @@ UTILS_DIR = utils
 HEADERS_DIR = headers
 
 # Source and Object files
-SRC_FILES = assembler.c pre_proc.c $(UTILS_DIR)/memory_helper.c $(UTILS_DIR)/strings_helper.c
+SRC_FILES = assembler.c pre_proc.c $(UTILS_DIR)/memory.c $(UTILS_DIR)/strings.c $(UTILS_DIR)/lexer.c
 OBJ_FILES = $(SRC_FILES:.c=.o)
 
 # Target executable
@@ -29,9 +29,11 @@ $(TARGET): $(OBJ_FILES)
 
 # Dependencies
 assembler.o: $(HEADERS_DIR)/pre_proc.h
-pre_proc.o: $(HEADERS_DIR)/data_struct.h $(HEADERS_DIR)/globals.h $(HEADERS_DIR)/pre_proc.h $(HEADERS_DIR)/memory_helper.h $(HEADERS_DIR)/strings_helper.h
-$(UTILS_DIR)/memory_helper.o: $(HEADERS_DIR)/memory_helper.h
-$(UTILS_DIR)/strings_helper.o: $(HEADERS_DIR)/strings_helper.h
+pre_proc.o: $(HEADERS_DIR)/data_struct.h $(HEADERS_DIR)/globals.h $(HEADERS_DIR)/pre_proc.h $(HEADERS_DIR)/memory.h $(HEADERS_DIR)/strings.h $(HEADERS_DIR)/lexer.h
+$(UTILS_DIR)/memory.o: $(HEADERS_DIR)/memory.h
+$(UTILS_DIR)/strings.o: $(HEADERS_DIR)/strings.h
+$(UTILS_DIR)/lexer.o: $(HEADERS_DIR)/globals.h $(HEADERS_DIR)/data_struct.h
+
 
 # Clean target
 clean:
