@@ -3,6 +3,7 @@
 #include "headers/memory.h"
 #include "headers/strings.h"
 #include "headers/lexer.h"
+#include "headers/files.h"
 
 Macro *create_macro(const char *name)
 {
@@ -72,7 +73,6 @@ Macro *find_macro(Macro *head, const char *name)
 
 int validate_macro(const char *name)
 {
-    printf("name: %s\n", name);
     if (get_opcode(name) >= 0 || get_register(name) >= 0 || is_valid_instruction(name))
     {
         return 0;
@@ -98,15 +98,12 @@ char *exec_preproc(const char *input_filename)
     Macro *macro_list = NULL, *current_macro = NULL;
     int in_macro = 0;
 
-    size_t am_filename_length = strlen(input_filename) + 4;
-    am_filename = (char *)allocate_memory(am_filename_length);
+    am_filename = create_file(input_filename, ".am");
     if (!am_filename)
     {
-        fprintf(stderr, "Failed to allocate memory for preprocess file\n");
+        fprintf(stderr, "Failed to create file\n");
         return 0;
     }
-
-    snprintf(am_filename, am_filename_length, "%s.am", input_filename);
 
     as_file = fopen(input_filename, "r");
     if (as_file == NULL)
