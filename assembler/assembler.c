@@ -17,11 +17,15 @@ int main(int argc, char *argv[])
         am_file = exec_preproc(argv[i]);
         if (!am_file)
         {
-            fprintf(stderr, "Failed to process file %s\n", argv[i]);
+            fprintf(stderr, "Failed to process file at pre proccess stage %s\n", argv[i]);
             continue;
         }
 
-        exec_assembler_transitions(am_file);
+        if (!(exec_assembler_transitions(am_file)))
+        {
+            fprintf(stderr, "Failed to process file at assembler stage %s\n", argv[i]);
+            continue;
+        };
 
         free(am_file);
     }

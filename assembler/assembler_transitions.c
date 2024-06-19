@@ -1,3 +1,24 @@
-void exec_assembler_transitions(const char *input_filename)
+#include <stdio.h>
+#include "headers/globals.h"
+
+int exec_first_pass(const char *input_filename)
+{
+    FILE *am_file;
+    int IC = 0, DC = 0, should_continue = 1;
+    char line[MAX_LINE_LENGTH];
+
+    am_file = fopen(input_filename, "r");
+    if (!am_file)
+    {
+        fprintf(stderr, "Failed to open file %s\n", input_filename);
+        return 0;
+    }
+
+    while (fgets(line, sizeof(line), am_file) != NULL)
+    {
+    }
+}
+
+int exec_second_pass(const char *input_filename)
 {
 }
