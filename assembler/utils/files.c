@@ -1,5 +1,6 @@
 #include "../headers/memory.h"
 #include "../headers/files.h"
+#include "../headers/globals.h"
 
 char *create_file(const char *filename, const char *extension)
 {
@@ -12,4 +13,50 @@ char *create_file(const char *filename, const char *extension)
     strcpy(file_path, filename);
     strcat(file_path, extension);
     return file_path;
+}
+
+int clear_empty_lines(const char *filename)
+{
+    FILE *file;
+    FILE *temp;
+    char line[MAX_LINE_LENGTH];
+    int should_removed;
+    int i;
+
+    file = fopen(filename, "r");
+    if (!file)
+    {
+        return 0;
+    }
+    temp = fopen("temp", "w");
+    if (!temp)
+    {
+        fclose(file);
+        return 0;
+    }
+    while (fgets(line, sizeof(line), file))
+    {
+        should_removed = 1;
+        for (i = 0; line[i] != '\0'; i++)
+        {
+            if (!isspace(line[i]))
+            {
+                if (line[i] == ';')
+                {
+                    break;
+                }
+                should_removed = 0;
+                break;
+            }
+        }
+        if (!should_removed)
+        {
+            fputs(line, temp);
+        }
+    }
+    fclose(file);
+    fclose(temp);
+    remove(filename);
+    rename("temp", filename);
+    return 1;
 }

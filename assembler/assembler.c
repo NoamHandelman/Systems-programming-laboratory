@@ -21,6 +21,8 @@ int main(int argc, char *argv[])
             continue;
         }
 
+        exec_assembler_transitions(am_file);
+
         free(am_file);
     }
 

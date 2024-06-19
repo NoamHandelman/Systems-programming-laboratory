@@ -200,6 +200,15 @@ char *exec_preproc(const char *input_filename)
 
     fclose(as_file);
     fclose(am_file);
+
+    if (!(clear_empty_lines(am_filename)))
+    {
+        fprintf(stderr, "Failed to clear empty lines from file %s\n", am_filename);
+        free_macros(macro_list);
+        free(am_filename);
+        return 0;
+    }
+
     free_macros(macro_list);
     return am_filename;
 }
