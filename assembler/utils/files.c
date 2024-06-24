@@ -5,13 +5,20 @@
 char *create_file(const char *filename, const char *extension)
 {
     char *file_path;
-    file_path = allocate_memory(strlen(filename) + strlen(extension) + 1);
+    char *end_pos = strrchr(filename, '.');
+
+    size_t filename_length = end_pos ? (end_pos - filename) : strlen(filename);
+
+    file_path = allocate_memory(filename_length + strlen(extension) + 1);
     if (!file_path)
     {
         return NULL;
     }
-    strcpy(file_path, filename);
+
+    strncpy(file_path, filename, filename_length);
+    file_path[filename_length] = '\0';
     strcat(file_path, extension);
+    
     return file_path;
 }
 

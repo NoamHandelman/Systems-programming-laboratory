@@ -2,6 +2,7 @@
     "files.associations": {
         "stdio.h": "c",
         "data_struct.h": "c",
-        "pre_proc.h": "c"
+        "pre_proc.h": "c",
+        "assembler_transitions.h": "c"
     }
 }

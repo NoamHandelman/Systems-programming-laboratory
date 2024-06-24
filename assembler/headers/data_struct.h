@@ -12,24 +12,14 @@ typedef struct OP_CODE
     int operands;
 } OP_CODE;
 
-typedef enum
-{
-    CODE,
-    DATA
-} LabelType;
 
-typedef enum
-{
-    A,
-    R,
-    E
-} Are;
-
-typedef struct Label
+typedef struct SYMBOL
 {
     char *name;
-    int value;
-    LabelType type;
-    Are are;
-    struct Label *next;
-} Label;
+    int address;
+    int is_external;
+    int is_relocatable;
+    int is_data;
+    int is_code;
+    struct SYMBOL *next;
+} SYMBOL;
