@@ -3,6 +3,7 @@
         "stdio.h": "c",
         "data_struct.h": "c",
         "pre_proc.h": "c",
-        "assembler_transitions.h": "c"
+        "assembler_transitions.h": "c",
+        "files.h": "c"
     }
 }

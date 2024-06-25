@@ -12,26 +12,28 @@ typedef struct OP_CODE
     int operands;
 } OP_CODE;
 
-typedef enum SymbolType
-{
-    ABSOLUTE,
-    EXTERNAL,
-    RELOCATABLE
-} SymbolType;
-
-typedef enum DirectiveType
-{
-    DATA,
-    STRING,
-    ENTRY,
-    EXTERN
-} DirectiveType;
-
 typedef struct Symbol
 {
     char *name;
     int address;
-    SymbolType symbol_type;
-    DirectiveType directive_type;
+    int is_external;
+    int is_entry;
+    int is_code;
     struct SYMBOL *next;
 } Symbol;
+
+// typedef struct Line
+// {
+//     char *label;
+//     char *opcode;
+//     char *operand1;
+//     char *operand2;
+//     int line_number;
+// } Line;
+
+typedef struct Variable
+{
+    char *name;
+    int address;
+    struct Variable *next;
+} Variable;

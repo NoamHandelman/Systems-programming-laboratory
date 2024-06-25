@@ -15,3 +15,20 @@ int check_for_extra_chars(char *token_end)
     }
     return 0;
 }
+
+int is_empty_line(const char *line)
+{
+    while (*line != '\0')
+    {
+        if (!isspace(*line))
+        {
+            if (*line == ';')
+            {
+                return 1;
+            }
+            return 0;
+        }
+        line++;
+    }
+    return 1;
+}

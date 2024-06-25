@@ -13,8 +13,11 @@ int exec_first_pass(const char *input_filename)
         return 0;
     }
 
-    while (fgets(line, sizeof(line), am_file) != NULL)
+    while (fgets(line, sizeof(line), am_file) != NULL && IC + DC <= MAX_MEMORY_SIZE)
     {
+        if (is_empty_line(line)) continue;
+        
+
     }
 
     fclose(am_file);
