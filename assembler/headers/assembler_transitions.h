@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <./strings.h>
+#include "./strings.h"
 #include "./globals.h"
+#include "./data_struct.h"
 
 int exec_first_pass(const char *);
 

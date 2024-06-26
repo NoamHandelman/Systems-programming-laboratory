@@ -1,6 +1,7 @@
 #include <string.h>
 #include "../headers/data_struct.h"
 #include "../headers/globals.h"
+#include "../headers/lexer.h"
 
 OP_CODE OP_CODES[] = {
     {"mov", 2},
@@ -63,4 +64,65 @@ int is_valid_instruction(char *inst)
         }
     }
     return 0;
+}
+
+int is_valid_symbol(const char *symbol, Symbol **symbol_table)
+{
+    int i;
+
+    if (find_symbol(*symbol_table, symbol))
+    {
+        fprintf(stderr, "Symbol %s already defined\n", symbol);
+        return 0;
+    }
+
+    if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol))
+    {
+        fprintf(stderr, "Symbol %s is a reserved word\n", symbol);
+        return 0;
+    }
+
+    if (strlen(symbol) > MAX_SYMBOL_LENGTH)
+    {
+        fprintf(stderr, "Symbol %s has illegal name length\n", symbol);
+        return 0;
+    }
+
+    if (!isalpha(symbol[0]))
+    {
+        fprintf(stderr, "Symbol %s must start with a letter\n", symbol);
+        return 0;
+    }
+
+    for (i = 1; i < strlen(symbol); i++)
+    {
+        if (!isalnum(symbol[i]))
+        {
+            fprintf(stderr, "Symbol %s must contains only letters or numbers\n", symbol);
+            return 0;
+        }
+    }
+
+    return 1;
+}
+
+int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
+{
+
+    char symbol_name[MAX_SYMBOL_LENGTH];
+    char *current;
+
+    current = strtok(line, " \t");
+
+    if (current[strlen(current) - 1] == ':')
+    {
+        strncpy(symbol_name, current, strlen(current) - 1);
+        symbol_name[strlen(current) - 1] = '\0';
+        current = strtok(NULL, " \t");
+
+        if (is_valid_label(symbol_name, symbol_table))
+        {
+            create_and_add_symbol(symbol_table, symbol_name, DC, 0, 0);
+        }
+    }
 }

@@ -3,8 +3,9 @@
 #include <string.h>
 #include "../headers/data_struct.h"
 
-int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, SymbolType symbol_type, DirectiveType directive_type)
+int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, int is_entry, int is_external)
 {
+
     Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
     if (!new_symbol)
     {
@@ -22,8 +23,8 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
     strcpy(new_symbol->name, name);
 
     new_symbol->address = address;
-    new_symbol->symbol_type = symbol_type;
-    new_symbol->directive_type = directive_type;
+    new_symbol->is_entry = is_entry;
+    new_symbol->is_external = is_external;
     new_symbol->next = NULL;
 
     if (*symbol_table == NULL)

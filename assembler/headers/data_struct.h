@@ -18,18 +18,8 @@ typedef struct Symbol
     int address;
     int is_external;
     int is_entry;
-    int is_code;
     struct SYMBOL *next;
 } Symbol;
-
-// typedef struct Line
-// {
-//     char *label;
-//     char *opcode;
-//     char *operand1;
-//     char *operand2;
-//     int line_number;
-// } Line;
 
 typedef struct Variable
 {
@@ -37,3 +27,7 @@ typedef struct Variable
     int address;
     struct Variable *next;
 } Variable;
+
+int create_and_add_symbol(Symbol **, const char *, int, int, int);
+
+Symbol *find_symbol(Symbol *, const char *);
