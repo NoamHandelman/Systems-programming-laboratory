@@ -40,6 +40,8 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
         }
         current->next = new_symbol;
     }
+
+    return 1;
 }
 
 Symbol *find_symbol(Symbol *symbol_table, const char *name)
@@ -65,5 +67,19 @@ void free_symbol_table(Symbol *symbol_table)
         free(current->name);
         free(current);
         current = next;
+    }
+}
+
+/**
+ * function to print, remove in the end!!!!
+ */
+
+void print_symbol_table(Symbol *symbol_table)
+{
+    Symbol *current = symbol_table;
+    while (current != NULL)
+    {
+        printf("name: %s, address: %d, is_entry: %d, is_external: %d\n", current->name, current->address, current->is_entry, current->is_external);
+        current = current->next;
     }
 }

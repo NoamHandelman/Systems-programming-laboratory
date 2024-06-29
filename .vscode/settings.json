@@ -5,6 +5,8 @@
         "pre_proc.h": "c",
         "assembler_transitions.h": "c",
         "files.h": "c",
-        "globals.h": "c"
+        "globals.h": "c",
+        "lexer.h": "c",
+        "strings.h": "c"
     }
 }

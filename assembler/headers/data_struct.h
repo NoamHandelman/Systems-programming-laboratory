@@ -1,3 +1,5 @@
+#ifndef DATA_STRUCT_H
+#define DATA_STRUCT_H
 typedef struct Macro
 {
     char *name;
@@ -18,16 +20,17 @@ typedef struct Symbol
     int address;
     int is_external;
     int is_entry;
-    struct SYMBOL *next;
+    struct Symbol *next;
 } Symbol;
-
-typedef struct Variable
-{
-    char *name;
-    int address;
-    struct Variable *next;
-} Variable;
 
 int create_and_add_symbol(Symbol **, const char *, int, int, int);
 
 Symbol *find_symbol(Symbol *, const char *);
+
+/**
+ * remove in the end!!!
+ */
+
+void print_symbol_table(Symbol *);
+
+#endif

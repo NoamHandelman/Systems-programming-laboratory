@@ -1,6 +1,6 @@
 #include <string.h>
-#include "../headers/data_struct.h"
 #include "../headers/globals.h"
+#include "../headers/data_struct.h"
 #include "../headers/lexer.h"
 
 OP_CODE OP_CODES[] = {
@@ -27,7 +27,7 @@ char *REGISTERS[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 /* Define the instructions */
 char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 
-int get_opcode(char *op)
+int get_opcode(const char *op)
 {
     int i;
     for (i = 0; i < OP_CODES_COUNT; i++)
@@ -40,7 +40,7 @@ int get_opcode(char *op)
     return -1;
 }
 
-int get_register(char *reg)
+int get_register(const char *reg)
 {
     int i;
     for (i = 0; i < REGISTERS_COUNT; i++)
@@ -53,7 +53,7 @@ int get_register(char *reg)
     return -1;
 }
 
-int is_valid_instruction(char *inst)
+int is_valid_instruction(const char *inst)
 {
     int i;
     for (i = 0; i < INSTRUCTIONS_COUNT; i++)
@@ -108,7 +108,6 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table)
 
 int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
 {
-
     char symbol_name[MAX_SYMBOL_LENGTH];
     char *current;
 
@@ -120,9 +119,11 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
         symbol_name[strlen(current) - 1] = '\0';
         current = strtok(NULL, " \t");
 
-        if (is_valid_label(symbol_name, symbol_table))
+        if (is_valid_symbol(symbol_name, symbol_table))
         {
-            create_and_add_symbol(symbol_table, symbol_name, DC, 0, 0);
+            return create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 0);
         }
     }
+
+    return 1;
 }

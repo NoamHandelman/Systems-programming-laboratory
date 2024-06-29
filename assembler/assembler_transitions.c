@@ -3,7 +3,7 @@
 int exec_first_pass(const char *input_filename)
 {
     FILE *am_file;
-    int IC = 0, DC = 0, should_continue = 1;
+    int IC = 0, DC = 0;
     char line[MAX_LINE_LENGTH];
     Symbol *symbol_table = NULL;
 
@@ -21,9 +21,10 @@ int exec_first_pass(const char *input_filename)
 
         if (strstr(line, ".data") || strstr(line, ".string"))
         {
-            handle_data_or_string(line, &symbol_table);
+            handle_data_or_string(line, &symbol_table, &DC);
         }
-        else if (strstr(line, ".entry") || strstr(line, ".extern"))
+        /**
+         * else if (strstr(line, ".entry") || strstr(line, ".extern"))
         {
             handle_entry_or_extern(line);
         }
@@ -31,7 +32,10 @@ int exec_first_pass(const char *input_filename)
         {
             handle_instruction(line, &IC);
         }
+         */
     }
+
+    print_symbol_table(symbol_table);
 
     fclose(am_file);
     return exec_second_pass(input_filename);
@@ -39,5 +43,5 @@ int exec_first_pass(const char *input_filename)
 
 int exec_second_pass(const char *input_filename)
 {
-    return 0;
+    return 1;
 }

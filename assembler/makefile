@@ -5,7 +5,7 @@ SRC_DIR = .
 UTILS_DIR = utils
 HEADERS_DIR = headers
 
-SRC_FILES = assembler.c pre_proc.c assembler_transitions.c $(UTILS_DIR)/memory.c $(UTILS_DIR)/strings.c $(UTILS_DIR)/lexer.c $(UTILS_DIR)/files.c
+SRC_FILES = assembler.c pre_proc.c assembler_transitions.c $(UTILS_DIR)/memory.c $(UTILS_DIR)/strings.c $(UTILS_DIR)/lexer.c $(UTILS_DIR)/files.c $(UTILS_DIR)/data_struct.c
 OBJ_FILES = $(SRC_FILES:.c=.o)
 
 TARGET = assembler

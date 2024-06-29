@@ -137,7 +137,6 @@ char *exec_preproc(const char *input_filename)
                 {
                     char *rest;
                     rest = strstr(line_copy, macro_name) + strlen(macro_name);
-                    printf("rest: %s\n", rest);
                     if (check_for_extra_chars(rest))
                     {
                         return handle_preproc_error("Extra characters after macro name", macro_list, am_filename, as_file, am_file);
