@@ -127,3 +127,7 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
 
     return 1;
 }
+
+int handle_entry_or_extern(char *line, Symbol **symbol_table)
+{
+}
