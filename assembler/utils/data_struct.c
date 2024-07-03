@@ -3,7 +3,7 @@
 #include <string.h>
 #include "../headers/data_struct.h"
 
-int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, int is_entry, int is_external)
+int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, int is_external, int is_data)
 {
 
     Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
@@ -23,8 +23,9 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
     strcpy(new_symbol->name, name);
 
     new_symbol->address = address;
-    new_symbol->is_entry = is_entry;
+    new_symbol->is_entry = NULL;
     new_symbol->is_external = is_external;
+    new_symbol->is_data = is_data;
     new_symbol->next = NULL;
 
     if (*symbol_table == NULL)

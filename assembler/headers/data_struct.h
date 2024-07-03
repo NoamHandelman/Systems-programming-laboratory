@@ -20,6 +20,7 @@ typedef struct Symbol
     int address;
     int is_external;
     int is_entry;
+    int is_data;
     struct Symbol *next;
 } Symbol;
 

@@ -19,13 +19,15 @@ int exec_first_pass(const char *input_filename)
         if (is_empty_line(line))
             continue;
 
+        remove_spaces(line);
+
         if (strstr(line, ".data") || strstr(line, ".string"))
         {
             handle_data_or_string(line, &symbol_table, &DC);
         }
-        else if (strstr(line, ".entry") || strstr(line, ".extern"))
+        else if (strstr(line, ".extern"))
         {
-            handle_entry_or_extern(line);
+            handle_extern(line, &symbol_table);
         }
         /**
 

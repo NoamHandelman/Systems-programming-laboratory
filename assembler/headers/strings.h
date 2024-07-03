@@ -7,4 +7,6 @@ int check_for_extra_chars(char *);
 
 int is_empty_line(const char *);
 
+void remove_spaces(char *);
+
 #endif

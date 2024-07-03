@@ -121,13 +121,23 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
 
         if (is_valid_symbol(symbol_name, symbol_table))
         {
-            return create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 0);
+            return create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 1);
         }
     }
 
     return 1;
 }
 
-int handle_entry_or_extern(char *line, Symbol **symbol_table)
+int handle_extern(char *line, Symbol **symbol_table)
 {
+    char symbol_name[MAX_SYMBOL_LENGTH];
+    char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
+
+    if (sscanf(line, ".extern %s %s", symbol_name, extra_forbidden_symbol) == 1)
+    {
+        if (is_valid_symbol(symbol_name, symbol_table))
+        {
+            return create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0);
+        }
+    }
 }
