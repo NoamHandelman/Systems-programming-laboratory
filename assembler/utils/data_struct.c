@@ -23,7 +23,7 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
     strcpy(new_symbol->name, name);
 
     new_symbol->address = address;
-    new_symbol->is_entry = NULL;
+    new_symbol->is_entry = 0;
     new_symbol->is_external = is_external;
     new_symbol->is_data = is_data;
     new_symbol->next = NULL;

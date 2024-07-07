@@ -24,6 +24,30 @@ typedef struct Symbol
     struct Symbol *next;
 } Symbol;
 
+typedef struct Error
+{
+    char *message;
+    int line_number;
+} Error;
+
+// typedef struct Word
+// {
+//     unsigned short binary;
+//     OP_CODE *opcode;
+//     int reg;
+//     int immediate_value;
+//     char *symbol;
+//     int number;
+//     char
+// } Word;
+
+typedef struct Data
+{
+    unsigned short binary;
+    int address;
+    int value;
+} Data;
+
 int create_and_add_symbol(Symbol **, const char *, int, int, int);
 
 Symbol *find_symbol(Symbol *, const char *);

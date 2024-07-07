@@ -17,4 +17,6 @@ int handle_data_or_string(char *, Symbol **, int *);
 
 int handle_extern(char *, Symbol **);
 
+int handle_instruction(char *, Symbol **, int *);
+
 #endif

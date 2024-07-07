@@ -140,4 +140,66 @@ int handle_extern(char *line, Symbol **symbol_table)
             return create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0);
         }
     }
+
+    return 1;
+}
+
+int handle_instruction(char *line, Symbol **symbol_table, int *IC)
+{
+    char symbol_name[MAX_SYMBOL_LENGTH];
+    char *current;
+
+    current = strtok(line, " \t");
+
+    if (current[strlen(current) - 1] == ':')
+    {
+        strncpy(symbol_name, current, strlen(current) - 1);
+        symbol_name[strlen(current) - 1] = '\0';
+        current = strtok(NULL, " \t");
+
+        if (is_valid_symbol(symbol_name, symbol_table))
+        {
+            return create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0);
+        }
+    }
+
+    /**
+     *  char *current;
+    char *operands;
+    char *opcode;
+    int opcode_index;
+    int operands_count = 0;
+
+    current = strtok(line, " \t");
+    opcode = current;
+
+    if ((opcode_index = get_opcode(opcode)) == -1)
+    {
+        fprintf(stderr, "Unknown opcode: %s\n", opcode);
+        return 0;
+    }
+
+    current = strtok(NULL, " \t");
+    operands = current;
+
+    if (operands)
+    {
+        operands_count = 1;
+        current = strtok(NULL, " \t");
+        if (current)
+        {
+            operands_count++;
+        }
+    }
+
+    if (operands_count != OP_CODES[opcode_index].operands)
+    {
+        fprintf(stderr, "Invalid number of operands for opcode %s\n", opcode);
+        return 0;
+    }
+
+    *IC += operands_count + 1;
+     */
+
+    return 1;
 }

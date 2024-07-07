@@ -6,6 +6,8 @@ int exec_first_pass(const char *input_filename)
     int IC = 0, DC = 0;
     char line[MAX_LINE_LENGTH];
     Symbol *symbol_table = NULL;
+    Data *data_table = NULL;
+    /**Code *code_table = NULL;*/
 
     am_file = fopen(input_filename, "r");
     if (!am_file)
@@ -25,17 +27,16 @@ int exec_first_pass(const char *input_filename)
         {
             handle_data_or_string(line, &symbol_table, &DC);
         }
-        else if (strstr(line, ".extern"))
+        else if (strstr(line, ".extern") || strstr(line, ".entry"))
         {
+            if (strstr(line, ".entry"))
+                continue;
             handle_extern(line, &symbol_table);
         }
-        /**
-
-else
-{
-    handle_instruction(line, &IC);
-}
- */
+        else
+        {
+            handle_instruction(line, &symbol_table, &IC);
+        }
     }
 
     print_symbol_table(symbol_table);

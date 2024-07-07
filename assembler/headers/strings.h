@@ -2,6 +2,7 @@
 #define STRINGS_H
 
 #include <ctype.h>
+#include <string.h>
 
 int check_for_extra_chars(char *);
 
