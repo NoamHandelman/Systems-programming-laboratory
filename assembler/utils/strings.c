@@ -1,5 +1,9 @@
 #include "../headers/strings.h"
 
+void remove_whitespace_from_edges(char *);
+void add_spaces(char *);
+void remove_extra_spaces(char *);
+
 int check_for_extra_chars(char *token_end)
 {
     while (*token_end != '\0')
@@ -60,7 +64,7 @@ int is_empty_line(const char *line)
 }
  */
 
-void trim_whitespace(char *line)
+void remove_whitespace_from_edges(char *line)
 {
     char *start = line;
     char *end;
@@ -83,20 +87,20 @@ void trim_whitespace(char *line)
     memmove(line, start, end - start + 2);
 }
 
-void add_spaces(char *str)
+void add_spaces(char *line)
 {
     char result[1024] = {0};
     int j = 0, i;
     int in_quotes = 0;
 
-    for (i = 0; str[i] != '\0'; i++)
+    for (i = 0; line[i] != '\0'; i++)
     {
-        if (str[i] == '\"')
+        if (line[i] == '\"')
         {
             in_quotes = !in_quotes;
         }
 
-        if (!in_quotes && str[i] == ':')
+        if (!in_quotes && line[i] == ':')
         {
             while (j > 0 && isspace((unsigned char)result[j - 1]))
             {
@@ -105,7 +109,7 @@ void add_spaces(char *str)
             result[j++] = ':';
             result[j++] = ' ';
         }
-        else if (!in_quotes && str[i] == ',')
+        else if (!in_quotes && line[i] == ',')
         {
             result[j++] = ' ';
             result[j++] = ',';
@@ -113,28 +117,28 @@ void add_spaces(char *str)
         }
         else
         {
-            result[j++] = str[i];
+            result[j++] = line[i];
         }
     }
     result[j] = '\0';
-    strcpy(str, result);
+    strcpy(line, result);
 }
 
-void remove_extra_spaces(char *str)
+void remove_extra_spaces(char *line)
 {
     char result[1024] = {0};
     int j = 0, i;
     int space_found = 0;
     int in_quotes = 0;
 
-    for (i = 0; str[i] != '\0'; i++)
+    for (i = 0; line[i] != '\0'; i++)
     {
-        if (str[i] == '\"')
+        if (line[i] == '\"')
         {
             in_quotes = !in_quotes;
         }
 
-        if (!in_quotes && isspace((unsigned char)str[i]))
+        if (!in_quotes && isspace((unsigned char)line[i]))
         {
             if (!space_found)
             {
@@ -144,17 +148,17 @@ void remove_extra_spaces(char *str)
         }
         else
         {
-            result[j++] = str[i];
+            result[j++] = line[i];
             space_found = 0;
         }
     }
     result[j] = '\0';
-    strcpy(str, result);
+    strcpy(line, result);
 }
 
 void handle_spaces(char *line)
 {
-    trim_whitespace(line);
+    remove_whitespace_from_edges(line);
     add_spaces(line);
     remove_extra_spaces(line);
 }

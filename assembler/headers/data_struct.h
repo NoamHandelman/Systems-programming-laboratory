@@ -30,16 +30,18 @@ typedef struct Error
     int line_number;
 } Error;
 
-// typedef struct Word
-// {
-//     unsigned short binary;
-//     OP_CODE *opcode;
-//     int reg;
-//     int immediate_value;
-//     char *symbol;
-//     int number;
-//     char
-// } Word;
+/**
+ * typedef struct Word
+{
+    unsigned short binary;
+    OP_CODE *opcode;
+    int reg;
+    int immediate_value;
+    char *symbol;
+    int number;
+    char
+} Word;
+ */
 
 typedef struct Data
 {
