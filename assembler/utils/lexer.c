@@ -106,23 +106,62 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table)
     return 1;
 }
 
+int parse_data_dir(char *line, int *DC)
+{
+    char *token;
+    int value;
+
+    token = strtok(line, " ");
+    while (token)
+    {
+       
+    }
+    return 1;
+}
+
 int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
 {
-    char symbol_name[MAX_SYMBOL_LENGTH];
-    char *current;
+    char symbol_name[MAX_SYMBOL_LENGTH + 1];
+    char *current = line;
+    char *token;
 
-    current = strtok(line, " \t");
-
-    if (current[strlen(current) - 1] == ':')
+    token = strtok(current, " ");
+    if (token && token[strlen(token) - 1] == ':')
     {
-        strncpy(symbol_name, current, strlen(current) - 1);
-        symbol_name[strlen(current) - 1] = '\0';
-        current = strtok(NULL, " \t");
+        strncpy(symbol_name, token, strlen(token) - 1);
+        symbol_name[strlen(token) - 1] = '\0';
 
         if (is_valid_symbol(symbol_name, symbol_table))
         {
             return create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 1);
         }
+
+        token = strtok(NULL, " ");
+    }
+
+    if (token)
+    {
+        if (strcmp(token, ".data") == 0)
+        {
+            
+            /**
+             * parse_data_dir();
+             */
+        }
+        else if (strcmp(token, ".string") == 0)
+        {
+            /**
+             *  parse_string_dir();
+
+             */
+        }
+        else
+        {
+            fprintf(stderr, "Unknown or missing directive\n");
+            return 0;
+        }
+
+        current = strtok(NULL, "");
     }
 
     return 1;
