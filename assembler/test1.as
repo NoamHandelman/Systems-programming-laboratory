@@ -25,7 +25,7 @@ END: stop
          
 
 STR: .string “abcd”
-LIST: .data 6, -9
- .data -100
-K: .data 31
+LIST: .data ffsffd , 6, -9
+ .data -100 , 55
+K: .data 31 , fff , 
 

@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdlib.h>
 #include "../headers/globals.h"
 #include "../headers/data_struct.h"
 #include "../headers/lexer.h"
@@ -26,6 +27,8 @@ char *REGISTERS[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 
 /* Define the instructions */
 char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
+
+int parse_data_dir(char *, int *);
 
 int get_opcode(const char *op)
 {
@@ -109,13 +112,50 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table)
 int parse_data_dir(char *line, int *DC)
 {
     char *token;
+    char *endptr;
     int value;
+    int expecting_number = 1;
+
+    if (line[0] == ',' || line[strlen(line) - 1] == ',')
+    {
+        fprintf(stderr, "Line should not start or end with a comma\n");
+    }
 
     token = strtok(line, " ");
     while (token)
     {
-       
+        if (expecting_number)
+        {
+            value = strtol(token, &endptr, 10);
+            if (*endptr == '\0')
+            {
+                printf("Parsed number: %d\n", value);
+                expecting_number = 0;
+            }
+            else
+            {
+                fprintf(stderr, "Invalid number: %s\n", token);
+            }
+        }
+        else
+        {
+            if (strcmp(token, ",") == 0)
+            {
+                expecting_number = 1;
+            }
+            else
+            {
+                fprintf(stderr, "Expected comma but found: %s\n", token);
+            }
+        }
+        token = strtok(NULL, " ");
     }
+
+    if (expecting_number)
+    {
+        fprintf(stderr, "Line should not end with a comma\n");
+    }
+
     return 1;
 }
 
@@ -124,6 +164,7 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
     char *current = line;
     char *token;
+    char *directive;
 
     token = strtok(current, " ");
     if (token && token[strlen(token) - 1] == ':')
@@ -133,7 +174,7 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
 
         if (is_valid_symbol(symbol_name, symbol_table))
         {
-            return create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 1);
+            create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 1);
         }
 
         token = strtok(NULL, " ");
@@ -141,27 +182,28 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
 
     if (token)
     {
-        if (strcmp(token, ".data") == 0)
+        directive = token;
+        current = strtok(NULL, "");
+        if (strcmp(directive, ".data") == 0)
         {
-            
-            /**
-             * parse_data_dir();
-             */
+            if (!parse_data_dir(current, DC))
+            {
+                fprintf(stderr, "Error parsing .data directive\n");
+                /**
+                 *               return 0;
+                 */
+            }
         }
-        else if (strcmp(token, ".string") == 0)
+        else if (strcmp(directive, ".string") == 0)
         {
-            /**
-             *  parse_string_dir();
-
-             */
         }
         else
         {
             fprintf(stderr, "Unknown or missing directive\n");
-            return 0;
+            /**
+             *            return 0;
+             */
         }
-
-        current = strtok(NULL, "");
     }
 
     return 1;

@@ -21,9 +21,7 @@ int exec_first_pass(const char *input_filename)
         if (is_empty_line(line))
             continue;
 
-        /**remove_spaces(line);*/
         handle_spaces(line);
-        printf("%s\n", line);
 
         if (strstr(line, ".data") || strstr(line, ".string"))
         {
