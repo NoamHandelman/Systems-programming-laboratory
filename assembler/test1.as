@@ -24,8 +24,8 @@ END: stop
      
          
 
-STR: .string “abcd”
-LIST: .data ffsffd , 6, -9
+STR: .string "1234fgfssff-03i"
+LIST: .data 6, -9
  .data -100 , 55
-K: .data 31 , fff , 
+K: .data 31
 

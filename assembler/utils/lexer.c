@@ -30,6 +30,8 @@ char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 
 int parse_data_dir(char *, int *);
 
+int parse_string_dir(char *, int *);
+
 int get_opcode(const char *op)
 {
     int i;
@@ -159,6 +161,40 @@ int parse_data_dir(char *line, int *DC)
     return 1;
 }
 
+int parse_string_dir(char *line, int *DC)
+{
+    char *line_copy;
+    int i;
+
+    printf("initial line : %s\n", line);
+
+    if (line[0] != '"' || line[strlen(line) - 1] != '"')
+    {
+        fprintf(stderr, "String should start and end with a double quote\n");
+        /**
+         *       return 0;
+         */
+    }
+
+    line[strlen(line) - 1] = '\0';
+    line_copy = line + 1;
+
+    for (i = 0; i < strlen(line_copy); i++)
+    {
+        printf("ASCII value of %c: %d\n", line_copy[i], line_copy[i]);
+        /**
+         * (*DC)++;
+         */
+    }
+
+    printf("End of string sign: 0\n");
+    /**
+     * (*DC)++;
+     */
+
+    return 1;
+}
+
 int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
 {
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
@@ -196,6 +232,13 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
         }
         else if (strcmp(directive, ".string") == 0)
         {
+            if (!parse_string_dir(current, DC))
+            {
+                fprintf(stderr, "Error parsing .string directive\n");
+                /**
+                 *               return 0;
+                 */
+            }
         }
         else
         {
