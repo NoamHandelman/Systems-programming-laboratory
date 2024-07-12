@@ -3,7 +3,7 @@
 int exec_first_pass(const char *input_filename)
 {
     FILE *am_file;
-    int IC = 0, DC = 0;
+    int IC = 0, DC = 0, line_number = 0;
     char line[MAX_LINE_LENGTH];
     Symbol *symbol_table = NULL;
     Data *data_table = NULL;
@@ -16,8 +16,9 @@ int exec_first_pass(const char *input_filename)
         return 0;
     }
 
-    while (fgets(line, sizeof(line), am_file) != NULL && IC + DC <= MAX_MEMORY_SIZE)
+    while (fgets(line, sizeof(line), am_file) && IC + DC <= MAX_MEMORY_SIZE)
     {
+        line_number++;
         if (is_empty_line(line))
             continue;
 
