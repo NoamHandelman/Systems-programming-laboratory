@@ -100,16 +100,7 @@ void add_spaces(char *line)
             in_quotes = !in_quotes;
         }
 
-        if (!in_quotes && line[i] == ':')
-        {
-            while (j > 0 && isspace((unsigned char)result[j - 1]))
-            {
-                j--;
-            }
-            result[j++] = ':';
-            result[j++] = ' ';
-        }
-        else if (!in_quotes && line[i] == ',')
+        if (!in_quotes && line[i] == ',')
         {
             result[j++] = ' ';
             result[j++] = ',';
@@ -138,7 +129,25 @@ void remove_extra_spaces(char *line)
             in_quotes = !in_quotes;
         }
 
-        if (!in_quotes && isspace((unsigned char)line[i]))
+        if (!in_quotes && line[i] == ':')
+        {
+            while (j > 0 && isspace((unsigned char)result[j - 1]))
+            {
+                j--;
+            }
+            result[j++] = ':';
+
+            if (isspace((unsigned char)line[i + 1]))
+            {
+                result[j++] = ' ';
+                i++;
+                while (isspace((unsigned char)line[i + 1]))
+                {
+                    i++;
+                }
+            }
+        }
+        else if (!in_quotes && isspace((unsigned char)line[i]))
         {
             if (!space_found)
             {

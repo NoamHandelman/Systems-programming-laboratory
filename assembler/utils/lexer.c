@@ -28,7 +28,7 @@ char *REGISTERS[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 /* Define the instructions */
 char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 
-int parse_data_dir(char *, int *);
+int parse_data_dir(char *, int *, Machine_Code_Image *);
 
 int parse_string_dir(char *, int *);
 
@@ -111,7 +111,7 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table)
     return 1;
 }
 
-int parse_data_dir(char *line, int *DC)
+int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
 {
     char *token;
     char *endptr;
@@ -195,7 +195,7 @@ int parse_string_dir(char *line, int *DC)
     return 1;
 }
 
-int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
+int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image)
 {
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
     char *current = line;
@@ -222,7 +222,7 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC)
         current = strtok(NULL, "");
         if (strcmp(directive, ".data") == 0)
         {
-            if (!parse_data_dir(current, DC))
+            if (!parse_data_dir(current, DC, data_image))
             {
                 fprintf(stderr, "Error parsing .data directive\n");
                 /**
@@ -286,44 +286,6 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC)
             return create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0);
         }
     }
-
-    /**
-     *  char *current;
-    char *operands;
-    char *opcode;
-    int opcode_index;
-    int operands_count = 0;
-
-    current = strtok(line, " \t");
-    opcode = current;
-
-    if ((opcode_index = get_opcode(opcode)) == -1)
-    {
-        fprintf(stderr, "Unknown opcode: %s\n", opcode);
-        return 0;
-    }
-
-    current = strtok(NULL, " \t");
-    operands = current;
-
-    if (operands)
-    {
-        operands_count = 1;
-        current = strtok(NULL, " \t");
-        if (current)
-        {
-            operands_count++;
-        }
-    }
-
-    if (operands_count != OP_CODES[opcode_index].operands)
-    {
-        fprintf(stderr, "Invalid number of operands for opcode %s\n", opcode);
-        return 0;
-    }
-
-    *IC += operands_count + 1;
-     */
 
     return 1;
 }

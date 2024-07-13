@@ -1,4 +1,4 @@
-MAIN:add r3   , LIST
+MAIN: add r3   , LIST
 LOOP  : prn #48
 
 
@@ -20,7 +20,7 @@ endmacr
  m_macr
  dec K
  jmp LOOP
-END: stop
+END:stop
      
          
 

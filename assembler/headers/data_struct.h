@@ -30,25 +30,15 @@ typedef struct Error
     int line_number;
 } Error;
 
-/**
- * typedef struct Word
+typedef struct Machine_Code_Image
 {
     unsigned short binary;
-    OP_CODE *opcode;
-    int reg;
-    int immediate_value;
-    char *symbol;
-    int number;
-    char
-} Word;
- */
-
-typedef struct Data
-{
-    unsigned short binary;
-    int address;
     int value;
-} Data;
+    int is_data;
+    int is_string;
+    int is_instruction;
+    const char *symbol;
+} Machine_Code_Image;
 
 int create_and_add_symbol(Symbol **, const char *, int, int, int);
 
@@ -59,5 +49,7 @@ Symbol *find_symbol(Symbol *, const char *);
  */
 
 void print_symbol_table(Symbol *);
+
+void update_data_symbols(Symbol **, int);
 
 #endif

@@ -6,8 +6,8 @@ int exec_first_pass(const char *input_filename)
     int IC = 0, DC = 0, line_number = 0;
     char line[MAX_LINE_LENGTH];
     Symbol *symbol_table = NULL;
-    Data *data_table = NULL;
-    /**Code *code_table = NULL;*/
+    Machine_Code_Image data_image[2048];
+    Machine_Code_Image code_image[2048];
 
     am_file = fopen(input_filename, "r");
     if (!am_file)
@@ -24,14 +24,14 @@ int exec_first_pass(const char *input_filename)
 
         handle_spaces(line);
 
+        printf("Line %d: %s\n", line_number, line);
+
         if (strstr(line, ".data") || strstr(line, ".string"))
         {
-            handle_data_or_string(line, &symbol_table, &DC);
+            handle_data_or_string(line, &symbol_table, &DC, data_image);
         }
-        else if (strstr(line, ".extern") || strstr(line, ".entry"))
+        else if (strstr(line, ".extern"))
         {
-            if (strstr(line, ".entry"))
-                continue;
             handle_extern(line, &symbol_table);
         }
         else
@@ -40,6 +40,7 @@ int exec_first_pass(const char *input_filename)
         }
     }
 
+    update_data_symbols(&symbol_table, IC);
     print_symbol_table(symbol_table);
 
     fclose(am_file);

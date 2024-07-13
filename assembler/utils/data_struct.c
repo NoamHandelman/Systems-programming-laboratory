@@ -84,3 +84,16 @@ void print_symbol_table(Symbol *symbol_table)
         current = current->next;
     }
 }
+
+void update_data_symbols(Symbol **symbol_table, int IC)
+{
+    Symbol *current = *symbol_table;
+    while (current != NULL)
+    {
+        if (current->is_data)
+        {
+            current->address += (IC + 100);
+        }
+        current = current->next;
+    }
+}
