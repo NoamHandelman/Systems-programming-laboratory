@@ -30,7 +30,7 @@ char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 
 int parse_data_dir(char *, int *, Machine_Code_Image *);
 
-int parse_string_dir(char *, int *);
+int parse_string_dir(char *, int *, Machine_Code_Image *);
 
 int get_opcode(const char *op)
 {
@@ -131,6 +131,7 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
             value = strtol(token, &endptr, 10);
             if (*endptr == '\0')
             {
+                data_image[(*DC)++].binary = value;
                 printf("Parsed number: %d\n", value);
                 expecting_number = 0;
             }
@@ -161,7 +162,7 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
     return 1;
 }
 
-int parse_string_dir(char *line, int *DC)
+int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image)
 {
     char *line_copy;
     int i;
@@ -171,9 +172,6 @@ int parse_string_dir(char *line, int *DC)
     if (line[0] != '"' || line[strlen(line) - 1] != '"')
     {
         fprintf(stderr, "String should start and end with a double quote\n");
-        /**
-         *       return 0;
-         */
     }
 
     line[strlen(line) - 1] = '\0';
@@ -182,16 +180,11 @@ int parse_string_dir(char *line, int *DC)
     for (i = 0; i < strlen(line_copy); i++)
     {
         printf("ASCII value of %c: %d\n", line_copy[i], line_copy[i]);
-        /**
-         * (*DC)++;
-         */
+        data_image[(*DC)++].binary = line_copy[i];
     }
 
     printf("End of string sign: 0\n");
-    /**
-     * (*DC)++;
-     */
-
+    data_image[(*DC)++].binary = '\0';
     return 1;
 }
 
@@ -225,27 +218,18 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
             if (!parse_data_dir(current, DC, data_image))
             {
                 fprintf(stderr, "Error parsing .data directive\n");
-                /**
-                 *               return 0;
-                 */
             }
         }
         else if (strcmp(directive, ".string") == 0)
         {
-            if (!parse_string_dir(current, DC))
+            if (!parse_string_dir(current, DC, data_image))
             {
                 fprintf(stderr, "Error parsing .string directive\n");
-                /**
-                 *               return 0;
-                 */
             }
         }
         else
         {
             fprintf(stderr, "Unknown or missing directive\n");
-            /**
-             *            return 0;
-             */
         }
     }
 

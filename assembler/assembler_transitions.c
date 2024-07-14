@@ -3,7 +3,7 @@
 int exec_first_pass(const char *input_filename)
 {
     FILE *am_file;
-    int IC = 0, DC = 0, line_number = 0;
+    int IC = 0, DC = 0, line_number = 0, should_continue = 1;
     char line[MAX_LINE_LENGTH];
     Symbol *symbol_table = NULL;
     Machine_Code_Image data_image[2048];
@@ -19,6 +19,7 @@ int exec_first_pass(const char *input_filename)
     while (fgets(line, sizeof(line), am_file) && IC + DC <= MAX_MEMORY_SIZE)
     {
         line_number++;
+
         if (is_empty_line(line))
             continue;
 
@@ -40,11 +41,18 @@ int exec_first_pass(const char *input_filename)
         }
     }
 
-    update_data_symbols(&symbol_table, IC);
-    print_symbol_table(symbol_table);
-
     fclose(am_file);
-    return exec_second_pass(input_filename);
+
+    if (should_continue)
+    {
+        update_data_symbols(&symbol_table, IC);
+        print_symbol_table(symbol_table);
+        printf("DC is : %d", DC);
+        return exec_second_pass(input_filename);
+    }
+
+    printf("Failed to process file in first pass : %s\n", input_filename);
+    return 0;
 }
 
 int exec_second_pass(const char *input_filename)
