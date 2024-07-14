@@ -131,7 +131,7 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
             value = strtol(token, &endptr, 10);
             if (*endptr == '\0')
             {
-                data_image[(*DC)++].binary = value;
+                data_image[(*DC)++].value = value;
                 printf("Parsed number: %d\n", value);
                 expecting_number = 0;
             }
@@ -180,11 +180,11 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image)
     for (i = 0; i < strlen(line_copy); i++)
     {
         printf("ASCII value of %c: %d\n", line_copy[i], line_copy[i]);
-        data_image[(*DC)++].binary = line_copy[i];
+        data_image[(*DC)++].value = line_copy[i];
     }
 
     printf("End of string sign: 0\n");
-    data_image[(*DC)++].binary = '\0';
+    data_image[(*DC)++].value = '\0';
     return 1;
 }
 
@@ -254,22 +254,24 @@ int handle_extern(char *line, Symbol **symbol_table)
 
 int handle_instruction(char *line, Symbol **symbol_table, int *IC)
 {
-    char symbol_name[MAX_SYMBOL_LENGTH];
-    char *current;
+    char symbol_name[MAX_SYMBOL_LENGTH + 1];
+    char *current = line;
+    char *token;
 
-    current = strtok(line, " \t");
-
-    if (current[strlen(current) - 1] == ':')
+    token = strtok(current, " ");
+    if (token && token[strlen(token) - 1] == ':')
     {
-        strncpy(symbol_name, current, strlen(current) - 1);
-        symbol_name[strlen(current) - 1] = '\0';
-        current = strtok(NULL, " \t");
+        strncpy(symbol_name, token, strlen(token) - 1);
+        symbol_name[strlen(token) - 1] = '\0';
 
         if (is_valid_symbol(symbol_name, symbol_table))
         {
-            return create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0);
+            create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 1);
         }
+
+        token = strtok(NULL, " ");
+        printf("token from instruction parsing : %s\n", token);
     }
 
-    return 1;
+        return 1;
 }

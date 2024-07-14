@@ -32,13 +32,16 @@ typedef struct Error
 
 typedef struct Machine_Code_Image
 {
-    unsigned short binary;
-    int value;
-    int is_data;
-    int is_string;
-    int is_instruction;
+    unsigned short value;
     const char *symbol;
 } Machine_Code_Image;
+
+typedef struct Instruction
+{
+    OP_CODE op_code;
+    
+
+} Instruction;
 
 int create_and_add_symbol(Symbol **, const char *, int, int, int);
 
