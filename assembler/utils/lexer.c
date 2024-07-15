@@ -236,6 +236,10 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
     return 1;
 }
 
+/**
+ * Could be more the one extern in a line
+ */
+
 int handle_extern(char *line, Symbol **symbol_table)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
@@ -252,11 +256,12 @@ int handle_extern(char *line, Symbol **symbol_table)
     return 1;
 }
 
-int handle_instruction(char *line, Symbol **symbol_table, int *IC)
+int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image)
 {
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
     char *current = line;
     char *token;
+    Instruction instruction;
 
     token = strtok(current, " ");
     if (token && token[strlen(token) - 1] == ':')
@@ -273,5 +278,18 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC)
         printf("token from instruction parsing : %s\n", token);
     }
 
-        return 1;
+    if (token) {
+        instruction = parse_instruction(token, IC, code_image);
+        if (!instruction) {
+            /**
+             * failed to parse
+             */
+        }
+
+        encode_instruction(instruction)
+    }
+
+
+
+    return 1;
 }

@@ -37,7 +37,7 @@ int exec_first_pass(const char *input_filename)
         }
         else
         {
-            handle_instruction(line, &symbol_table, &IC);
+            handle_instruction(line, &symbol_table, &IC, code_image);
         }
     }
 

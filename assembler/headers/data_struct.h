@@ -24,23 +24,28 @@ typedef struct Symbol
     struct Symbol *next;
 } Symbol;
 
-typedef struct Error
-{
-    char *message;
-    int line_number;
-} Error;
-
 typedef struct Machine_Code_Image
 {
     unsigned short value;
     const char *symbol;
 } Machine_Code_Image;
 
+typedef struct Operand
+{
+    char *op_type;
+    union
+    {
+        int reg;
+        int num;
+        char *symbol;
+    } value;
+} Operand;
+
 typedef struct Instruction
 {
     OP_CODE op_code;
-    
-
+    Operand operands[2]; // Maximum of 2 operands
+    int operand_count;
 } Instruction;
 
 int create_and_add_symbol(Symbol **, const char *, int, int, int);
