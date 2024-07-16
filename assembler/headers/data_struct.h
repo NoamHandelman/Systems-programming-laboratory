@@ -39,12 +39,15 @@ typedef struct Operand
         int num;
         char *symbol;
     } value;
+
+    int addressing_mode;
+
 } Operand;
 
 typedef struct Instruction
 {
     OP_CODE op_code;
-    Operand operands[2]; // Maximum of 2 operands
+    Operand operands[2];
     int operand_count;
 } Instruction;
 

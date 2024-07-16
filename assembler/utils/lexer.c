@@ -188,6 +188,86 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image)
     return 1;
 }
 
+int get_addressing_mode(const char *operand)
+{
+    if (operand[0] == '#')
+    {
+        return 0;
+    }
+
+    if (operand[0] == '*')
+    {
+        return 2;
+    }
+
+    if (operand[0] == 'r')
+    {
+        return 3;
+    }
+
+    return 1;
+}
+
+Instruction *parse_instruction(const char *line)
+{
+    char line_copy[MAX_LINE_LENGTH];
+    char *token;
+    Instruction *instr;
+    int operand_count = 0;
+
+    strncpy(line_copy, line, MAX_LINE_LENGTH);
+    line_copy[MAX_LINE_LENGTH - 1] = '\0';
+
+    instr = (Instruction *)malloc(sizeof(Instruction));
+    if (!instr)
+    {
+        return NULL;
+    }
+
+    instr->operand_count = 0;
+
+    token = strtok(line_copy, " ");
+    instr->op_code.opcode = (char *)malloc(strlen(token) + 1);
+    if (!instr->op_code.opcode)
+    {
+        free(instr);
+        return NULL;
+    }
+    strcpy(instr->op_code.opcode, token);
+
+    token = strtok(NULL, " ");
+    while (token && token != ',' && operand_count < 2)
+    {
+        
+        int addressing_mode = get_addressing_mode(token);
+        instr->operands[operand_count].addressing_mode = addressing_mode;
+        if (addressing_mode == 0)
+        {
+            instr->operands[operand_count].value.num = atoi(token + 1);
+        }
+        else if (addressing_mode == REGISTER_DIRECT)
+        {
+            instr->operands[operand_count].value.reg = atoi(token + 1);
+        }
+        else
+        {
+            instr->operands[operand_count].value.symbol = (char *)malloc(strlen(token) + 1);
+            if (!instr->operands[operand_count].value.symbol)
+            {
+                free(instr->op_code.opcode);
+                free(instr);
+                return NULL;
+            }
+            strcpy(instr->operands[operand_count].value.symbol, token);
+        }
+        operand_count++;
+        token = strtok(NULL, " ,");
+    }
+    instr->operand_count = operand_count;
+
+    return instr;
+}
+
 int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image)
 {
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
@@ -261,7 +341,7 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
     char *current = line;
     char *token;
-    Instruction instruction;
+    Instruction *instruction;
 
     token = strtok(current, " ");
     if (token && token[strlen(token) - 1] == ':')
@@ -278,18 +358,18 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
         printf("token from instruction parsing : %s\n", token);
     }
 
-    if (token) {
-        instruction = parse_instruction(token, IC, code_image);
-        if (!instruction) {
+    if (token)
+    {
+        instruction = parse_instruction(token);
+        if (!instruction)
+        {
             /**
              * failed to parse
              */
         }
 
-        encode_instruction(instruction)
+        encode_instruction(instruction);
     }
-
-
 
     return 1;
 }
