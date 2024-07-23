@@ -34,6 +34,11 @@ int exec_first_pass(const char *input_filename)
         else if (strstr(line, ".extern"))
         {
             handle_extern(line, &symbol_table);
+        } else if (strstr(line, ".entry")) {
+            /**
+             * handle entry in second phase?
+             */
+            continue;
         }
         else
         {
