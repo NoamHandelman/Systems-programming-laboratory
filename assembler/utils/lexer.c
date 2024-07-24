@@ -243,7 +243,8 @@ Instruction *parse_instruction(const char *line)
     strcpy(instr->op_code.opcode, token);
     printf("Opcode: %s\n", instr->op_code.opcode);
 
-    while ((token = strtok(NULL, " ,")) && operand_count < 2)
+    printf("Token before loop: %s\n", token);
+    while ((token = strtok(NULL, " ")) && operand_count < 2)
     {
         printf("Token: %s\n", token);
         int addressing_mode = get_addressing_mode(token);
