@@ -14,7 +14,8 @@ LOOP  : prn #48
  bne END
  dec K
  jmp LOOP
-END:stop
+END: stop
+boo 1
      
          
 

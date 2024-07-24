@@ -190,7 +190,6 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image)
 
 int get_addressing_mode(const char *operand)
 {
-    printf("tokwnn : %s \n", operand);
     if (operand[0] == '#')
     {
         return 0;
@@ -216,6 +215,7 @@ Instruction *parse_instruction(const char *line)
     Instruction *instr;
     int operand_count = 0;
 
+    printf("Line in parse instr: %s\n", line);
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     line_copy[MAX_LINE_LENGTH - 1] = '\0';
 
@@ -228,8 +228,16 @@ Instruction *parse_instruction(const char *line)
     instr->operand_count = 0;
 
     token = strtok(line_copy, " ");
+
     if (!token)
     {
+        free(instr);
+        return NULL;
+    }
+
+    if (get_opcode(token) == -1)
+    {
+        printf("Invalid opcode: %s\n", token);
         free(instr);
         return NULL;
     }
@@ -240,14 +248,16 @@ Instruction *parse_instruction(const char *line)
         free(instr);
         return NULL;
     }
+
     strcpy(instr->op_code.opcode, token);
     printf("Opcode: %s\n", instr->op_code.opcode);
+    printf("Token  line 245 : %s\n", token);
 
-    printf("Token before loop: %s\n", token);
-    while ((token = strtok(NULL, " ")) && operand_count < 2)
+    while ((token = strtok(NULL, " ,")) && operand_count < 2)
     {
-        printf("Token: %s\n", token);
-        int addressing_mode = get_addressing_mode(token);
+        int addressing_mode;
+        printf("operand: %s\n", token);
+        addressing_mode = get_addressing_mode(token);
         instr->operands[operand_count].addressing_mode = addressing_mode;
         if (addressing_mode == 0)
         {
@@ -351,6 +361,10 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
     Instruction *instruction;
     int i;
 
+    char initial_line[MAX_LINE_LENGTH];
+    strncpy(initial_line, line, MAX_LINE_LENGTH);
+    initial_line[MAX_LINE_LENGTH - 1] = '\0';
+
     token = strtok(current, " ");
     if (token && token[strlen(token) - 1] == ':')
     {
@@ -362,18 +376,29 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
             create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 1);
         }
 
-        token = strtok(NULL, " ");
+        token = strtok(NULL, "");
     }
 
+    else
+    {
+        token = initial_line;
+    }
+
+    printf("Token line 370 before parse: %s\n", token);
     if (token)
     {
         instruction = parse_instruction(token);
         if (!instruction)
         {
-            /**
-             * failed to parse
-             */
+            fprintf(stderr, "Error parsing instruction\n");
+            return 0;
         }
+
+        encode_instruction(instruction);
+
+        /**
+         * remove in the end!!!
+         */
         printf("Instruction details:\n");
         printf("Opcode: %s\n", instruction->op_code.opcode);
         printf("Number of operands: %d\n", instruction->operand_count);

@@ -20,7 +20,8 @@ endmacr
  m_macr
  dec K
  jmp LOOP
-END:stop
+END: stop
+boo 1
      
          
 
