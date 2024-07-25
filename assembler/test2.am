@@ -16,7 +16,7 @@ sub L3, L3
 jmp LOOP
 END: stop
 STR: .string "abcd" 
-LIST: .data 6, -9
+LIST: .data 6 , -9
 K: .data  31 
 .data -100
 .extern L3

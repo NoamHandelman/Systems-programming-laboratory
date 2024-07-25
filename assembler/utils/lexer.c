@@ -3,6 +3,7 @@
 #include "../headers/globals.h"
 #include "../headers/data_struct.h"
 #include "../headers/lexer.h"
+#include "../headers/code_conversions.h"
 
 OP_CODE OP_CODES[] = {
     {"mov", 2},
@@ -31,6 +32,10 @@ char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 int parse_data_dir(char *, int *, Machine_Code_Image *);
 
 int parse_string_dir(char *, int *, Machine_Code_Image *);
+
+int get_addressing_mode(const char *);
+
+Instruction *parse_instruction(const char *);
 
 int get_opcode(const char *op)
 {
@@ -208,6 +213,10 @@ int get_addressing_mode(const char *operand)
     return 1;
 }
 
+/**
+ * should also valid address mode is ok for each instruction
+ */
+
 Instruction *parse_instruction(const char *line)
 {
     char line_copy[MAX_LINE_LENGTH];
@@ -250,8 +259,7 @@ Instruction *parse_instruction(const char *line)
     }
 
     strcpy(instr->op_code.opcode, token);
-    printf("Opcode: %s\n", instr->op_code.opcode);
-    printf("Token  line 245 : %s\n", token);
+    printf("Token line 245 : %s\n", token);
 
     while ((token = strtok(NULL, " ,")) && operand_count < 2)
     {
@@ -333,10 +341,6 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
     return 1;
 }
 
-/**
- * Could be more the one extern in a line
- */
-
 int handle_extern(char *line, Symbol **symbol_table)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
@@ -373,7 +377,7 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
 
         if (is_valid_symbol(symbol_name, symbol_table))
         {
-            create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 1);
+            create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0);
         }
 
         token = strtok(NULL, "");
@@ -384,7 +388,6 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
         token = initial_line;
     }
 
-    printf("Token line 370 before parse: %s\n", token);
     if (token)
     {
         instruction = parse_instruction(token);
@@ -394,12 +397,12 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
             return 0;
         }
 
-        encode_instruction(instruction);
-
         /**
          * remove in the end!!!
          */
-        printf("Instruction details:\n");
+
+        /**
+         * printf("Instruction details:\n");
         printf("Opcode: %s\n", instruction->op_code.opcode);
         printf("Number of operands: %d\n", instruction->operand_count);
 
@@ -421,10 +424,9 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
                 break;
             }
         }
-
-        /**
-         *  encode_instruction(instruction);
          */
+
+        encode_instruction(instruction, code_image, IC);
     }
 
     return 1;

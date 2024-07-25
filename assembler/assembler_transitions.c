@@ -34,7 +34,9 @@ int exec_first_pass(const char *input_filename)
         else if (strstr(line, ".extern"))
         {
             handle_extern(line, &symbol_table);
-        } else if (strstr(line, ".entry")) {
+        }
+        else if (strstr(line, ".entry"))
+        {
             /**
              * handle entry in second phase?
              */
@@ -50,7 +52,7 @@ int exec_first_pass(const char *input_filename)
 
     if (should_continue)
     {
-        update_data_symbols(&symbol_table, IC);
+        update_symbols(&symbol_table, IC);
         print_symbol_table(symbol_table);
         printf("DC is : %d", DC);
         return exec_second_pass(input_filename);

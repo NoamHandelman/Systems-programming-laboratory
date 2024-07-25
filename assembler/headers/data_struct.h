@@ -61,6 +61,6 @@ Symbol *find_symbol(Symbol *, const char *);
 
 void print_symbol_table(Symbol *);
 
-void update_data_symbols(Symbol **, int);
+void update_symbols(Symbol **, int);
 
 #endif

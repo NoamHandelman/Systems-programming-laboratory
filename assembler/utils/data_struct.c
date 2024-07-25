@@ -85,14 +85,20 @@ void print_symbol_table(Symbol *symbol_table)
     }
 }
 
-void update_data_symbols(Symbol **symbol_table, int IC)
+void update_symbols(Symbol **symbol_table, int IC)
 {
     Symbol *current = *symbol_table;
     while (current != NULL)
     {
         if (current->is_data)
         {
+            printf("Updating data symbol: %s\n", current->name);
             current->address += (IC + 100);
+        }
+        if (!current->is_data)
+        {
+            printf("Updating code symbol: %s\n", current->name);
+            current->address += 100;
         }
         current = current->next;
     }
