@@ -97,6 +97,9 @@ void update_symbols(Symbol **symbol_table, int IC)
         }
         if (!current->is_data)
         {
+            /**
+             * maybe better this when creating the symbol
+             */
             printf("Updating code symbol: %s\n", current->name);
             current->address += 100;
         }

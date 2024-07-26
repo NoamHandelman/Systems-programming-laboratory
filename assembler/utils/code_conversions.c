@@ -47,43 +47,42 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
     (*IC)++;
     printf("Done processing first word of instruction\n");
 
-    if (instruction->operand_count > 0)
+    for (i = 0; i < instruction->operand_count; i++)
     {
         code_image[*IC].value = 0;
-        if (instruction->operand_count == 2)
+        code_image[*IC].symbol = NULL;
+
+        if (instruction->operands[i].addressing_mode == 0)
         {
-            if ((instruction->operands[0].addressing_mode == 2 || instruction->operands[0].addressing_mode == 3) && (instruction->operands[1].addressing_mode == 2 || instruction->operands[1].addressing_mode == 3))
+            code_image[*IC].value |= (instruction->operands[i].value.num << 3);
+        }
+        else if (instruction->operands[i].addressing_mode == 1)
+        {
+            code_image[*IC].symbol = instruction->operands[i].value.symbol;
+        }
+        else if (instruction->operands[i].addressing_mode == 2 || instruction->operands[i].addressing_mode == 3)
+        {
+            if (instruction->operand_count == 2 &&
+                (instruction->operands[0].addressing_mode == 2 || instruction->operands[0].addressing_mode == 3) &&
+                (instruction->operands[1].addressing_mode == 2 || instruction->operands[1].addressing_mode == 3))
             {
                 code_image[*IC].value |= (instruction->operands[0].value.reg << 6);
                 code_image[*IC].value |= (instruction->operands[1].value.reg << 3);
-                code_image[*IC].value |= (1 << 2);
-                printf("Machine code 2 value: ");
-                for (i = 0; i < MACHINE_WORD_SIZE; i++)
-                {
-                    printf("%d", (code_image[*IC].value >> (MACHINE_WORD_SIZE - 1 - i)) & 1);
-                }
-                printf("\n");
-
-                (*IC)++;
-                printf("Done processing second common word of instruction\n");
+                code_image[(*IC)++].value |= (1 << 2);
+                break;
             }
+            else
+            {
+                if (i == 0)
+                {
+                    code_image[*IC].value |= (instruction->operands[i].value.reg << 6);
+                }
+                else
+                {
+                    code_image[*IC].value |= (instruction->operands[i].value.reg << 3);
+                }
+            }
+            code_image[(*IC)++].value |= (1 << 2);
         }
     }
 }
-/**
- *unsigned short encode_immediate(int value)
-{
-    unsigned short word = 0;
-    word |= (value & 0x3FFF);
-    word |= (0 << 14);
-    return word;
-}
-
-unsigned short encode_direct(int address)
-{
-    unsigned short word = 0;
-    word |= (address & 0x3FFF);
-    word |= (2 << 14);
-    return word;
-}
- */
