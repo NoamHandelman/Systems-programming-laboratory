@@ -224,7 +224,9 @@ Instruction *parse_instruction(const char *line)
     Instruction *instr;
     int operand_count = 0;
 
-    printf("Line in parse instr: %s\n", line);
+    /**
+     *printf("Line in parse instr: %s\n", line);
+     */
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     line_copy[MAX_LINE_LENGTH - 1] = '\0';
 
@@ -259,12 +261,18 @@ Instruction *parse_instruction(const char *line)
     }
 
     strcpy(instr->op_code.opcode, token);
-    printf("Token line 245 : %s\n", token);
+    /**
+     *    printf("Token line 245 : %s\n", token);
+
+     */
 
     while ((token = strtok(NULL, " ,")) && operand_count < 2)
     {
         int addressing_mode;
-        printf("operand: %s\n", token);
+        /**
+         * printf("operand: %s\n", token);
+         */
+
         addressing_mode = get_addressing_mode(token);
         instr->operands[operand_count].addressing_mode = addressing_mode;
         if (addressing_mode == 0)
@@ -273,7 +281,7 @@ Instruction *parse_instruction(const char *line)
         }
         else if (addressing_mode == 2 || addressing_mode == 3)
         {
-            instr->operands[operand_count].value.reg = atoi(token + 1);
+            instr->operands[operand_count].value.reg = atoi(token + (addressing_mode == 2 ? 2 : 1));
         }
         else
         {
@@ -363,7 +371,6 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
     char *current = line;
     char *token;
     Instruction *instruction;
-    int i;
 
     char initial_line[MAX_LINE_LENGTH];
     strncpy(initial_line, line, MAX_LINE_LENGTH);
@@ -402,7 +409,7 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
          */
 
         /**
-         * printf("Instruction details:\n");
+         *   printf("Instruction details:\n");
         printf("Opcode: %s\n", instruction->op_code.opcode);
         printf("Number of operands: %d\n", instruction->operand_count);
 

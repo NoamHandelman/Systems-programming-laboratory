@@ -3,6 +3,8 @@
 #include <string.h>
 #include "../headers/data_struct.h"
 
+#define MEMORY_START 100
+
 int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, int is_external, int is_data)
 {
 
@@ -87,21 +89,18 @@ void print_symbol_table(Symbol *symbol_table)
 
 void update_symbols(Symbol **symbol_table, int IC)
 {
-    Symbol *current = *symbol_table;
+     Symbol *current = *symbol_table;
     while (current != NULL)
     {
         if (current->is_data)
         {
             printf("Updating data symbol: %s\n", current->name);
-            current->address += (IC + 100);
+            current->address += (IC + MEMORY_START);
         }
-        if (!current->is_data)
+        if (!current->is_data && !current->is_external)
         {
-            /**
-             * maybe better this when creating the symbol
-             */
-            printf("Updating code symbol: %s\n", current->name);
-            current->address += 100;
+
+            current->address += MEMORY_START;
         }
         current = current->next;
     }
