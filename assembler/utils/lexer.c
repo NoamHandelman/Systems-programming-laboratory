@@ -372,10 +372,15 @@ int handle_entry(char *line, Symbol **symbol_table, int *IC, Declaration **entri
 
     if (sscanf(line, ".entry %s %s", symbol_name, extra_forbidden_symbol) == 1)
     {
-        if (is_valid_symbol(symbol_name, symbol_table))
+        /**
+         * if (is_valid_symbol(symbol_name, symbol_table))
         {
-            return create_and_add_entry(entries, symbol_name, IC);
-        }
+         */
+
+        return create_and_add_entry(entries, symbol_name, IC);
+        /**
+         * }
+         */
     }
 
     return 1;

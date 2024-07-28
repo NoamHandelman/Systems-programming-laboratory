@@ -127,6 +127,20 @@ int create_and_add_entry(Declaration **entries, char *name, int *IC)
     return 1;
 }
 
+Declaration *find_declaration(Symbol *declaration_table, const char *name)
+{
+    Symbol *current = declaration_table;
+    while (current != NULL)
+    {
+        if (strcmp(current->name, name) == 0)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}
+
 void update_symbols(Symbol **symbol_table, int IC)
 {
     Symbol *current = *symbol_table;

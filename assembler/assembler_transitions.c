@@ -9,6 +9,7 @@ int exec_first_pass(const char *input_filename)
     Machine_Code_Image data_image[2048];
     Machine_Code_Image code_image[2048];
     Declaration *entries = NULL;
+    Declaration *externs = NULL;
 
     am_file = fopen(input_filename, "r");
     if (!am_file)

@@ -72,4 +72,6 @@ void update_symbols(Symbol **, int);
 
 int create_and_add_entry(Declaration **, char *, int *);
 
+Declaration *find_declaration(Symbol *, const char *);
+
 #endif
