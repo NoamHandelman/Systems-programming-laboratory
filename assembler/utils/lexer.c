@@ -368,14 +368,14 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
 }
  */
 
-int handle_extern(char *line, Symbol **symbol_table, Declaration **entries)
+int handle_extern(char *line, Symbol **symbol_table, Declaration **externs)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
     char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
 
     if (sscanf(line, ".extern %s %s", symbol_name, extra_forbidden_symbol) == 1)
     {
-        return create_and_add_declaration(entries, symbol_name, 0);
+        return create_and_add_declaration(externs, symbol_name, 0);
     }
 
     return 1;

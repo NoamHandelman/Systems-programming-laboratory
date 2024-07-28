@@ -74,4 +74,8 @@ int create_and_add_declaration(Declaration **, char *, int *);
 
 Declaration *find_declaration(Symbol *, const char *);
 
+void update_entry_symbols(Symbol **, Declaration **);
+
+void update_extern_symbols(Symbol **, Declaration **);
+
 #endif

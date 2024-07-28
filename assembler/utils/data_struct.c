@@ -127,7 +127,8 @@ int create_and_add_declaration(Declaration **table, char *name, int *IC)
     return 1;
 }
 
-Declaration *find_declaration(Symbol *declaration_table, const char *name)
+/**
+ *Declaration *find_declaration(Symbol *declaration_table, const char *name)
 {
     Symbol *current = declaration_table;
     while (current != NULL)
@@ -140,6 +141,7 @@ Declaration *find_declaration(Symbol *declaration_table, const char *name)
     }
     return NULL;
 }
+ */
 
 void update_symbols(Symbol **symbol_table, int IC)
 {
@@ -155,6 +157,42 @@ void update_symbols(Symbol **symbol_table, int IC)
         {
 
             current->address += MEMORY_START;
+        }
+        current = current->next;
+    }
+}
+
+void update_entry_symbols(Symbol **symbol_table, Declaration **entries)
+{
+    Declaration *current = *entries;
+    while (current != NULL)
+    {
+        Symbol *symbol = find_symbol(*symbol_table, current->name);
+        if (symbol)
+        {
+            symbol->is_entry = 1;
+        }
+        else
+        {
+            fprintf(stderr, "Entry symbol not found: %s\n", current->name);
+        }
+        current = current->next;
+    }
+}
+
+void update_extern_symbols(Symbol **symbol_table, Declaration **externs)
+{
+    Declaration *current = *externs;
+    while (current != NULL)
+    {
+        Symbol *symbol = find_symbol(*symbol_table, current->name);
+        if (symbol)
+        {
+            symbol->is_external = 1;
+        }
+        else
+        {
+            fprintf(stderr, "Extern symbol not found: %s\n", current->name);
         }
         current = current->next;
     }
