@@ -87,7 +87,7 @@ void print_symbol_table(Symbol *symbol_table)
     }
 }
 
-int create_and_add_entry(Declaration **entries, char *name, int *IC)
+int create_and_add_declaration(Declaration **table, char *name, int *IC)
 {
     Declaration *new_entry = (Declaration *)malloc(sizeof(Declaration));
     printf("Creating entry for symbol: %s\n", name);
@@ -110,13 +110,13 @@ int create_and_add_entry(Declaration **entries, char *name, int *IC)
     new_entry->address = *IC;
     new_entry->next = NULL;
 
-    if (*entries == NULL)
+    if (*table == NULL)
     {
-        *entries = new_entry;
+        *table = new_entry;
     }
     else
     {
-        Declaration *current = *entries;
+        Declaration *current = *table;
         while (current->next != NULL)
         {
             current = current->next;

@@ -35,7 +35,7 @@ int exec_first_pass(const char *input_filename)
         }
         else if (strstr(line, ".extern"))
         {
-            handle_extern(line, &symbol_table);
+            handle_extern(line, &symbol_table, &externs);
         }
         else if (strstr(line, ".entry"))
         {
@@ -51,6 +51,16 @@ int exec_first_pass(const char *input_filename)
 
     if (should_continue)
     {
+        if (entries)
+        {
+            update_entries();
+        }
+
+        if (externs)
+        {
+            update_externs();
+        }
+
         update_symbols(&symbol_table, IC);
         print_symbol_table(symbol_table);
         printf("DC is : %d", DC);
