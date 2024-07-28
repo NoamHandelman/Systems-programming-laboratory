@@ -365,6 +365,22 @@ int handle_extern(char *line, Symbol **symbol_table)
     return 1;
 }
 
+int handle_entry(char *line, Symbol **symbol_table, int *IC, Declaration **entries)
+{
+    char symbol_name[MAX_SYMBOL_LENGTH];
+    char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
+
+    if (sscanf(line, ".entry %s %s", symbol_name, extra_forbidden_symbol) == 1)
+    {
+        if (is_valid_symbol(symbol_name, symbol_table))
+        {
+            return create_and_add_entry(entries, symbol_name, IC);
+        }
+    }
+
+    return 1;
+}
+
 int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image)
 {
     char symbol_name[MAX_SYMBOL_LENGTH + 1];

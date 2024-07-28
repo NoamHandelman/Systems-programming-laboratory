@@ -51,6 +51,13 @@ typedef struct Instruction
     int operand_count;
 } Instruction;
 
+typedef struct Declaration
+{
+    char *name;
+    int address;
+    struct Declaration *next;
+} Declaration;
+
 int create_and_add_symbol(Symbol **, const char *, int, int, int);
 
 Symbol *find_symbol(Symbol *, const char *);
@@ -62,5 +69,7 @@ Symbol *find_symbol(Symbol *, const char *);
 void print_symbol_table(Symbol *);
 
 void update_symbols(Symbol **, int);
+
+int create_and_add_entry(Declaration **, char *, int *);
 
 #endif

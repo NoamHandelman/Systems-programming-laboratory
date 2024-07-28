@@ -8,6 +8,7 @@ int exec_first_pass(const char *input_filename)
     Symbol *symbol_table = NULL;
     Machine_Code_Image data_image[2048];
     Machine_Code_Image code_image[2048];
+    Declaration *entries = NULL;
 
     am_file = fopen(input_filename, "r");
     if (!am_file)
@@ -37,10 +38,7 @@ int exec_first_pass(const char *input_filename)
         }
         else if (strstr(line, ".entry"))
         {
-            /**
-             * handle entry in second phase?
-             */
-            continue;
+            handle_entry(line, &symbol_table, &IC, &entries);
         }
         else
         {
