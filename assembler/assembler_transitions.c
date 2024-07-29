@@ -9,7 +9,10 @@ int exec_first_pass(const char *input_filename)
     Machine_Code_Image data_image[2048];
     Machine_Code_Image code_image[2048];
     Declaration *entries = NULL;
-    Declaration *externs = NULL;
+    /**
+     *     Declaration *externs = NULL;
+
+     */
 
     am_file = fopen(input_filename, "r");
     if (!am_file)
@@ -35,7 +38,8 @@ int exec_first_pass(const char *input_filename)
         }
         else if (strstr(line, ".extern"))
         {
-            handle_extern(line, &symbol_table, &externs);
+
+            handle_extern(line, &symbol_table);
         }
         else if (strstr(line, ".entry"))
         {
@@ -54,7 +58,6 @@ int exec_first_pass(const char *input_filename)
         int t;
         int k;
         update_entry_symbols(&symbol_table, &entries);
-        update_extern_symbols(&symbol_table, &externs);
         update_symbols_addresses(&symbol_table, IC);
         update_symbols_in_code_image(code_image, symbol_table);
         print_symbol_table(symbol_table);
@@ -67,7 +70,15 @@ int exec_first_pass(const char *input_filename)
                 printf("%d", (code_image[t].value >> (15 - 1 - k)) & 1);
             }
             printf("\n");
-            printf("Code image symbol: %s\n", code_image[t].symbol);
+        }
+        printf("Data image:\n");
+        for (t = 0; t < DC; t++)
+        {
+            for (k = 0; k < 15; k++)
+            {
+                printf("%d", (data_image[t].value >> (15 - 1 - k)) & 1);
+            }
+            printf("\n");
         }
         return exec_second_pass(input_filename);
     }

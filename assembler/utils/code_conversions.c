@@ -141,6 +141,12 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
                         code_image[i].value |= (1 << 1);
                         code_image[i].value &= ~(1 << 2);
                     }
+
+                    if (current->is_external)
+                    {
+                        code_image[i].value |= (1 << 0);
+                        code_image[i].value &= ~(1 << 2);
+                    }
                 }
             }
         }

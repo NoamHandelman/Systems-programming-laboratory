@@ -349,33 +349,19 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
     return 1;
 }
 
-/**
- * int handle_extern(char *line, Symbol **symbol_table, Declaration **entries)
+int handle_extern(char *line, Symbol **symbol_table)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
     char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
 
     if (sscanf(line, ".extern %s %s", symbol_name, extra_forbidden_symbol) == 1)
     {
-
         if (is_valid_symbol(symbol_name, symbol_table))
         {
             return create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0);
+        } else {
+            printf("Symbol %s is not valid\n", symbol_name);
         }
-    }
-
-    return 1;
-}
- */
-
-int handle_extern(char *line, Symbol **symbol_table, Declaration **externs)
-{
-    char symbol_name[MAX_SYMBOL_LENGTH];
-    char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
-
-    if (sscanf(line, ".extern %s %s", symbol_name, extra_forbidden_symbol) == 1)
-    {
-        return create_and_add_declaration(externs, symbol_name, 0);
     }
 
     return 1;
@@ -388,15 +374,7 @@ int handle_entry(char *line, Symbol **symbol_table, int IC, Declaration **entrie
 
     if (sscanf(line, ".entry %s %s", symbol_name, extra_forbidden_symbol) == 1)
     {
-        /**
-         * if (is_valid_symbol(symbol_name, symbol_table))
-        {
-         */
-
         return create_and_add_declaration(entries, symbol_name, IC);
-        /**
-         * }
-         */
     }
 
     return 1;
