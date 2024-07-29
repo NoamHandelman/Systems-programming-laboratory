@@ -70,7 +70,7 @@ void print_symbol_table(Symbol *);
 
 void update_symbols(Symbol **, int);
 
-int create_and_add_declaration(Declaration **, char *, int *);
+int create_and_add_declaration(Declaration **, char *, int);
 
 Declaration *find_declaration(Symbol *, const char *);
 

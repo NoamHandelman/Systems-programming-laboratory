@@ -381,7 +381,7 @@ int handle_extern(char *line, Symbol **symbol_table, Declaration **externs)
     return 1;
 }
 
-int handle_entry(char *line, Symbol **symbol_table, int *IC, Declaration **entries)
+int handle_entry(char *line, Symbol **symbol_table, int IC, Declaration **entries)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
     char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];

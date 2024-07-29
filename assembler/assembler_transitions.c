@@ -39,7 +39,7 @@ int exec_first_pass(const char *input_filename)
         }
         else if (strstr(line, ".entry"))
         {
-            handle_entry(line, &symbol_table, &IC, &entries);
+            handle_entry(line, &symbol_table, IC, &entries);
         }
         else
         {

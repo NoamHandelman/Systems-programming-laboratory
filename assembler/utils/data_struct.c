@@ -87,10 +87,10 @@ void print_symbol_table(Symbol *symbol_table)
     }
 }
 
-int create_and_add_declaration(Declaration **table, char *name, int *IC)
+int create_and_add_declaration(Declaration **table, char *name, int address)
 {
     Declaration *new_entry = (Declaration *)malloc(sizeof(Declaration));
-    printf("Creating entry for symbol: %s\n", name);
+    printf("Creating decl struct for symbol: %s\n", name);
     if (!new_entry)
     {
         fprintf(stderr, "Memory allocation failed\n");
@@ -107,7 +107,7 @@ int create_and_add_declaration(Declaration **table, char *name, int *IC)
 
     strcpy(new_entry->name, name);
 
-    new_entry->address = *IC;
+    new_entry->address = address;
     new_entry->next = NULL;
 
     if (*table == NULL)
@@ -170,6 +170,7 @@ void update_entry_symbols(Symbol **symbol_table, Declaration **entries)
         Symbol *symbol = find_symbol(*symbol_table, current->name);
         if (symbol)
         {
+            
             symbol->is_entry = 1;
         }
         else
