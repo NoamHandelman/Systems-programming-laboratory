@@ -143,7 +143,7 @@ int create_and_add_declaration(Declaration **table, char *name, int address)
 }
  */
 
-void update_symbols(Symbol **symbol_table, int IC)
+void update_symbols_addresses(Symbol **symbol_table, int IC)
 {
     Symbol *current = *symbol_table;
     while (current != NULL)
@@ -153,7 +153,7 @@ void update_symbols(Symbol **symbol_table, int IC)
             printf("Updating data symbol: %s\n", current->name);
             current->address += (IC + MEMORY_START);
         }
-        if (!current->is_data && !current->is_external)
+        else if (!current->is_data && !current->is_external)
         {
 
             current->address += MEMORY_START;

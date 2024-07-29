@@ -51,12 +51,24 @@ int exec_first_pass(const char *input_filename)
 
     if (should_continue)
     {
+        int t;
+        int k;
         update_entry_symbols(&symbol_table, &entries);
         update_extern_symbols(&symbol_table, &externs);
-        update_symbols(&symbol_table, IC);
+        update_symbols_addresses(&symbol_table, IC);
+        update_symbols_in_code_image(code_image, symbol_table);
         print_symbol_table(symbol_table);
         printf("DC is : %d\n", DC);
         printf("IC is : %d\n", IC);
+        for (t = 0; t < IC; t++)
+        {
+            for (k = 0; k < 15; k++)
+            {
+                printf("%d", (code_image[t].value >> (15 - 1 - k)) & 1);
+            }
+            printf("\n");
+            printf("Code image symbol: %s\n", code_image[t].symbol);
+        }
         return exec_second_pass(input_filename);
     }
 

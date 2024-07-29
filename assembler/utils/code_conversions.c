@@ -121,3 +121,28 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
         printf("Done processing %d word of instruction\n", i + 2);
     }
 }
+
+void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table)
+{
+    int i;
+    Symbol *current = symbol_table;
+    while (current)
+    {
+        for (i = 0; i < 2048; i++)
+        {
+            if (code_image[i].symbol)
+            {
+                if (strcmp(code_image[i].symbol, current->name) == 0)
+                {
+                    code_image[i].value |= (current->address << 3);
+
+                    if (current->is_entry)
+                    {
+                        code_image[i].value |= (1 << 2);
+                    }
+                }
+            }
+        }
+        current = current->next;
+    }
+}

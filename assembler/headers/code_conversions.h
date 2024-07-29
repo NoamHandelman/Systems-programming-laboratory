@@ -11,4 +11,6 @@
 
 void encode_instruction(Instruction *, Machine_Code_Image *, int *);
 
+void update_symbols_in_code_image(Machine_Code_Image *, Symbol *);
+
 #endif

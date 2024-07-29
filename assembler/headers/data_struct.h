@@ -68,7 +68,7 @@ Symbol *find_symbol(Symbol *, const char *);
 
 void print_symbol_table(Symbol *);
 
-void update_symbols(Symbol **, int);
+void update_symbols_addresses(Symbol **, int);
 
 int create_and_add_declaration(Declaration **, char *, int);
 

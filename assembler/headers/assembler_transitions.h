@@ -6,6 +6,7 @@
 #include "./strings.h"
 #include "./globals.h"
 #include "./lexer.h"
+#include "./code_conversions.h"
 
 int exec_first_pass(const char *);
 
