@@ -138,7 +138,8 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
 
                     if (current->is_entry)
                     {
-                        code_image[i].value |= (1 << 2);
+                        code_image[i].value |= (1 << 1);
+                        code_image[i].value &= ~(1 << 2);
                     }
                 }
             }
