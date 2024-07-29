@@ -9,6 +9,7 @@
         "lexer.h": "c",
         "strings.h": "c",
         "string.h": "c",
-        "stdlib.h": "c"
+        "stdlib.h": "c",
+        "code_conversions.h": "c"
     }
 }

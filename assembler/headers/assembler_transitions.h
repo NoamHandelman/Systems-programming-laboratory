@@ -10,6 +10,6 @@
 
 int exec_first_pass(const char *);
 
-int exec_second_pass(const char *);
+int exec_second_pass(const char *, Symbol *, Machine_Code_Image *, Machine_Code_Image *, int, int, Declaration *);
 
 #endif

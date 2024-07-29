@@ -2,6 +2,7 @@
 #include "../headers/globals.h"
 
 #define MACHINE_WORD_SIZE 15
+#define START_ADDRESS 100
 
 unsigned short encode_addressing_mode(int addressing_mode)
 {
@@ -151,5 +152,28 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
             }
         }
         current = current->next;
+    }
+}
+
+void convert_to_octal(FILE *output_file, Machine_Code_Image *code_image, int IC, Machine_Code_Image *data_image, int DC)
+{
+    int i;
+    unsigned short value;
+    int address = START_ADDRESS;
+
+    fprintf(output_file, "%d %d\n", IC, DC);
+
+    for (i = 0; i < IC; i++)
+    {
+        value = code_image[i].value;
+        fprintf(output_file, "0%d ", address++);
+        fprintf(output_file, "%05o\n", value & 0x7FFF);
+    }
+
+    for (i = 0; i < DC; i++)
+    {
+        value = data_image[i].value;
+        fprintf(output_file, "0%d ", address++);
+        fprintf(output_file, "%05o\n", value & 0x7FFF);
     }
 }
