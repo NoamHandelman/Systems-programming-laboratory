@@ -1,75 +1,4 @@
-#include "headers/globals.h"
 #include "headers/pre_proc.h"
-#include "headers/memory.h"
-#include "headers/strings.h"
-#include "headers/lexer.h"
-#include "headers/files.h"
-
-Macro *create_macro(const char *name)
-{
-    Macro *macro = (Macro *)allocate_memory(sizeof(Macro));
-    if (!macro)
-        return NULL;
-
-    macro->name = (char *)allocate_memory(strlen(name) + 1);
-    if (!macro->name)
-    {
-        free(macro);
-        return NULL;
-    }
-    strcpy(macro->name, name);
-
-    macro->content = NULL;
-    macro->line_count = 0;
-    macro->next = NULL;
-
-    return macro;
-}
-
-void add_macro_line(Macro *macro, const char *line)
-{
-    macro->content = (char **)realloc(macro->content, sizeof(char *) * (macro->line_count + 1));
-    macro->content[macro->line_count] = (char *)allocate_memory(strlen(line) + 1);
-    strcpy(macro->content[macro->line_count], line);
-    macro->line_count++;
-}
-
-void add_macro(Macro **head, Macro *macro)
-{
-    macro->next = *head;
-    *head = macro;
-}
-
-void free_macros(Macro *head)
-{
-    int i;
-    Macro *current = head;
-    while (current)
-    {
-        Macro *next = current->next;
-        for (i = 0; i < current->line_count; i++)
-        {
-            free(current->content[i]);
-        }
-        free(current->content);
-        free(current->name);
-        free(current);
-        current = next;
-    }
-}
-
-Macro *find_macro(Macro *head, const char *name)
-{
-    while (head)
-    {
-        if (strcmp(head->name, name) == 0)
-        {
-            return head;
-        }
-        head = head->next;
-    }
-    return NULL;
-}
 
 int validate_macro(const char *name)
 {
@@ -122,7 +51,7 @@ char *exec_preproc(const char *input_filename)
         return 0;
     }
 
-    while (fgets(line, sizeof(line), as_file) != NULL)
+    while (fgets(line, sizeof(line), as_file))
     {
         char *token, *macro_name;
         char line_copy[MAX_LINE_LENGTH];

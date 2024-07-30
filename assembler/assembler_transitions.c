@@ -3,16 +3,12 @@
 int exec_first_pass(const char *input_filename)
 {
     FILE *am_file;
-    int IC = 0, DC = 0, line_number = 0, should_continue = 1;
+    int IC = 0, DC = 0, line_number = 0, should_continue = 1, externs_count = 0;
     char line[MAX_LINE_LENGTH];
     Symbol *symbol_table = NULL;
     Machine_Code_Image data_image[2048];
     Machine_Code_Image code_image[2048];
     Declaration *entries = NULL;
-    /**
-     *     Declaration *externs = NULL;
-
-     */
 
     am_file = fopen(input_filename, "r");
     if (!am_file)
@@ -39,11 +35,11 @@ int exec_first_pass(const char *input_filename)
         else if (strstr(line, ".extern"))
         {
 
-            handle_extern(line, &symbol_table);
+            handle_extern(line, &symbol_table, &externs_count);
         }
         else if (strstr(line, ".entry"))
         {
-            handle_entry(line, &symbol_table, IC, &entries);
+            handle_entry(line, &symbol_table, &entries);
         }
         else
         {
@@ -53,55 +49,93 @@ int exec_first_pass(const char *input_filename)
 
     fclose(am_file);
 
-    return exec_second_pass(input_filename, symbol_table, code_image, data_image, IC, DC, entries);
+    return exec_second_pass(input_filename, symbol_table, code_image, data_image, IC, DC, entries, externs_count);
 }
 
-int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries)
+int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count)
 {
-
-    FILE *ob_file;
     FILE *ent_file;
     FILE *ext_file;
-    Symbol *current = symbol_table;
-    char output_filename[256];
-    int t;
-    int k;
-
+    char *ob_file_name;
+    char *ent_file_name;
+    char *ext_file_name;
     update_entry_symbols(&symbol_table, &entries);
     update_symbols_addresses(&symbol_table, IC);
     update_symbols_in_code_image(code_image, symbol_table);
     print_symbol_table(symbol_table);
 
-    printf("DC is : %d\n", DC);
-    printf("IC is : %d\n", IC);
-    for (t = 0; t < IC; t++)
+    ob_file_name = create_file(input_filename, ".ob");
+    if (!ob_file_name)
     {
-        for (k = 0; k < 15; k++)
-        {
-            printf("%d", (code_image[t].value >> (15 - 1 - k)) & 1);
-        }
-        printf("\n");
-    }
-    printf("Data image:\n");
-    for (t = 0; t < DC; t++)
-    {
-        for (k = 0; k < 15; k++)
-        {
-            printf("%d", (data_image[t].value >> (15 - 1 - k)) & 1);
-        }
-        printf("\n");
-    }
-    strcpy(output_filename, input_filename);
-    strcat(output_filename, ".ob");
-    ob_file = fopen(output_filename, "w");
-
-    if (!ob_file)
-    {
-        fprintf(stderr, "Failed to open file: %s\n", input_filename);
+        fprintf(stderr, "Failed to create file\n");
         return 0;
     }
 
-    convert_to_octal(ob_file, code_image, IC, data_image, DC);
+    convert_to_octal(ob_file_name, code_image, IC, data_image, DC);
+
+    if (entries)
+    {
+        Declaration *current = entries;
+        ent_file_name = create_file(input_filename, ".ent");
+        if (!ent_file_name)
+        {
+            fprintf(stderr, "Failed to create file\n");
+            return 0;
+        }
+
+        ent_file = fopen(ent_file_name, "w");
+        if (!ent_file)
+        {
+            fprintf(stderr, "Failed to open file %s\n", ent_file_name);
+            return 0;
+        }
+
+        while (current)
+        {
+            fprintf(ent_file, "%s 0%d\n", current->name, find_symbol(symbol_table, current->name)->address);
+            current = current->next;
+        }
+
+        fclose(ent_file);
+    }
+
+    printf("Externs count: %d\n", externs_count);
+
+    if (externs_count)
+    {
+        Symbol *current = symbol_table;
+        int i;
+        ext_file_name = create_file(input_filename, ".ext");
+        if (!ext_file_name)
+        {
+            fprintf(stderr, "Failed to create file\n");
+            return 0;
+        }
+
+        ext_file = fopen(ext_file_name, "w");
+        if (!ext_file)
+        {
+            fprintf(stderr, "Failed to open file %s\n", ext_file_name);
+            return 0;
+        }
+
+        while (current)
+        {
+            if (current->is_external)
+            {
+                for (i = 0; i < IC; i++)
+                {
+                    if (code_image[i].symbol && strcmp(code_image[i].symbol, current->name) == 0)
+                    {
+                        fprintf(ext_file, "%s 0%d\n", current->name, i + 100);
+                    }
+                }
+            }
+            current = current->next;
+        }
+
+        fclose(ext_file);
+    }
 
     return 1;
 }

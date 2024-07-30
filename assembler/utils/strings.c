@@ -34,36 +34,6 @@ int is_empty_line(const char *line)
     return 1;
 }
 
-/**
- * void remove_spaces(char *line)
-{
-    char *start;
-    char *end;
-
-    start = line;
-    while (*start && isspace((unsigned char)*start))
-    {
-        start++;
-    }
-
-    if (*start == '\0')
-    {
-        line[0] = '\0';
-        return;
-    }
-
-    end = start + strlen(start) - 1;
-    while (end > start && isspace((unsigned char)*end))
-    {
-        end--;
-    }
-
-    *(end + 1) = '\0';
-
-    memmove(line, start, end - start + 2);
-}
- */
-
 void remove_whitespace_from_edges(char *line)
 {
     char *start = line;

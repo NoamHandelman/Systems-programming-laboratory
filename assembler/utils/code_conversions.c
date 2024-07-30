@@ -155,11 +155,12 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
     }
 }
 
-void convert_to_octal(FILE *output_file, Machine_Code_Image *code_image, int IC, Machine_Code_Image *data_image, int DC)
+void convert_to_octal(char *ob_file_name, Machine_Code_Image *code_image, int IC, Machine_Code_Image *data_image, int DC)
 {
     int i;
     unsigned short value;
     int address = START_ADDRESS;
+    FILE *output_file = fopen(ob_file_name, "w");
 
     fprintf(output_file, "%d %d\n", IC, DC);
 
@@ -176,4 +177,6 @@ void convert_to_octal(FILE *output_file, Machine_Code_Image *code_image, int IC,
         fprintf(output_file, "0%d ", address++);
         fprintf(output_file, "%05o\n", value & 0x7FFF);
     }
+
+    fclose(output_file);
 }

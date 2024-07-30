@@ -1,5 +1,9 @@
 #ifndef DATA_STRUCT_H
 #define DATA_STRUCT_H
+
+/**
+ * Macro struct
+ */
 typedef struct Macro
 {
     char *name;
@@ -8,11 +12,19 @@ typedef struct Macro
     struct Macro *next;
 } Macro;
 
-typedef struct OP_CODE
-{
-    char *opcode;
-    int operands;
-} OP_CODE;
+Macro *create_macro(const char *);
+
+void add_macro_line(Macro *, const char *);
+
+void add_macro(Macro **, Macro *);
+
+void free_macros(Macro *);
+
+Macro *find_macro(Macro *, const char *);
+
+/**
+ * Symbol struct
+ */
 
 typedef struct Symbol
 {
@@ -24,11 +36,36 @@ typedef struct Symbol
     struct Symbol *next;
 } Symbol;
 
+int create_and_add_symbol(Symbol **, const char *, int, int, int);
+
+Symbol *find_symbol(Symbol *, const char *);
+
+/**
+ * remove in the end!!!
+ */
+
+void print_symbol_table(Symbol *);
+
+void update_symbols_addresses(Symbol **, int);
+
+/**
+ * Machine Code Image struct
+ */
+
 typedef struct Machine_Code_Image
 {
     unsigned short value;
     const char *symbol;
 } Machine_Code_Image;
+
+/**
+ * Instruction struct
+ */
+typedef struct OP_CODE
+{
+    char *opcode;
+    int operands;
+} OP_CODE;
 
 typedef struct Operand
 {
@@ -51,31 +88,18 @@ typedef struct Instruction
     int operand_count;
 } Instruction;
 
+/**
+ * Declaration struct
+ */
+
 typedef struct Declaration
 {
     char *name;
-    int address;
     struct Declaration *next;
 } Declaration;
 
-int create_and_add_symbol(Symbol **, const char *, int, int, int);
-
-Symbol *find_symbol(Symbol *, const char *);
-
-/**
- * remove in the end!!!
- */
-
-void print_symbol_table(Symbol *);
-
-void update_symbols_addresses(Symbol **, int);
-
-int create_and_add_declaration(Declaration **, char *, int);
-
-Declaration *find_declaration(Symbol *, const char *);
+int create_and_add_declaration(Declaration **, char *);
 
 void update_entry_symbols(Symbol **, Declaration **);
-
-void update_extern_symbols(Symbol **, Declaration **);
 
 #endif

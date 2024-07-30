@@ -224,9 +224,6 @@ Instruction *parse_instruction(const char *line)
     Instruction *instr;
     int operand_count = 0;
 
-    /**
-     *printf("Line in parse instr: %s\n", line);
-     */
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     line_copy[MAX_LINE_LENGTH - 1] = '\0';
 
@@ -261,18 +258,10 @@ Instruction *parse_instruction(const char *line)
     }
 
     strcpy(instr->op_code.opcode, token);
-    /**
-     *    printf("Token line 245 : %s\n", token);
-
-     */
 
     while ((token = strtok(NULL, " ,")) && operand_count < 2)
     {
         int addressing_mode;
-        /**
-         * printf("operand: %s\n", token);
-         */
-
         addressing_mode = get_addressing_mode(token);
         instr->operands[operand_count].addressing_mode = addressing_mode;
         if (addressing_mode == 0)
@@ -349,7 +338,7 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
     return 1;
 }
 
-int handle_extern(char *line, Symbol **symbol_table)
+int handle_extern(char *line, Symbol **symbol_table, int *externs_count)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
     char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
@@ -358,8 +347,11 @@ int handle_extern(char *line, Symbol **symbol_table)
     {
         if (is_valid_symbol(symbol_name, symbol_table))
         {
+            (*externs_count)++;
             return create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0);
-        } else {
+        }
+        else
+        {
             printf("Symbol %s is not valid\n", symbol_name);
         }
     }
@@ -367,14 +359,14 @@ int handle_extern(char *line, Symbol **symbol_table)
     return 1;
 }
 
-int handle_entry(char *line, Symbol **symbol_table, int IC, Declaration **entries)
+int handle_entry(char *line, Symbol **symbol_table, Declaration **entries)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
     char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
 
     if (sscanf(line, ".entry %s %s", symbol_name, extra_forbidden_symbol) == 1)
     {
-        return create_and_add_declaration(entries, symbol_name, IC);
+        return create_and_add_declaration(entries, symbol_name);
     }
 
     return 1;
@@ -418,35 +410,6 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
             fprintf(stderr, "Error parsing instruction\n");
             return 0;
         }
-
-        /**
-         * remove in the end!!!
-         */
-
-        /**
-         *   printf("Instruction details:\n");
-        printf("Opcode: %s\n", instruction->op_code.opcode);
-        printf("Number of operands: %d\n", instruction->operand_count);
-
-        for (i = 0; i < instruction->operand_count; i++)
-        {
-            printf("Operand %d:\n", i + 1);
-            printf("Addressing mode: %d\n", instruction->operands[i].addressing_mode);
-            switch (instruction->operands[i].addressing_mode)
-            {
-            case 0:
-                printf("Immediate value: %d\n", instruction->operands[i].value.num);
-                break;
-            case 2:
-            case 3:
-                printf("Register: %d\n", instruction->operands[i].value.reg);
-                break;
-            default:
-                printf("Symbol: %s\n", instruction->operands[i].value.symbol);
-                break;
-            }
-        }
-         */
 
         encode_instruction(instruction, code_image, IC);
     }

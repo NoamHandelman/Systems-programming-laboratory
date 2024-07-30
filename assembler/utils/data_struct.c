@@ -5,6 +5,81 @@
 
 #define MEMORY_START 100
 
+/**
+ * Macro functions
+ */
+
+Macro *create_macro(const char *name)
+{
+    Macro *macro = (Macro *)malloc(sizeof(Macro));
+    if (!macro)
+        return NULL;
+
+    macro->name = (char *)malloc(strlen(name) + 1);
+
+    if (!macro->name)
+    {
+        free(macro);
+        return NULL;
+    }
+    strcpy(macro->name, name);
+
+    macro->content = NULL;
+    macro->line_count = 0;
+    macro->next = NULL;
+
+    return macro;
+}
+
+void add_macro_line(Macro *macro, const char *line)
+{
+    macro->content = (char **)realloc(macro->content, sizeof(char *) * (macro->line_count + 1));
+    macro->content[macro->line_count] = (char *)malloc(strlen(line) + 1);
+    strcpy(macro->content[macro->line_count], line);
+    macro->line_count++;
+}
+
+void add_macro(Macro **head, Macro *macro)
+{
+    macro->next = *head;
+    *head = macro;
+}
+
+void free_macros(Macro *head)
+{
+    int i;
+    Macro *current = head;
+    while (current)
+    {
+        Macro *next = current->next;
+        for (i = 0; i < current->line_count; i++)
+        {
+            free(current->content[i]);
+        }
+        free(current->content);
+        free(current->name);
+        free(current);
+        current = next;
+    }
+}
+
+Macro *find_macro(Macro *head, const char *name)
+{
+    while (head)
+    {
+        if (strcmp(head->name, name) == 0)
+        {
+            return head;
+        }
+        head = head->next;
+    }
+    return NULL;
+}
+
+/**
+ * Symbol functions
+ */
+
 int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, int is_external, int is_data)
 {
 
@@ -87,7 +162,7 @@ void print_symbol_table(Symbol *symbol_table)
     }
 }
 
-int create_and_add_declaration(Declaration **table, char *name, int address)
+int create_and_add_declaration(Declaration **table, char *name)
 {
     Declaration *new_entry = (Declaration *)malloc(sizeof(Declaration));
     printf("Creating decl struct for symbol: %s\n", name);
@@ -107,7 +182,6 @@ int create_and_add_declaration(Declaration **table, char *name, int address)
 
     strcpy(new_entry->name, name);
 
-    new_entry->address = address;
     new_entry->next = NULL;
 
     if (*table == NULL)
@@ -126,22 +200,6 @@ int create_and_add_declaration(Declaration **table, char *name, int address)
 
     return 1;
 }
-
-/**
- *Declaration *find_declaration(Symbol *declaration_table, const char *name)
-{
-    Symbol *current = declaration_table;
-    while (current != NULL)
-    {
-        if (strcmp(current->name, name) == 0)
-        {
-            return current;
-        }
-        current = current->next;
-    }
-    return NULL;
-}
- */
 
 void update_symbols_addresses(Symbol **symbol_table, int IC)
 {
@@ -176,24 +234,6 @@ void update_entry_symbols(Symbol **symbol_table, Declaration **entries)
         else
         {
             fprintf(stderr, "Entry symbol not found: %s\n", current->name);
-        }
-        current = current->next;
-    }
-}
-
-void update_extern_symbols(Symbol **symbol_table, Declaration **externs)
-{
-    Declaration *current = *externs;
-    while (current != NULL)
-    {
-        Symbol *symbol = find_symbol(*symbol_table, current->name);
-        if (symbol)
-        {
-            symbol->is_external = 1;
-        }
-        else
-        {
-            fprintf(stderr, "Extern symbol not found: %s\n", current->name);
         }
         current = current->next;
     }
