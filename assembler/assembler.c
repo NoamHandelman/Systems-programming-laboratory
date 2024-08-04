@@ -33,13 +33,13 @@ int main(int argc, char *argv[])
         am_file = exec_preproc(as_file);
         if (!am_file)
         {
-            fprintf(stderr, "Failed to process file at pre proccess stage %s\n", argv[i]);
+            fprintf(stderr, "Failed to process %s at pre proccess stage\n", argv[i]);
             continue;
         }
 
         if (!(exec_first_pass(am_file)))
         {
-            fprintf(stderr, "Failed to process file at assembler stage %s\n", argv[i]);
+            fprintf(stderr, "Failed to process %s at assembler stage\n", argv[i]);
             continue;
         };
 

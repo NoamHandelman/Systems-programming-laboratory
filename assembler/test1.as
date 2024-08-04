@@ -21,6 +21,7 @@ endmacr
  dec K
  jmp LOOP
 END: stop
+.entry END Bold boo
 boo 1
      
          

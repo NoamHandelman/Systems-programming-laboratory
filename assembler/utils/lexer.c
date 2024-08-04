@@ -368,6 +368,10 @@ int handle_entry(char *line, Symbol **symbol_table, Declaration **entries)
     {
         return create_and_add_declaration(entries, symbol_name);
     }
+    else
+    {
+        printf("Invalid entry declaration on line %s\n", line);
+    }
 
     return 1;
 }
