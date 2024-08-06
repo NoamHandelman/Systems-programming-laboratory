@@ -12,11 +12,18 @@ typedef struct Macro
     struct Macro *next;
 } Macro;
 
-Macro *create_macro(const char *);
+Macro *create_and_add_macro(Macro **, const char *);
+/**
+ * Macro *create_macro(const char *);
+
+ */
 
 void add_macro_line(Macro *, const char *);
 
-void add_macro(Macro **, Macro *);
+/**
+ * void add_macro(Macro **, Macro *);
+
+ */
 
 void free_macros(Macro *);
 

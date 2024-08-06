@@ -5,7 +5,7 @@ SRC_DIR = .
 UTILS_DIR = utils
 HEADERS_DIR = headers
 
-SRC_FILES = assembler.c pre_proc.c assembler_transitions.c $(UTILS_DIR)/strings.c $(UTILS_DIR)/lexer.c $(UTILS_DIR)/files.c $(UTILS_DIR)/data_struct.c $(UTILS_DIR)/code_conversions.c
+SRC_FILES = assembler.c pre_proc.c assembler_transitions.c $(UTILS_DIR)/strings.c $(UTILS_DIR)/lexer.c $(UTILS_DIR)/files.c $(UTILS_DIR)/data_struct.c $(UTILS_DIR)/code_conversions.c $(UTILS_DIR)/errors.c
 OBJ_FILES = $(SRC_FILES:.c=.o)
 
 TARGET = assembler
@@ -20,12 +20,13 @@ $(TARGET): $(OBJ_FILES)
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-assembler.o: $(HEADERS_DIR)/pre_proc.h $(HEADERS_DIR)/assembler_transitions.h
+assembler.o: $(HEADERS_DIR)/pre_proc.h $(HEADERS_DIR)/assembler_transitions.h $(HEADERS_DIR)/errors.h
 pre_proc.o: $(HEADERS_DIR)/data_struct.h $(HEADERS_DIR)/globals.h $(HEADERS_DIR)/pre_proc.h $(HEADERS_DIR)/strings.h $(HEADERS_DIR)/lexer.h $(HEADERS_DIR)/files.h
 $(UTILS_DIR)/strings.o: $(HEADERS_DIR)/strings.h
 $(UTILS_DIR)/lexer.o: $(HEADERS_DIR)/globals.h $(HEADERS_DIR)/data_struct.h
 $(UTILS_DIR)/files.o: $(HEADERS_DIR)/files.h
 $(UTILS_DIR)/code_conversions.o: $(HEADERS_DIR)/data_struct.h
+$(UTILS_DIR)/errors.o: $(HEADERS_DIR)/errors.h
 assembler_transitions.o: $(HEADERS_DIR)/assembler_transitions.h $(HEADERS_DIR)/code_conversions.h 
 
 clean:

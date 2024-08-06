@@ -21,8 +21,10 @@ int exec_first_pass(const char *input_filename)
     {
         line_number++;
 
-        if (is_empty_line(line))
-            continue;
+        /**
+         *   if (is_empty_line(line))
+                    continue;
+         */
 
         handle_spaces(line);
 

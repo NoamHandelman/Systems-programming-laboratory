@@ -9,14 +9,13 @@
  * Macro functions
  */
 
-Macro *create_macro(const char *name)
+Macro *create_and_add_macro(Macro **head, const char *name)
 {
     Macro *macro = (Macro *)malloc(sizeof(Macro));
     if (!macro)
         return NULL;
 
     macro->name = (char *)malloc(strlen(name) + 1);
-
     if (!macro->name)
     {
         free(macro);
@@ -26,7 +25,8 @@ Macro *create_macro(const char *name)
 
     macro->content = NULL;
     macro->line_count = 0;
-    macro->next = NULL;
+    macro->next = *head;
+    *head = macro;
 
     return macro;
 }
@@ -39,11 +39,13 @@ void add_macro_line(Macro *macro, const char *line)
     macro->line_count++;
 }
 
-void add_macro(Macro **head, Macro *macro)
+/**
+ * void add_macro(Macro **head, Macro *macro)
 {
     macro->next = *head;
     *head = macro;
 }
+ */
 
 void free_macros(Macro *head)
 {
