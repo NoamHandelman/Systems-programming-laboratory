@@ -30,14 +30,37 @@ Macro *create_and_add_macro(Macro **head, const char *name)
 
     return macro;
 }
+int add_macro_line(Macro *macro, const char *line)
+{
+    char **new_content = (char **)realloc(macro->content, sizeof(char *) * (macro->line_count + 1));
+    if (!new_content)
+    {
+        return 0;
+    }
 
-void add_macro_line(Macro *macro, const char *line)
+    macro->content = new_content;
+
+    macro->content[macro->line_count] = (char *)malloc(strlen(line) + 1);
+    if (!macro->content[macro->line_count])
+    {
+        return 0;
+    }
+
+    strcpy(macro->content[macro->line_count], line);
+    macro->line_count++;
+
+    return 1;
+}
+
+/**
+ * void add_macro_line(Macro *macro, const char *line)
 {
     macro->content = (char **)realloc(macro->content, sizeof(char *) * (macro->line_count + 1));
     macro->content[macro->line_count] = (char *)malloc(strlen(line) + 1);
     strcpy(macro->content[macro->line_count], line);
     macro->line_count++;
 }
+ */
 
 /**
  * void add_macro(Macro **head, Macro *macro)

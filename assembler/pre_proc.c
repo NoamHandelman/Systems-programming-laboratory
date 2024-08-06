@@ -9,12 +9,9 @@ int validate_macro(const char *name)
     return 1;
 }
 
-void *handle_preproc_error(const char *message, Macro *macro_list, char *am_filename, FILE *as_file, FILE *am_file)
+void *handle_preproc_error(const char *message, char *line, int line_number, Macro *macro_list, char *am_filename, FILE *as_file, FILE *am_file)
 {
-    /**
-     * display_error
-     */
-
+    display_error(line, line_number, message, am_filename);
     free_macros(macro_list);
     free(am_filename);
     fclose(as_file);
@@ -95,7 +92,7 @@ char *exec_preproc(const char *input_filename)
                     current_macro = create_and_add_macro(&macro_list, macro_name);
                     if (!current_macro)
                     {
-                        return handle_preproc_error("Failed to create macro", macro_list, am_filename, as_file, am_file);
+                        return handle_preproc_error("Failed to create macro", line, line_number, macro_list, am_filename, as_file, am_file);
                     }
                     /**
                      * add_macro(&macro_list, current_macro);
@@ -117,14 +114,21 @@ char *exec_preproc(const char *input_filename)
                 rest = strstr(line_copy, "endmacr") + strlen("endmacr");
                 if (check_for_extra_chars(rest))
                 {
-                    return handle_preproc_error("Extra characters after endmacr", macro_list, am_filename, as_file, am_file);
+                    /**
+                     *  return handle_preproc_error("Extra characters after end of macro declaration", line, line_number, macro_list, am_filename, as_file, am_file);
+                     */
+                    display_error(line, line_number, "Extra characters after end of macro declaration", input_filename);
+                    should_continue = 0;
                 }
                 in_macro = 0;
                 current_macro = NULL;
             }
             else if (in_macro)
             {
-                add_macro_line(current_macro, line_copy);
+                if (!add_macro_line(current_macro, line_copy))
+                {
+                    return handle_preproc_error("Failed to add line to macro", line, line_number, macro_list, am_filename, as_file, am_file);
+                };
             }
             else
             {
@@ -153,5 +157,5 @@ char *exec_preproc(const char *input_filename)
     fclose(as_file);
     fclose(am_file);
     free_macros(macro_list);
-    return am_filename;
+    return should_continue ? am_filename : NULL;
 }

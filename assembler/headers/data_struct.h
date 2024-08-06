@@ -18,7 +18,7 @@ Macro *create_and_add_macro(Macro **, const char *);
 
  */
 
-void add_macro_line(Macro *, const char *);
+int add_macro_line(Macro *, const char *);
 
 /**
  * void add_macro(Macro **, Macro *);

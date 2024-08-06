@@ -22,7 +22,7 @@ char *exec_preproc(const char *);
  * @brief Handle error in the pre proccess stage.
  */
 
-void *handle_preproc_error(const char *, Macro *, char *, FILE *, FILE *);
+void *handle_preproc_error(const char *, char *, int, Macro *, char *, FILE *, FILE *);
 
 /**
  * @brief Function to validate macro definition.
