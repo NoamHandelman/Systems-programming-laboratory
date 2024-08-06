@@ -8,7 +8,7 @@
  * @param file_name The name of the file that caused the error.
  */
 
-void display_error(char *line, int line_number, char *error_message, char *file_name)
+void display_error(char *line, int line_number, const char *error_message, const char *file_name)
 {
-    printf("ERROR: file %s, at %s (line %d): %s\n", file_name, line, line_number, error_message);
+    printf("ERROR: file %s, at \"%s\" (line %d): %s\n", file_name, line, line_number, error_message);
 }

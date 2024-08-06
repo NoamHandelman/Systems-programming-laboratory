@@ -6,10 +6,7 @@ LOOP  : prn #48
 
 ;testdelete
 
-macr m_macr
-
-
-
+macr noammax
  cmp r3, #-6
  bne END
 endmacr 
@@ -17,12 +14,18 @@ endmacr
  inc r6
  mov *r6,K
  sub r1, r4
- m_macr
+ noammax
+
+macr testmacro2
+inc r7
+inc r1
+dec K
+endmacr
  dec K
  jmp LOOP
+ testmacro2
 END: stop
-.entry END Bold boo
-boo 1
+.entry END
      
          
 

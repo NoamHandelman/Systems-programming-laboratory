@@ -1,11 +1,5 @@
 MAIN: add r3   , LIST
 LOOP  : prn #48
-
-
-    ;testdelete
-
-;testdelete
-
  lea STR, r6
  inc r6
  mov *r6,K
@@ -14,14 +8,12 @@ LOOP  : prn #48
  bne END
  dec K
  jmp LOOP
+inc r7
+inc r1
+dec K
 END: stop
-.entry END Bold boo
-boo 1
-     
-         
-
+.entry END
 STR: .string "1234fgfssff-03i"
 LIST: .data 6, -9
  .data -100 , 55
 K: .data 31
-

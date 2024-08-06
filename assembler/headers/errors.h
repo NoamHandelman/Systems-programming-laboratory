@@ -7,6 +7,6 @@
  * @brief Display a detailed error message with the line number and the line itself.
  */
 
-void display_error(char *, int, char *, char *);
+void display_error(char *, int, const char *, const char *);
 
 #endif

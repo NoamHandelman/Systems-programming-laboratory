@@ -1,5 +1,11 @@
 #include "headers/pre_proc.h"
 
+/**
+ * @brief Function to validate macro definition.
+ * @param name The name of the macro.
+ * @return 1 if the macro is valid, 0 otherwise.
+ */
+
 int validate_macro(const char *name)
 {
     if (get_opcode(name) >= 0 || is_valid_instruction(name))
@@ -8,6 +14,18 @@ int validate_macro(const char *name)
     }
     return 1;
 }
+
+/**
+ * @brief Handle error in the pre proccess stage.
+ * @param message The error message to display.
+ * @param line The line that caused the error.
+ * @param line_number The line number where the error occurred.
+ * @param macro_list The list of macros.
+ * @param am_filename The name of the am file.
+ * @param as_file The file pointer for the as file.
+ * @param am_file The file pointer for the am file.
+ * @return NULL (to indicate an error occurred).
+ */
 
 void *handle_preproc_error(const char *message, char *line, int line_number, Macro *macro_list, char *am_filename, FILE *as_file, FILE *am_file)
 {
@@ -18,6 +36,12 @@ void *handle_preproc_error(const char *message, char *line, int line_number, Mac
     fclose(am_file);
     return NULL;
 }
+
+/**
+ * @brief The main function for the pre proccess stage.
+ * @param input_filename The name of the input file.
+ * @return the path for the am file.
+ */
 
 char *exec_preproc(const char *input_filename)
 {
@@ -75,18 +99,13 @@ char *exec_preproc(const char *input_filename)
                     rest = strstr(line_copy, macro_name) + strlen(macro_name);
                     if (check_for_extra_chars(rest))
                     {
-                        /**
-                         *  return handle_preproc_error("Extra characters after macro name", macro_list, am_filename, as_file, am_file);
-                         */
-                        display_error(line, line_number, "Extra characters after macro name", input_filename);
+
+                        display_error(line_copy, line_number, "Extra characters after macro name", input_filename);
                         should_continue = 0;
                     }
                     if (!validate_macro(macro_name))
                     {
-                        /**
-                         * return handle_preproc_error("Invalid macro name", macro_list, am_filename, as_file, am_file);
-                         */
-                        display_error(line, line_number, "Invalid macro name", input_filename);
+                        display_error(line_copy, line_number, "Invalid macro name, macro can not be a reserved word", input_filename);
                         should_continue = 0;
                     }
                     current_macro = create_and_add_macro(&macro_list, macro_name);
@@ -94,17 +113,11 @@ char *exec_preproc(const char *input_filename)
                     {
                         return handle_preproc_error("Failed to create macro", line, line_number, macro_list, am_filename, as_file, am_file);
                     }
-                    /**
-                     * add_macro(&macro_list, current_macro);
-                     */
                     in_macro = 1;
                 }
                 else
                 {
-                    /**
-                     * return handle_preproc_error("No macro name provided", macro_list, am_filename, as_file, am_file);
-                     */
-                    display_error(line, line_number, "No macro name provided", input_filename);
+                    display_error(line_copy, line_number, "No macro name provided", input_filename);
                     should_continue = 0;
                 }
             }
@@ -114,10 +127,7 @@ char *exec_preproc(const char *input_filename)
                 rest = strstr(line_copy, "endmacr") + strlen("endmacr");
                 if (check_for_extra_chars(rest))
                 {
-                    /**
-                     *  return handle_preproc_error("Extra characters after end of macro declaration", line, line_number, macro_list, am_filename, as_file, am_file);
-                     */
-                    display_error(line, line_number, "Extra characters after end of macro declaration", input_filename);
+                    display_error(line_copy, line_number, "Extra characters after end of macro declaration", input_filename);
                     should_continue = 0;
                 }
                 in_macro = 0;

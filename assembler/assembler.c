@@ -36,9 +36,11 @@ int main(int argc, char *argv[])
         am_file = exec_preproc(as_file);
         if (!am_file)
         {
-            printf("ERROR: Failed to process %s at pre proccess stage\n", argv[i]);
+            printf("Failed to process %s at pre proccess stage\n", argv[i]);
             continue;
         }
+
+        printf("Pre proccess stage done successfully for %s\n", argv[i]);
 
         if (!(exec_first_pass(am_file)))
         {
