@@ -6,12 +6,20 @@
  * @return 1 if the macro is valid, 0 otherwise.
  */
 
-int validate_macro(const char *name)
+int validate_macro(const char *name, Macro *macro_list)
 {
     if (get_opcode(name) >= 0 || is_valid_instruction(name))
     {
+        printf("Macro name can not be a reserved word\n");
         return 0;
     }
+
+    if (find_macro(macro_list, name))
+    {
+        printf("Macro name already defined\n");
+        return 0;
+    }
+
     return 1;
 }
 
@@ -103,9 +111,9 @@ char *exec_preproc(const char *input_filename)
                         display_error(line_copy, line_number, "Extra characters after macro name", input_filename);
                         should_continue = 0;
                     }
-                    if (!validate_macro(macro_name))
+                    if (!validate_macro(macro_name, macro_list))
                     {
-                        display_error(line_copy, line_number, "Invalid macro name, macro can not be a reserved word", input_filename);
+                        display_error(line_copy, line_number, "Invalid macro name", input_filename);
                         should_continue = 0;
                     }
                     current_macro = create_and_add_macro(&macro_list, macro_name);

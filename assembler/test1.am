@@ -8,9 +8,7 @@ LOOP  : prn #48
  bne END
  dec K
  jmp LOOP
-inc r7
-inc r1
-dec K
+ testmacro2
 END: stop
 .entry END
 STR: .string "1234fgfssff-03i"
