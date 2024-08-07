@@ -290,9 +290,19 @@ Instruction *parse_instruction(const char *line)
     return instr;
 }
 
-int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image)
+/**
+ * @brief Main function to process data or string directive.
+ * @param line The line to process.
+ * @param symbol_table The symbol table.
+ * @param DC The data counter.
+ * @param data_image The data image array.
+ * @param should_continue A flag to indicate if the process should continue.
+ * @return 1 if the process was successful, 0 otherwise.
+ */
+
+int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue)
 {
-    char symbol_name[MAX_SYMBOL_LENGTH + 1];
+    char symbol_name[MAX_SYMBOL_LENGTH - 1];
     char *current = line;
     char *token;
     char *directive;

@@ -13,4 +13,6 @@
 
 #define MAX_SYMBOL_LENGTH 31
 
+#define MEMORY_START 100
+
 #endif

@@ -2,8 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "../headers/data_struct.h"
-
-#define MEMORY_START 100
+#include "../headers/globals.h"
 
 /**
  * Macro functions

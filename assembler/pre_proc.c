@@ -3,20 +3,30 @@
 /**
  * @brief Function to validate macro definition.
  * @param name The name of the macro.
- * @return 1 if the macro is valid, 0 otherwise.
+ * @param macro_list The list of macros.
+ * @param line The line that caused the error.
+ * @param line_number The line number where the error occurred.
+ * @param am_filename The name of the am file.
+ * @return 1 if the macro is valid, 0 otherwise (If the name length is bigger then 31, or if the name is a reserved word, or if its already defined).
  */
 
-int validate_macro(const char *name, Macro *macro_list)
+int validate_macro(const char *name, Macro *macro_list, char *line, int line_number, const char *am_filename)
 {
+    if (strlen(name) > MAX_SYMBOL_LENGTH)
+    {
+        display_error(line, line_number, "Macro name is too long", am_filename);
+        return 0;
+    }
+
     if (get_opcode(name) >= 0 || is_valid_instruction(name))
     {
-        printf("Macro name can not be a reserved word\n");
+        display_error(line, line_number, "Macro name can not be a reserved word", am_filename);
         return 0;
     }
 
     if (find_macro(macro_list, name))
     {
-        printf("Macro name already defined\n");
+        display_error(line, line_number, "Macro name already defined", am_filename);
         return 0;
     }
 
@@ -105,18 +115,27 @@ char *exec_preproc(const char *input_filename)
                 {
                     char *rest;
                     rest = strstr(line_copy, macro_name) + strlen(macro_name);
+                    /**
+                     * Check for extra characters after the macro name.
+                     */
                     if (check_for_extra_chars(rest))
                     {
-
                         display_error(line_copy, line_number, "Extra characters after macro name", input_filename);
                         should_continue = 0;
                     }
-                    if (!validate_macro(macro_name, macro_list))
+
+                    /**
+                     * Validate the macro name.
+                     */
+                    if (!validate_macro(macro_name, macro_list, line_copy, line_number, input_filename))
                     {
-                        display_error(line_copy, line_number, "Invalid macro name", input_filename);
                         should_continue = 0;
                     }
                     current_macro = create_and_add_macro(&macro_list, macro_name);
+
+                    /**
+                     * Check if the macro was created successfully, if not exit the program.
+                     */
                     if (!current_macro)
                     {
                         return handle_preproc_error("Failed to create macro", line, line_number, macro_list, am_filename, as_file, am_file);
@@ -131,6 +150,9 @@ char *exec_preproc(const char *input_filename)
             }
             else if (strcmp(token, "endmacr") == 0)
             {
+                /**
+                 * Check for extra characters after end of macro declaration.
+                 */
                 char *rest;
                 rest = strstr(line_copy, "endmacr") + strlen("endmacr");
                 if (check_for_extra_chars(rest))
@@ -143,6 +165,9 @@ char *exec_preproc(const char *input_filename)
             }
             else if (in_macro)
             {
+                /**
+                 * Add the line to the current macro, if the allocation failed exit the program.
+                 */
                 if (!add_macro_line(current_macro, line_copy))
                 {
                     return handle_preproc_error("Failed to add line to macro", line, line_number, macro_list, am_filename, as_file, am_file);

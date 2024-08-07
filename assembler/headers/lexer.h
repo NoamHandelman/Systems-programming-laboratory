@@ -13,7 +13,7 @@ int is_valid_instruction(const char *);
 
 int is_valid_symbol(const char *, Symbol **);
 
-int handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image *);
+int handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image *, int *);
 
 int handle_extern(char *, Symbol **, int *);
 

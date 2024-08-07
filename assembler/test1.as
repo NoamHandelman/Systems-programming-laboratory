@@ -16,7 +16,7 @@ endmacr
  sub r1, r4
  noammax
 
-macr noammax
+macr noam123456789012345678901234567
 inc r7
 inc r1
 dec K

@@ -29,6 +29,6 @@ void *handle_preproc_error(const char *, char *, int, Macro *, char *, FILE *, F
  * @return 1 if the macro is valid, 0 otherwise.
  */
 
-int validate_macro(const char *, Macro *);
+int validate_macro(const char *, Macro *, char *, int, const char *);
 
 #endif

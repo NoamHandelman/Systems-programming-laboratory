@@ -1,38 +1,46 @@
 #include "headers/assembler_transitions.h"
 
+/**
+ * @brief Execute the first pass of the assembler.
+ * @param input_filename The name of the am file to process.
+ * @return 1 if the first pass was successful, 0 otherwise.
+ */
+
 int exec_first_pass(const char *input_filename)
 {
     FILE *am_file;
     int IC = 0, DC = 0, line_number = 0, should_continue = 1, externs_count = 0;
     char line[MAX_LINE_LENGTH];
     Symbol *symbol_table = NULL;
-    Machine_Code_Image data_image[2048];
-    Machine_Code_Image code_image[2048];
+    Machine_Code_Image data_image[MAX_MEMORY_SIZE];
+    Machine_Code_Image code_image[MAX_MEMORY_SIZE];
     Declaration *entries = NULL;
 
     am_file = fopen(input_filename, "r");
     if (!am_file)
     {
-        fprintf(stderr, "Failed to open file: %s\n", input_filename);
+        printf("ERROR: Failed to open file: %s\n", input_filename);
         return 0;
     }
 
-    while (fgets(line, sizeof(line), am_file) && IC + DC <= MAX_MEMORY_SIZE)
+    /**
+     * Read the file line by line while not exceed the allowed memory and process it.
+     */
+
+    while (fgets(line, sizeof(line), am_file) && IC + DC <= MAX_MEMORY_SIZE - MEMORY_START)
     {
         line_number++;
 
         /**
-         *   if (is_empty_line(line))
-                    continue;
+         * Adjust the line so it will be easier to parse.
          */
-
         handle_spaces(line);
 
         printf("Line %d: %s\n", line_number, line);
 
         if (strstr(line, ".data") || strstr(line, ".string"))
         {
-            handle_data_or_string(line, &symbol_table, &DC, data_image);
+            handle_data_or_string(line, &symbol_table, &DC, data_image, &should_continue);
         }
         else if (strstr(line, ".extern"))
         {
