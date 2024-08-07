@@ -93,14 +93,12 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
     Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
     if (!new_symbol)
     {
-        fprintf(stderr, "Memory allocation failed\n");
         return 0;
     }
 
     new_symbol->name = (char *)malloc(strlen(name) + 1);
     if (!new_symbol->name)
     {
-        fprintf(stderr, "Memory allocation for name failed\n");
         free(new_symbol);
         return 0;
     }

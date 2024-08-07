@@ -27,7 +27,7 @@ $(UTILS_DIR)/lexer.o: $(HEADERS_DIR)/globals.h $(HEADERS_DIR)/data_struct.h
 $(UTILS_DIR)/files.o: $(HEADERS_DIR)/files.h
 $(UTILS_DIR)/code_conversions.o: $(HEADERS_DIR)/data_struct.h
 $(UTILS_DIR)/errors.o: $(HEADERS_DIR)/errors.h
-assembler_transitions.o: $(HEADERS_DIR)/assembler_transitions.h $(HEADERS_DIR)/code_conversions.h 
+assembler_transitions.o: $(HEADERS_DIR)/assembler_transitions.h $(HEADERS_DIR)/code_conversions.h $(HEADERS_DIR)/errors.h
 
 clean:
 	rm -f $(TARGET) $(OBJ_FILES) $(UTILS_DIR)/*.o

@@ -4,6 +4,7 @@
 #include "../headers/data_struct.h"
 #include "../headers/lexer.h"
 #include "../headers/code_conversions.h"
+#include "../headers/errors.h"
 
 OP_CODE OP_CODES[] = {
     {"mov", 2},
@@ -29,7 +30,7 @@ char *REGISTERS[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 /* Define the instructions */
 char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 
-int parse_data_dir(char *, int *, Machine_Code_Image *);
+void parse_data_dir(char *, int *, Machine_Code_Image *, int, const char *, int *);
 
 int parse_string_dir(char *, int *, Machine_Code_Image *);
 
@@ -76,31 +77,43 @@ int is_valid_instruction(const char *inst)
     return 0;
 }
 
-int is_valid_symbol(const char *symbol, Symbol **symbol_table)
+int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int line_number, const char *input_filename)
 {
     int i;
 
+    if (strlen(symbol) > MAX_SYMBOL_LENGTH)
+    {
+        /**
+         *         fprintf(stderr, "Symbol %s has illegal name length\n", symbol);
+         */
+        display_error(line, line_number, "Symbol has illegal name length", input_filename);
+        return 0;
+    }
+
     if (find_symbol(*symbol_table, symbol))
     {
-        fprintf(stderr, "Symbol %s already defined\n", symbol);
+        /**
+         *        fprintf(stderr, "Symbol %s already defined\n", symbol);
+         */
+        display_error(line, line_number, "Symbol already defined", input_filename);
         return 0;
     }
 
     if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol))
     {
-        fprintf(stderr, "Symbol %s is a reserved word\n", symbol);
-        return 0;
-    }
-
-    if (strlen(symbol) > MAX_SYMBOL_LENGTH)
-    {
-        fprintf(stderr, "Symbol %s has illegal name length\n", symbol);
+        /**
+         *       fprintf(stderr, "Symbol %s is a reserved word\n", symbol);
+         */
+        display_error(line, line_number, "Symbol can not be a reserved word", input_filename);
         return 0;
     }
 
     if (!isalpha(symbol[0]))
     {
-        fprintf(stderr, "Symbol %s must start with a letter\n", symbol);
+        /**
+         *      fprintf(stderr, "Symbol %s must start with a letter\n", symbol);
+         */
+        display_error(line, line_number, "Symbol must start with a letter", input_filename);
         return 0;
     }
 
@@ -108,7 +121,10 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table)
     {
         if (!isalnum(symbol[i]))
         {
-            fprintf(stderr, "Symbol %s must contains only letters or numbers\n", symbol);
+            /**
+             *        fprintf(stderr, "Symbol %s must contains only letters or numbers\n", symbol);
+             */
+            display_error(line, line_number, "Symbol must contains only letters or numbers", input_filename);
             return 0;
         }
     }
@@ -116,7 +132,7 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table)
     return 1;
 }
 
-int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
+void parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int line_number, const char *input_filename, int *should_continue)
 {
     char *token;
     char *endptr;
@@ -125,7 +141,8 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
 
     if (line[0] == ',' || line[strlen(line) - 1] == ',')
     {
-        fprintf(stderr, "Line should not start or end with a comma\n");
+        should_continue = 0;
+        display_error(line, line_number, "Line should not start or end with a comma", input_filename);
     }
 
     token = strtok(line, " ");
@@ -142,7 +159,11 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
             }
             else
             {
-                fprintf(stderr, "Invalid number: %s\n", token);
+                should_continue = 0;
+                /**
+                 * fprintf(stderr, "Invalid number: %s\n", token);
+                 */
+                display_error(line, line_number, "Invalid number", input_filename);
             }
         }
         else
@@ -153,7 +174,11 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
             }
             else
             {
-                fprintf(stderr, "Expected comma but found: %s\n", token);
+                display_error(line, line_number, "Expected comma but found", input_filename);
+                /**
+                 * fprintf(stderr, "Expected comma but found: %s\n", token);
+                 */
+                should_continue = 0;
             }
         }
         token = strtok(NULL, " ");
@@ -161,10 +186,12 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image)
 
     if (expecting_number)
     {
-        fprintf(stderr, "Line should not end with a comma\n");
+        display_error(line, line_number, "Expected number but found", input_filename);
+        /**
+         * fprintf(stderr, "Expected number but found nothing\n");
+         */
+        should_continue = 0;
     }
-
-    return 1;
 }
 
 int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image)
@@ -300,9 +327,9 @@ Instruction *parse_instruction(const char *line)
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue)
+int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue, int line_number, const char *input_filename)
 {
-    char symbol_name[MAX_SYMBOL_LENGTH - 1];
+    char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
     char *token;
     char *directive;
@@ -313,9 +340,17 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
         strncpy(symbol_name, token, strlen(token) - 1);
         symbol_name[strlen(token) - 1] = '\0';
 
-        if (is_valid_symbol(symbol_name, symbol_table))
+        if (!is_valid_symbol(symbol_name, symbol_table, line, line_number, input_filename))
         {
-            create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 1);
+            should_continue = 0;
+        }
+        else
+        {
+            if (!create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 1))
+            {
+                display_error(line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
+                return 0;
+            };
         }
 
         token = strtok(NULL, " ");
@@ -325,13 +360,12 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
     {
         directive = token;
         current = strtok(NULL, "");
+
         if (strcmp(directive, ".data") == 0)
         {
-            if (!parse_data_dir(current, DC, data_image))
-            {
-                fprintf(stderr, "Error parsing .data directive\n");
-            }
+            parse_data_dir(current, DC, data_image, line_number, input_filename, should_continue);
         }
+
         else if (strcmp(directive, ".string") == 0)
         {
             if (!parse_string_dir(current, DC, data_image))
@@ -348,14 +382,14 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
     return 1;
 }
 
-int handle_extern(char *line, Symbol **symbol_table, int *externs_count)
+int handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename)
 {
     char symbol_name[MAX_SYMBOL_LENGTH];
     char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
 
     if (sscanf(line, ".extern %s %s", symbol_name, extra_forbidden_symbol) == 1)
     {
-        if (is_valid_symbol(symbol_name, symbol_table))
+        if (is_valid_symbol(symbol_name, symbol_table, line, line_number, input_filename))
         {
             (*externs_count)++;
             return create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0);
@@ -386,7 +420,7 @@ int handle_entry(char *line, Symbol **symbol_table, Declaration **entries)
     return 1;
 }
 
-int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image)
+int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename)
 {
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
     char *current = line;
@@ -403,7 +437,7 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
         strncpy(symbol_name, token, strlen(token) - 1);
         symbol_name[strlen(token) - 1] = '\0';
 
-        if (is_valid_symbol(symbol_name, symbol_table))
+        if (is_valid_symbol(symbol_name, symbol_table, line, line_number, input_filename))
         {
             create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0);
         }

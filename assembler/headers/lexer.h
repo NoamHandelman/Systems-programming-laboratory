@@ -11,14 +11,14 @@ int get_register(const char *);
 
 int is_valid_instruction(const char *);
 
-int is_valid_symbol(const char *, Symbol **);
+int is_valid_symbol(const char *, Symbol **, char *, int, const char *);
 
-int handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image *, int *);
+int handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *);
 
-int handle_extern(char *, Symbol **, int *);
+int handle_extern(char *, Symbol **, int *, int *, int, const char *);
 
 int handle_entry(char *, Symbol **, Declaration **);
 
-int handle_instruction(char *, Symbol **, int *, Machine_Code_Image *);
+int handle_instruction(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *);
 
 #endif
