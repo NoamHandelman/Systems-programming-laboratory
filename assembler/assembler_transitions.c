@@ -63,9 +63,8 @@ int exec_first_pass(const char *input_filename)
                 return 0;
             }
         }
-        else if (strstr(line, ".extern"))
+        else if (strstr(final_line, ".extern"))
         {
-
             handle_extern(final_line, &symbol_table, &externs_count, &should_continue, line_number, input_filename);
         }
         else if (strstr(final_line, ".entry"))
