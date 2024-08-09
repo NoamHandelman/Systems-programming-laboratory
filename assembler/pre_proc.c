@@ -18,7 +18,7 @@ int validate_macro(const char *name, Macro *macro_list, char *line, int line_num
         return 0;
     }
 
-    if (get_opcode(name) >= 0 || is_valid_instruction(name))
+    if (get_opcode(name) >= 0 || is_valid_instruction(name) || get_register(name) >= 0)
     {
         display_error(line, line_number, "Macro name can not be a reserved word", am_filename);
         return 0;
@@ -64,7 +64,10 @@ void *handle_preproc_error(const char *message, char *line, int line_number, Mac
 char *exec_preproc(const char *input_filename)
 {
     FILE *as_file, *am_file = NULL;
-    char line[MAX_LINE_LENGTH];
+    /**
+     * In the pre process stage we will hold the line on a very large buffer and only on the firs pass we will valid the line length.
+     */
+    char line[INITIAL_BUFFER_SIZE];
     char *am_filename;
     Macro *macro_list = NULL, *current_macro = NULL;
     int in_macro = 0;
@@ -79,7 +82,7 @@ char *exec_preproc(const char *input_filename)
     }
 
     as_file = fopen(input_filename, "r");
-    if (as_file == NULL)
+    if (!as_file)
     {
         printf("ERROR: Failed to open file %s\n", input_filename);
         free(am_filename);
@@ -87,7 +90,7 @@ char *exec_preproc(const char *input_filename)
     }
 
     am_file = fopen(am_filename, "w");
-    if (am_file == NULL)
+    if (!am_file)
     {
         printf("ERROR: Failed to open file %s\n", input_filename);
         free(am_filename);
@@ -98,7 +101,7 @@ char *exec_preproc(const char *input_filename)
     while (fgets(line, sizeof(line), as_file))
     {
         char *token, *macro_name;
-        char line_copy[MAX_LINE_LENGTH];
+        char line_copy[INITIAL_BUFFER_SIZE];
         line_number++;
         strcpy(line_copy, line);
         if (is_empty_line(line))

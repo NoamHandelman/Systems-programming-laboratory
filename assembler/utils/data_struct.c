@@ -243,3 +243,15 @@ void update_entry_symbols(Symbol **symbol_table, Declaration **entries)
         current = current->next;
     }
 }
+
+void free_declarations(Declaration *table)
+{
+    Declaration *current = table;
+    while (current != NULL)
+    {
+        Declaration *next = current->next;
+        free(current->name);
+        free(current);
+        current = next;
+    }
+}

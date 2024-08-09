@@ -1,10 +1,4 @@
-#include <string.h>
-#include <stdlib.h>
-#include "../headers/globals.h"
-#include "../headers/data_struct.h"
 #include "../headers/lexer.h"
-#include "../headers/code_conversions.h"
-#include "../headers/errors.h"
 
 OP_CODE OP_CODES[] = {
     {"mov", 2},
@@ -30,9 +24,19 @@ char *REGISTERS[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
 /* Define the instructions */
 char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 
-void parse_data_dir(char *, int *, Machine_Code_Image *, int, const char *, int *);
+/**
+ * @brief Function tp extract the numbers from the .data directive and add them to the data image.
+ * @return 1 if the process was successful, 0 otherwise.
+ */
 
-int parse_string_dir(char *, int *, Machine_Code_Image *);
+int parse_data_dir(char *, int *, Machine_Code_Image *, int, const char *, char *);
+
+/**
+ * @brief Function to extract each char from the .string directive and add the asci code to the data image.
+ * @return 1 if the process was successful, 0 otherwise.
+ */
+
+int parse_string_dir(char *, int *, Machine_Code_Image *, int, const char *, char *);
 
 int get_addressing_mode(const char *);
 
@@ -132,17 +136,18 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
     return 1;
 }
 
-void parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int line_number, const char *input_filename, int *should_continue)
+int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int line_number, const char *input_filename, char *full_line)
 {
     char *token;
     char *endptr;
     int value;
     int expecting_number = 1;
+    int error_found = 1;
 
     if (line[0] == ',' || line[strlen(line) - 1] == ',')
     {
-        should_continue = 0;
-        display_error(line, line_number, "Line should not start or end with a comma", input_filename);
+        error_found = 0;
+        display_error(full_line, line_number, "Line should not start or end with a comma", input_filename);
     }
 
     token = strtok(line, " ");
@@ -153,17 +158,23 @@ void parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int lin
             value = strtol(token, &endptr, 10);
             if (*endptr == '\0')
             {
-                data_image[(*DC)++].value = value;
-                printf("Parsed number: %d\n", value);
+                if (value < MIN_DATA_NUM || value > MAX_DATA_NUM)
+                {
+                    display_error(full_line, line_number, "Number out of valid range", input_filename);
+                    error_found = 0;
+                }
+                else
+                {
+                    data_image[(*DC)++].value = value;
+                    printf("Parsed number: %d\n", value);
+                }
                 expecting_number = 0;
             }
             else
             {
-                should_continue = 0;
-                /**
-                 * fprintf(stderr, "Invalid number: %s\n", token);
-                 */
-                display_error(line, line_number, "Invalid number", input_filename);
+                error_found = 0;
+                expecting_number = 0;
+                display_error(full_line, line_number, "Found invalid token (not a number)", input_filename);
             }
         }
         else
@@ -174,11 +185,8 @@ void parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int lin
             }
             else
             {
-                display_error(line, line_number, "Expected comma but found", input_filename);
-                /**
-                 * fprintf(stderr, "Expected comma but found: %s\n", token);
-                 */
-                should_continue = 0;
+                display_error(full_line, line_number, "Numbers should be separated by comma", input_filename);
+                error_found = 0;
             }
         }
         token = strtok(NULL, " ");
@@ -186,38 +194,65 @@ void parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int lin
 
     if (expecting_number)
     {
-        display_error(line, line_number, "Expected number but found", input_filename);
-        /**
-         * fprintf(stderr, "Expected number but found nothing\n");
-         */
-        should_continue = 0;
+        display_error(full_line, line_number, "Expected number but not found", input_filename);
+        error_found = 0;
     }
+
+    return error_found;
 }
 
-int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image)
+int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image, int line_number, const char *input_filename, char *full_line)
 {
     char *line_copy;
-    int i;
+    int i, error_found = 1;
+    char *start_quote, *end_quote;
 
     printf("initial line : %s\n", line);
 
-    if (line[0] != '"' || line[strlen(line) - 1] != '"')
+    start_quote = strchr(line, '"');
+
+    if (start_quote)
     {
-        fprintf(stderr, "String should start and end with a double quote\n");
+        end_quote = strchr(start_quote + 1, '"');
     }
 
-    line[strlen(line) - 1] = '\0';
-    line_copy = line + 1;
-
-    for (i = 0; i < strlen(line_copy); i++)
+    if (!start_quote || !end_quote || start_quote == end_quote)
     {
-        printf("ASCII value of %c: %d\n", line_copy[i], line_copy[i]);
-        data_image[(*DC)++].value = line_copy[i];
+        display_error(full_line, line_number, "String should start and end with a double quote", input_filename);
+        error_found = 0;
+    }
+
+    for (i = 0; i < start_quote - line; i++)
+    {
+        if (!isspace(line[i]))
+        {
+            display_error(full_line, line_number, "Unexpected characters before the start of the string", input_filename);
+            error_found = 0;
+            break;
+        }
+    }
+
+    for (i = end_quote - line + 1; i < strlen(line); i++)
+    {
+        if (!isspace(line[i]))
+        {
+            display_error(full_line, line_number, "Unexpected characters after the end of the string", input_filename);
+            error_found = 0;
+            break;
+        }
+    }
+
+    line_copy = start_quote + 1;
+    while (line_copy < end_quote)
+    {
+        printf("ASCII value of %c: %d\n", *line_copy, *line_copy);
+        data_image[(*DC)++].value = *line_copy++;
     }
 
     printf("End of string sign: 0\n");
     data_image[(*DC)++].value = '\0';
-    return 1;
+
+    return error_found;
 }
 
 int get_addressing_mode(const char *operand)
@@ -327,12 +362,15 @@ Instruction *parse_instruction(const char *line)
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue, int line_number, const char *input_filename)
+void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue, int line_number, const char *input_filename)
 {
     char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
     char *token;
     char *directive;
+    char original_line[MAX_LINE_LENGTH];
+
+    strncpy(original_line, line, MAX_LINE_LENGTH);
 
     token = strtok(current, " ");
     if (token && token[strlen(token) - 1] == ':')
@@ -340,7 +378,7 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
         strncpy(symbol_name, token, strlen(token) - 1);
         symbol_name[strlen(token) - 1] = '\0';
 
-        if (!is_valid_symbol(symbol_name, symbol_table, line, line_number, input_filename))
+        if (!is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename))
         {
             should_continue = 0;
         }
@@ -348,8 +386,9 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
         {
             if (!create_and_add_symbol(symbol_table, symbol_name, *DC, 0, 1))
             {
-                display_error(line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
-                return 0;
+                display_error(original_line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
+                *should_continue = -1;
+                return;
             };
         }
 
@@ -363,23 +402,19 @@ int handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Co
 
         if (strcmp(directive, ".data") == 0)
         {
-            parse_data_dir(current, DC, data_image, line_number, input_filename, should_continue);
+            *should_continue = parse_data_dir(current, DC, data_image, line_number, input_filename, original_line);
         }
 
         else if (strcmp(directive, ".string") == 0)
         {
-            if (!parse_string_dir(current, DC, data_image))
-            {
-                fprintf(stderr, "Error parsing .string directive\n");
-            }
+
+            *should_continue = parse_string_dir(current, DC, data_image, line_number, input_filename, original_line);
         }
         else
         {
-            fprintf(stderr, "Unknown or missing directive\n");
+            display_error(original_line, line_number, "Invalid directive", input_filename);
         }
     }
-
-    return 1;
 }
 
 int handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename)

@@ -15,4 +15,7 @@
 
 #define MEMORY_START 100
 
+#define INITIAL_BUFFER_SIZE 1024
+
+
 #endif

@@ -1,4 +1,5 @@
-MAIN: add r3   , LIST
+MAIN: add r3   , LIST 2222222222222222222222222222222222222222222222222222222222
+
 LOOP  : prn #48
 
 
@@ -23,7 +24,6 @@ dec K
 endmacr
  dec K
  jmp LOOP
- testmacro2
 END: stop
 .entry END
      

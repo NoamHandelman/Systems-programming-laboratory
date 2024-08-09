@@ -3,7 +3,6 @@
 /**
  * This is a large enough random number so that we can with a high probability absorb the entire line and make sure that its length is not greater than allowed.
  */
-#define INITIAL_BUFFER_SIZE 1024
 
 /**
  * @brief Execute the first pass of the assembler.
@@ -16,6 +15,7 @@ int exec_first_pass(const char *input_filename)
     FILE *am_file;
     int IC = 0, DC = 0, line_number = 0, should_continue = 1, externs_count = 0;
     char line[INITIAL_BUFFER_SIZE];
+    char final_line[MAX_LINE_LENGTH + 1];
     Symbol *symbol_table = NULL;
     Machine_Code_Image data_image[MAX_MEMORY_SIZE];
     Machine_Code_Image code_image[MAX_MEMORY_SIZE];
@@ -41,29 +41,40 @@ int exec_first_pass(const char *input_filename)
             should_continue = 0;
         }
 
+        printf("length : %lu\n", strlen(line));
+
+        strncpy(final_line, line, MAX_LINE_LENGTH);
+        final_line[MAX_LINE_LENGTH] = '\0';
+
         /**
          * Adjust the line so it will be easier to parse.
          */
-        handle_spaces(line);
+        handle_spaces(final_line);
 
-        printf("Line %d: %s\n", line_number, line);
+        printf("Line %d: %s\n", line_number, final_line);
 
-        if (strstr(line, ".data") || strstr(line, ".string"))
+        if (strstr(final_line, ".data") || strstr(final_line, ".string"))
         {
-            handle_data_or_string(line, &symbol_table, &DC, data_image, &should_continue, line_number, input_filename);
+            handle_data_or_string(final_line, &symbol_table, &DC, data_image, &should_continue, line_number, input_filename);
+
+            if (should_continue == -1)
+            {
+                free_all_resources(symbol_table, entries);
+                return 0;
+            }
         }
         else if (strstr(line, ".extern"))
         {
 
-            handle_extern(line, &symbol_table, &externs_count, &should_continue, line_number, input_filename);
+            handle_extern(final_line, &symbol_table, &externs_count, &should_continue, line_number, input_filename);
         }
-        else if (strstr(line, ".entry"))
+        else if (strstr(final_line, ".entry"))
         {
-            handle_entry(line, &symbol_table, &entries);
+            handle_entry(final_line, &symbol_table, &entries);
         }
         else
         {
-            handle_instruction(line, &symbol_table, &IC, code_image, &should_continue, line_number, input_filename);
+            handle_instruction(final_line, &symbol_table, &IC, code_image, &should_continue, line_number, input_filename);
         }
     }
 
@@ -74,11 +85,8 @@ int exec_first_pass(const char *input_filename)
 
 int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count)
 {
-    FILE *ent_file;
-    FILE *ext_file;
-    char *ob_file_name;
-    char *ent_file_name;
-    char *ext_file_name;
+    FILE *ent_file, *ext_file;
+    char *ob_file_name, *ent_file_name, *ext_file_name;
     update_entry_symbols(&symbol_table, &entries);
     update_symbols_addresses(&symbol_table, IC);
     update_symbols_in_code_image(code_image, symbol_table);
@@ -158,4 +166,16 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
     }
 
     return 1;
+}
+
+/**
+ * @brief Free all resources allocated during the assembler execution.
+ * @param symbol_table The symbol table to free.
+ * @param entries The entries table to free.
+ */
+
+void free_all_resources(Symbol *symbol_table, Declaration *entries)
+{
+    free_symbol_table(symbol_table);
+    free_declarations(entries);
 }

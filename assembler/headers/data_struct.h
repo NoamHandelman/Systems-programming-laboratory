@@ -47,6 +47,8 @@ int create_and_add_symbol(Symbol **, const char *, int, int, int);
 
 Symbol *find_symbol(Symbol *, const char *);
 
+void free_symbol_table(Symbol *);
+
 /**
  * remove in the end!!!
  */
@@ -108,5 +110,7 @@ typedef struct Declaration
 int create_and_add_declaration(Declaration **, char *);
 
 void update_entry_symbols(Symbol **, Declaration **);
+
+void free_declarations(Declaration *);
 
 #endif

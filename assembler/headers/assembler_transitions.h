@@ -9,6 +9,7 @@
 #include "./code_conversions.h"
 #include "./files.h"
 #include "./errors.h"
+#include "./data_struct.h"
 
 /**
  * @brief The main function for the first pass of the assembler.
@@ -23,5 +24,11 @@ int exec_first_pass(const char *);
  */
 
 int exec_second_pass(const char *, Symbol *, Machine_Code_Image *, Machine_Code_Image *, int, int, Declaration *, int);
+
+/**
+ * @brief Free all the resources that were allocated during the first and second passes.
+ */
+
+void free_all_resources(Symbol *, Declaration *);
 
 #endif
