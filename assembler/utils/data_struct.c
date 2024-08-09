@@ -173,14 +173,12 @@ int create_and_add_declaration(Declaration **table, char *name)
     printf("Creating decl struct for symbol: %s\n", name);
     if (!new_entry)
     {
-        fprintf(stderr, "Memory allocation failed\n");
         return 0;
     }
 
     new_entry->name = (char *)malloc(strlen(name) + 1);
     if (!new_entry->name)
     {
-        fprintf(stderr, "Memory allocation for name failed\n");
         free(new_entry);
         return 0;
     }

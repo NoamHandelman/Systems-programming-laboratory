@@ -66,14 +66,29 @@ int exec_first_pass(const char *input_filename)
         else if (strstr(final_line, ".extern"))
         {
             handle_extern(final_line, &symbol_table, &externs_count, &should_continue, line_number, input_filename);
+            if (should_continue == -1)
+            {
+                free_all_resources(symbol_table, entries);
+                return 0;
+            }
         }
         else if (strstr(final_line, ".entry"))
         {
-            handle_entry(final_line, &symbol_table, &entries);
+            handle_entry(final_line, &symbol_table, &entries, &should_continue, line_number, input_filename);
+            if (should_continue == -1)
+            {
+                free_all_resources(symbol_table, entries);
+                return 0;
+            }
         }
         else
         {
             handle_instruction(final_line, &symbol_table, &IC, code_image, &should_continue, line_number, input_filename);
+            if (should_continue == -1)
+            {
+                free_all_resources(symbol_table, entries);
+                return 0;
+            }
         }
     }
 
@@ -98,7 +113,11 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
         return 0;
     }
 
+    printf("creating ob file %s\n", ob_file_name);
+
     convert_to_octal(ob_file_name, code_image, IC, data_image, DC);
+
+    printf("converted to octal\n");
 
     if (entries)
     {
@@ -117,15 +136,27 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
             return 0;
         }
 
+        printf("open ent file %s\n", ent_file_name);
+
         while (current)
         {
-            fprintf(ent_file, "%s 0%d\n", current->name, find_symbol(symbol_table, current->name)->address);
+            Symbol *symbol = find_symbol(symbol_table, current->name);
+            if (!symbol)
+            {
+                /**
+                 * Handle other kind of error like this.
+                 */
+                printf("Entry symbol not found: %s\n", current->name);
+                return 0;
+            }
+            fprintf(ent_file, "%s 0%d\n", current->name, symbol->address);
             current = current->next;
         }
 
         fclose(ent_file);
     }
 
+    printf("ent file created\n");
     printf("Externs count: %d\n", externs_count);
 
     if (externs_count)

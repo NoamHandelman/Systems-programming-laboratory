@@ -23,10 +23,10 @@ int is_valid_symbol(const char *, Symbol **, char *, int, const char *);
 
 void handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *);
 
-int handle_extern(char *, Symbol **, int *, int *, int, const char *);
+void handle_extern(char *, Symbol **, int *, int *, int, const char *);
 
-int handle_entry(char *, Symbol **, Declaration **);
+void handle_entry(char *, Symbol **, Declaration **, int *, int, const char *);
 
-int handle_instruction(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *);
+void handle_instruction(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *);
 
 #endif

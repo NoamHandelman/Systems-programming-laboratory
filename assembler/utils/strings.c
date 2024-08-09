@@ -63,6 +63,9 @@ void add_spaces(char *line)
     int j = 0, i;
     int in_quotes = 0;
 
+    if (strstr(line, ".entry") || strstr(line, ".extern"))
+        return;
+
     for (i = 0; line[i] != '\0'; i++)
     {
         if (line[i] == '\"')
@@ -81,6 +84,7 @@ void add_spaces(char *line)
             result[j++] = line[i];
         }
     }
+
     result[j] = '\0';
     strcpy(line, result);
 }

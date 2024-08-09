@@ -83,57 +83,43 @@ int is_valid_instruction(const char *inst)
 
 int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int line_number, const char *input_filename)
 {
-    int i;
+    int i, error_found = 1;
 
     if (strlen(symbol) > MAX_SYMBOL_LENGTH)
     {
-        /**
-         *         fprintf(stderr, "Symbol %s has illegal name length\n", symbol);
-         */
-        display_error(line, line_number, "Symbol has illegal name length", input_filename);
-        return 0;
+
+        display_error(line, line_number, "Symbol length should be 31 or less", input_filename);
+        error_found = 0;
     }
 
     if (find_symbol(*symbol_table, symbol))
     {
-        /**
-         *        fprintf(stderr, "Symbol %s already defined\n", symbol);
-         */
         display_error(line, line_number, "Symbol already defined", input_filename);
-        return 0;
+        error_found = 0;
     }
 
     if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol))
     {
-        /**
-         *       fprintf(stderr, "Symbol %s is a reserved word\n", symbol);
-         */
         display_error(line, line_number, "Symbol can not be a reserved word", input_filename);
-        return 0;
+        error_found = 0;
     }
 
     if (!isalpha(symbol[0]))
     {
-        /**
-         *      fprintf(stderr, "Symbol %s must start with a letter\n", symbol);
-         */
         display_error(line, line_number, "Symbol must start with a letter", input_filename);
-        return 0;
+        error_found = 0;
     }
 
     for (i = 1; i < strlen(symbol); i++)
     {
         if (!isalnum(symbol[i]))
         {
-            /**
-             *        fprintf(stderr, "Symbol %s must contains only letters or numbers\n", symbol);
-             */
             display_error(line, line_number, "Symbol must contains only letters or numbers", input_filename);
-            return 0;
+            error_found = 0;
         }
     }
 
-    return 1;
+    return error_found;
 }
 
 int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int line_number, const char *input_filename, char *full_line)
@@ -417,45 +403,113 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
     }
 }
 
-int handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename)
+void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename)
 {
-    char symbol_name[MAX_SYMBOL_LENGTH];
-    char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
+    char *token;
+    char symbol_name[MAX_LINE_LENGTH];
+    char original_line[MAX_LINE_LENGTH];
 
-    if (sscanf(line, ".extern %s %s", symbol_name, extra_forbidden_symbol) == 1)
+    strncpy(original_line, line, MAX_LINE_LENGTH);
+
+    token = strtok(line, " ");
+
+    if (token && token[strlen(token) - 1] == ':')
     {
-        if (is_valid_symbol(symbol_name, symbol_table, line, line_number, input_filename))
+        display_warning(original_line, line_number, "A symbol before an extern declaration is meaningless", input_filename);
+        token = strtok(NULL, " ");
+    }
+
+    if (token && strcmp(token, ".extern") == 0)
+    {
+        token = strtok(NULL, " ");
+        if (token)
         {
-            (*externs_count)++;
-            return create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0);
+            strncpy(symbol_name, token, MAX_LINE_LENGTH);
+            symbol_name[MAX_LINE_LENGTH - 1] = '\0';
+
+            if (is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename))
+            {
+                if (!create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0))
+                {
+                    display_error(original_line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
+                    *should_continue = -1;
+                    return;
+                }
+                (*externs_count)++;
+            }
+
+            token = strtok(NULL, " ");
+            if (token)
+            {
+                display_error(original_line, line_number, "Only one symbol is allowed after extern declaration", input_filename);
+                *should_continue = 0;
+            }
         }
         else
         {
-            printf("Symbol %s is not valid\n", symbol_name);
+            display_error(original_line, line_number, "No symbol provided after extern declaration", input_filename);
+            *should_continue = 0;
         }
-    }
-
-    return 1;
-}
-
-int handle_entry(char *line, Symbol **symbol_table, Declaration **entries)
-{
-    char symbol_name[MAX_SYMBOL_LENGTH];
-    char extra_forbidden_symbol[MAX_SYMBOL_LENGTH];
-
-    if (sscanf(line, ".entry %s %s", symbol_name, extra_forbidden_symbol) == 1)
-    {
-        return create_and_add_declaration(entries, symbol_name);
     }
     else
     {
-        printf("Invalid entry declaration on line %s\n", line);
+        display_error(original_line, line_number, "Invalid extern declaration, .extern must be the first token in the line", input_filename);
+        *should_continue = 0;
     }
-
-    return 1;
 }
 
-int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename)
+void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int *should_continue, int line_number, const char *input_filename)
+{
+    char *token;
+    char symbol_name[MAX_LINE_LENGTH];
+    char original_line[MAX_LINE_LENGTH];
+
+    strncpy(original_line, line, MAX_LINE_LENGTH);
+
+    token = strtok(line, " ");
+
+    if (token && token[strlen(token) - 1] == ':')
+    {
+        display_warning(original_line, line_number, "A symbol before an entry declaration is meaningless", input_filename);
+        token = strtok(NULL, " ");
+    }
+
+    if (token && strcmp(token, ".entry") == 0)
+    {
+        token = strtok(NULL, " ");
+        if (token)
+        {
+            strncpy(symbol_name, token, MAX_LINE_LENGTH);
+            symbol_name[MAX_LINE_LENGTH - 1] = '\0';
+
+            if (!create_and_add_declaration(entries, symbol_name))
+            {
+                display_error(original_line, line_number, "Failed to create and add entry declaration, memory allocation failed", input_filename);
+                *should_continue = -1;
+                return;
+            }
+
+            token = strtok(NULL, " ");
+            if (token)
+            {
+                display_error(original_line, line_number, "Only one symbol is allowed after entry declaration", input_filename);
+                *should_continue = 0;
+            }
+        }
+        else
+        {
+            display_error(original_line, line_number, "No symbol provided after entry declaration", input_filename);
+            *should_continue = 0;
+        }
+    }
+    else
+    {
+        display_error(original_line, line_number, "Invalid entry declaration, .entry must be the first token in the line", input_filename);
+        *should_continue = 0;
+    }
+}
+
+void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename)
 {
     char symbol_name[MAX_SYMBOL_LENGTH + 1];
     char *current = line;
@@ -474,7 +528,11 @@ int handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_
 
         if (is_valid_symbol(symbol_name, symbol_table, line, line_number, input_filename))
         {
-            create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0);
+            if (!create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0)) {
+                display_error(line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
+                *should_continue = -1;
+                return;
+            };
         }
 
         token = strtok(NULL, "");
