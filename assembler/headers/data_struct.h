@@ -74,6 +74,8 @@ typedef struct OP_CODE
 {
     char *opcode;
     int operands;
+    int src_operands[4];
+    int dest_operands[4];
 } OP_CODE;
 
 typedef struct Operand
@@ -92,7 +94,7 @@ typedef struct Operand
 
 typedef struct Instruction
 {
-    OP_CODE op_code;
+    char *op_code;
     Operand operands[2];
     int operand_count;
 } Instruction;
@@ -112,5 +114,7 @@ int create_and_add_declaration(Declaration **, char *);
 void update_entry_symbols(Symbol **, Declaration **);
 
 void free_declarations(Declaration *);
+
+Declaration *find_declaration(Declaration *, const char *);
 
 #endif

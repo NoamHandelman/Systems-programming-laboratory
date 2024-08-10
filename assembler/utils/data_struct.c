@@ -253,3 +253,17 @@ void free_declarations(Declaration *table)
         current = next;
     }
 }
+
+Declaration *find_declaration(Declaration *table, const char *name)
+{
+    Declaration *current = table;
+    while (current)
+    {
+        if (strcmp(current->name, name) == 0)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+    return NULL;
+}

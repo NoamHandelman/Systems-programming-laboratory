@@ -1,22 +1,22 @@
 #include "../headers/lexer.h"
 
 OP_CODE OP_CODES[] = {
-    {"mov", 2},
-    {"cmp", 2},
-    {"add", 2},
-    {"sub", 2},
-    {"lea", 1},
-    {"clr", 1},
-    {"not", 2},
-    {"inc", 1},
-    {"dec", 1},
-    {"jmp", 1},
-    {"bne", 1},
-    {"red", 1},
-    {"prn", 1},
-    {"jsr", 1},
-    {"rts", 0},
-    {"stop", 0}};
+    {"mov", 2, {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {"cmp", 2, {1, 1, 1, 1}, {1, 1, 1, 1}},
+    {"add", 2, {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {"sub", 2, {1, 1, 1, 1}, {0, 1, 1, 1}},
+    {"lea", 2, {0, 1, 0, 0}, {0, 1, 1, 1}},
+    {"clr", 1, {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {"not", 1, {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {"inc", 1, {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {"dec", 1, {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {"jmp", 1, {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {"bne", 1, {0, 0, 0, 0}, {0, 1, 1, 0}},
+    {"red", 1, {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {"prn", 1, {0, 0, 0, 0}, {1, 1, 1, 1}},
+    {"jsr", 1, {0, 0, 0, 0}, {0, 1, 1, 1}},
+    {"rts", 0, {0, 0, 0, 0}, {0, 0, 0, 0}},
+    {"stop", 0, {0, 0, 0, 0}, {0, 0, 0, 0}}};
 
 /* Define the registers */
 char *REGISTERS[] = {"r0", "r1", "r2", "r3", "r4", "r5", "r6", "r7"};
@@ -40,7 +40,9 @@ int parse_string_dir(char *, int *, Machine_Code_Image *, int, const char *, cha
 
 int get_addressing_mode(const char *);
 
-Instruction *parse_instruction(const char *);
+int validate_instruction(Instruction *, char *, int, const char *);
+
+Instruction *parse_instruction(const char *, char *, int, const char *, int *);
 
 int get_opcode(const char *op)
 {
@@ -196,11 +198,7 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image, int li
     printf("initial line : %s\n", line);
 
     start_quote = strchr(line, '"');
-
-    if (start_quote)
-    {
-        end_quote = strchr(start_quote + 1, '"');
-    }
+    end_quote = strrchr(line, '"');
 
     if (!start_quote || !end_quote || start_quote == end_quote)
     {
@@ -261,16 +259,53 @@ int get_addressing_mode(const char *operand)
     return 1;
 }
 
+int validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename)
+{
+    int opcode_index = get_opcode(instr->op_code);
+    int error_found = 1;
+
+    if (instr->operand_count != OP_CODES[opcode_index].operands)
+    {
+        display_error(full_line, line_number, "Invalid number of operands", input_filename);
+        error_found = 0;
+    }
+
+    if (instr->operand_count == 1)
+    {
+        if (!OP_CODES[opcode_index].dest_operands[instr->operands[0].addressing_mode])
+        {
+            display_error(full_line, line_number, "Invalid destination operand", input_filename);
+            error_found = 0;
+        }
+    }
+
+    if (instr->operand_count == 2)
+    {
+        if (!OP_CODES[opcode_index].src_operands[instr->operands[0].addressing_mode])
+        {
+            display_error(full_line, line_number, "Invalid source operand", input_filename);
+            error_found = 0;
+        }
+        if (!OP_CODES[opcode_index].dest_operands[instr->operands[1].addressing_mode])
+        {
+            display_error(full_line, line_number, "Invalid destination operand", input_filename);
+            error_found = 0;
+        }
+    }
+
+    return error_found;
+}
+
 /**
  * should also valid address mode is ok for each instruction
  */
 
-Instruction *parse_instruction(const char *line)
+Instruction *parse_instruction(const char *line, char *full_line, int line_number, const char *input_filename, int *should_continue)
 {
     char line_copy[MAX_LINE_LENGTH];
     char *token;
     Instruction *instr;
-    int operand_count = 0;
+    int operand_count = 0, is_valid_instruction;
 
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     line_copy[MAX_LINE_LENGTH - 1] = '\0';
@@ -278,6 +313,8 @@ Instruction *parse_instruction(const char *line)
     instr = (Instruction *)malloc(sizeof(Instruction));
     if (!instr)
     {
+        display_error(full_line, line_number, "Failed to allocate memory for instruction", input_filename);
+        *should_continue = -1;
         return NULL;
     }
 
@@ -288,24 +325,29 @@ Instruction *parse_instruction(const char *line)
     if (!token)
     {
         free(instr);
+        display_error(full_line, line_number, "No operation code found", input_filename);
+        *should_continue = 0;
         return NULL;
     }
 
     if (get_opcode(token) == -1)
     {
-        printf("Invalid opcode: %s\n", token);
+        display_error(full_line, line_number, "Invalid operation code", input_filename);
+        *should_continue = 0;
         free(instr);
         return NULL;
     }
 
-    instr->op_code.opcode = (char *)malloc(strlen(token) + 1);
-    if (!instr->op_code.opcode)
+    instr->op_code = (char *)malloc(strlen(token) + 1);
+    if (!instr->op_code)
     {
+        display_error(full_line, line_number, "Failed to allocate memory for operation code", input_filename);
+        *should_continue = -1;
         free(instr);
         return NULL;
     }
 
-    strcpy(instr->op_code.opcode, token);
+    strcpy(instr->op_code, token);
 
     while ((token = strtok(NULL, " ,")) && operand_count < 2)
     {
@@ -325,7 +367,9 @@ Instruction *parse_instruction(const char *line)
             instr->operands[operand_count].value.symbol = (char *)malloc(strlen(token) + 1);
             if (!instr->operands[operand_count].value.symbol)
             {
-                free(instr->op_code.opcode);
+                display_error(full_line, line_number, "Failed to allocate memory for symbol", input_filename);
+                *should_continue = -1;
+                free(instr->op_code);
                 free(instr);
                 return NULL;
             }
@@ -335,7 +379,9 @@ Instruction *parse_instruction(const char *line)
     }
     instr->operand_count = operand_count;
 
-    return instr;
+    is_valid_instruction = validate_instruction(instr, full_line, line_number, input_filename);
+
+    return is_valid_instruction ? instr : NULL;
 }
 
 /**
@@ -403,7 +449,7 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
     }
 }
 
-void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename)
+void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename, Declaration *entries)
 {
     char *token;
     char symbol_name[MAX_LINE_LENGTH];
@@ -429,13 +475,21 @@ void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *s
 
             if (is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename))
             {
-                if (!create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0))
+                if (find_declaration(entries, symbol_name))
                 {
-                    display_error(original_line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
-                    *should_continue = -1;
-                    return;
+                    display_error(original_line, line_number, "Symbol already declared as entry", input_filename);
+                    *should_continue = 0;
                 }
-                (*externs_count)++;
+                else
+                {
+                    if (!create_and_add_symbol(symbol_table, symbol_name, 0, 1, 0))
+                    {
+                        display_error(original_line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
+                        *should_continue = -1;
+                        return;
+                    }
+                    (*externs_count)++;
+                }
             }
 
             token = strtok(NULL, " ");
@@ -479,14 +533,26 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
         token = strtok(NULL, " ");
         if (token)
         {
+            Symbol *symbol;
             strncpy(symbol_name, token, MAX_LINE_LENGTH);
             symbol_name[MAX_LINE_LENGTH - 1] = '\0';
 
-            if (!create_and_add_declaration(entries, symbol_name))
+            symbol = find_symbol(*symbol_table, symbol_name);
+
+            if (symbol && symbol->is_external)
             {
-                display_error(original_line, line_number, "Failed to create and add entry declaration, memory allocation failed", input_filename);
-                *should_continue = -1;
-                return;
+                display_error(original_line, line_number, "Symbol already defined as external", input_filename);
+                *should_continue = 0;
+            }
+
+            else
+            {
+                if (!create_and_add_declaration(entries, symbol_name))
+                {
+                    display_error(original_line, line_number, "Failed to create and add entry declaration, memory allocation failed", input_filename);
+                    *should_continue = -1;
+                    return;
+                }
             }
 
             token = strtok(NULL, " ");
@@ -511,13 +577,14 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
 
 void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename)
 {
-    char symbol_name[MAX_SYMBOL_LENGTH + 1];
+    char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
     char *token;
     Instruction *instruction;
 
-    char initial_line[MAX_LINE_LENGTH];
+    char initial_line[MAX_LINE_LENGTH], line_copy[MAX_LINE_LENGTH];
     strncpy(initial_line, line, MAX_LINE_LENGTH);
+    strncpy(line_copy, line, MAX_LINE_LENGTH);
     initial_line[MAX_LINE_LENGTH - 1] = '\0';
 
     token = strtok(current, " ");
@@ -526,10 +593,11 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
         strncpy(symbol_name, token, strlen(token) - 1);
         symbol_name[strlen(token) - 1] = '\0';
 
-        if (is_valid_symbol(symbol_name, symbol_table, line, line_number, input_filename))
+        if (is_valid_symbol(symbol_name, symbol_table, line_copy, line_number, input_filename))
         {
-            if (!create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0)) {
-                display_error(line, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
+            if (!create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0))
+            {
+                display_error(line_copy, line_number, "Failed to create and add symbol, memory allocation failed", input_filename);
                 *should_continue = -1;
                 return;
             };
@@ -545,15 +613,13 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
 
     if (token)
     {
-        instruction = parse_instruction(token);
+        instruction = parse_instruction(token, line_copy, line_number, input_filename, should_continue);
         if (!instruction)
         {
-            fprintf(stderr, "Error parsing instruction\n");
-            return 0;
+            return;
         }
 
+        printf("Encoding instruction\n");
         encode_instruction(instruction, code_image, IC);
     }
-
-    return 1;
 }

@@ -20,7 +20,7 @@ unsigned short encode_addressing_mode(int addressing_mode)
 
 void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC)
 {
-    int opcode_index = get_opcode(instruction->op_code.opcode);
+    int opcode_index = get_opcode(instruction->op_code);
     int i;
     int j;
 
