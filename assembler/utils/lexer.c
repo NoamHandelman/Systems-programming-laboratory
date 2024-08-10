@@ -83,7 +83,7 @@ int is_valid_instruction(const char *inst)
     return 0;
 }
 
-int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int line_number, const char *input_filename)
+int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int line_number, const char *input_filename, Macro **macro_list)
 {
     int i, error_found = 1;
 
@@ -97,6 +97,14 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
     if (find_symbol(*symbol_table, symbol))
     {
         display_error(line, line_number, "Symbol already defined", input_filename);
+        error_found = 0;
+    }
+
+    printf("before find macro\n");
+
+    if (find_macro(*macro_list, symbol))
+    {
+        display_error(line, line_number, "Symbol can not be a macro name", input_filename);
         error_found = 0;
     }
 
@@ -394,7 +402,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue, int line_number, const char *input_filename)
+void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list)
 {
     char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
@@ -410,7 +418,7 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
         strncpy(symbol_name, token, strlen(token) - 1);
         symbol_name[strlen(token) - 1] = '\0';
 
-        if (!is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename))
+        if (!is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename, macro_list))
         {
             should_continue = 0;
         }
@@ -449,7 +457,7 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
     }
 }
 
-void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename, Declaration *entries)
+void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename, Declaration *entries, Macro **macro_list)
 {
     char *token;
     char symbol_name[MAX_LINE_LENGTH];
@@ -473,7 +481,7 @@ void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *s
             strncpy(symbol_name, token, MAX_LINE_LENGTH);
             symbol_name[MAX_LINE_LENGTH - 1] = '\0';
 
-            if (is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename))
+            if (is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename, macro_list))
             {
                 if (find_declaration(entries, symbol_name))
                 {
@@ -575,7 +583,7 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
     }
 }
 
-void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename)
+void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list)
 {
     char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
@@ -593,7 +601,7 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
         strncpy(symbol_name, token, strlen(token) - 1);
         symbol_name[strlen(token) - 1] = '\0';
 
-        if (is_valid_symbol(symbol_name, symbol_table, line_copy, line_number, input_filename))
+        if (is_valid_symbol(symbol_name, symbol_table, line_copy, line_number, input_filename, macro_list))
         {
             if (!create_and_add_symbol(symbol_table, symbol_name, *IC, 0, 0))
             {
@@ -604,6 +612,12 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
         }
 
         token = strtok(NULL, "");
+        if (!token)
+        {
+            display_error(line_copy, line_number, "No instruction found after symbol", input_filename);
+            *should_continue = 0;
+            return;
+        }
     }
 
     else
@@ -615,11 +629,8 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
     {
         instruction = parse_instruction(token, line_copy, line_number, input_filename, should_continue);
         if (!instruction)
-        {
             return;
-        }
 
-        printf("Encoding instruction\n");
         encode_instruction(instruction, code_image, IC);
     }
 }

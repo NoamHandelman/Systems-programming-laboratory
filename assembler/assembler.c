@@ -9,10 +9,12 @@
 #include "headers/files.h"
 #include "headers/assembler_transitions.h"
 #include "headers/errors.h"
+#include "headers/data_struct.h"
 
 int main(int argc, char *argv[])
 {
     int i;
+    Macro *macro_list = NULL;
 
     char *am_file;
     char *as_file;
@@ -20,6 +22,7 @@ int main(int argc, char *argv[])
     if (argc < 2)
     {
         printf("ERROR: No files detected\n");
+        free_macros(macro_list);
         return 1;
     }
 
@@ -33,7 +36,7 @@ int main(int argc, char *argv[])
             continue;
         }
 
-        am_file = exec_preproc(as_file);
+        am_file = exec_preproc(as_file, &macro_list);
         if (!am_file)
         {
             printf("Failed to process %s at pre proccess stage\n", argv[i]);
@@ -42,13 +45,14 @@ int main(int argc, char *argv[])
 
         printf("Pre proccess stage done successfully for %s\n", argv[i]);
 
-        if (!(exec_first_pass(am_file)))
+        if (!(exec_first_pass(am_file, &macro_list)))
         {
             printf("ERROR: Failed to process %s at assembler stage\n", argv[i]);
         };
 
         free(as_file);
         free(am_file);
+        free_macros(macro_list);
     }
 
     printf("Done process all files\n");

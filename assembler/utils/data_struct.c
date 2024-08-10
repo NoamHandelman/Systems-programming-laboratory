@@ -74,6 +74,7 @@ Macro *find_macro(Macro *head, const char *name)
 {
     while (head)
     {
+        printf("Checking macro: %s\n", head->name);
         if (strcmp(head->name, name) == 0)
         {
             return head;

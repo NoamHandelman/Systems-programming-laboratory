@@ -16,7 +16,7 @@
  * @return 1 if the first pass was successful, 0 otherwise.
  */
 
-int exec_first_pass(const char *);
+int exec_first_pass(const char *, Macro **);
 
 /**
  * @brief The main function for the second pass of the assembler.

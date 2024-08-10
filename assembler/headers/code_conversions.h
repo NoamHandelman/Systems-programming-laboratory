@@ -8,6 +8,7 @@
 
 #include "../headers/data_struct.h"
 #include "../headers/lexer.h"
+#include "../headers/globals.h"
 
 void encode_instruction(Instruction *, Machine_Code_Image *, int *);
 

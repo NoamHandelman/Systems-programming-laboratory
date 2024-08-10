@@ -1,4 +1,4 @@
-MAIN: add r3   , LIST 2222222222222222222222222222222222222222222222222222222222
+MAIN: add r3   , LIST
 
 LOOP  : prn #48
 
@@ -7,7 +7,7 @@ LOOP  : prn #48
 
 ;testdelete
 
-macr noammax
+macr END
  cmp r3, #-6
  bne END
 endmacr 
@@ -15,13 +15,12 @@ endmacr
  inc r6
  mov *r6,K
  sub r1, r4
- noammax
+ END
 
-macr noam123456789012345678901234567
 inc r7
 inc r1
 dec K
-endmacr
+
  dec K
  jmp LOOP
 END: stop

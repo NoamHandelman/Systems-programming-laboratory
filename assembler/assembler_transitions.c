@@ -10,7 +10,7 @@
  * @return 1 if the first pass was successful, 0 otherwise.
  */
 
-int exec_first_pass(const char *input_filename)
+int exec_first_pass(const char *input_filename, Macro **macro_list)
 {
     FILE *am_file;
     int IC = 0, DC = 0, line_number = 0, should_continue = 1, externs_count = 0;
@@ -55,7 +55,7 @@ int exec_first_pass(const char *input_filename)
 
         if (strstr(final_line, ".data") || strstr(final_line, ".string"))
         {
-            handle_data_or_string(final_line, &symbol_table, &DC, data_image, &should_continue, line_number, input_filename);
+            handle_data_or_string(final_line, &symbol_table, &DC, data_image, &should_continue, line_number, input_filename, macro_list);
 
             if (should_continue == -1)
             {
@@ -65,7 +65,7 @@ int exec_first_pass(const char *input_filename)
         }
         else if (strstr(final_line, ".extern"))
         {
-            handle_extern(final_line, &symbol_table, &externs_count, &should_continue, line_number, input_filename, entries);
+            handle_extern(final_line, &symbol_table, &externs_count, &should_continue, line_number, input_filename, entries, macro_list);
             if (should_continue == -1)
             {
                 free_all_resources(symbol_table, entries);
@@ -83,7 +83,7 @@ int exec_first_pass(const char *input_filename)
         }
         else
         {
-            handle_instruction(final_line, &symbol_table, &IC, code_image, &should_continue, line_number, input_filename);
+            handle_instruction(final_line, &symbol_table, &IC, code_image, &should_continue, line_number, input_filename, macro_list);
             if (should_continue == -1)
             {
                 free_all_resources(symbol_table, entries);

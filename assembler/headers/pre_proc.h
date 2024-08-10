@@ -16,7 +16,7 @@
  * @return the path for the am file.
  */
 
-char *exec_preproc(const char *);
+char *exec_preproc(const char *, Macro **);
 
 /**
  * @brief Handle error in the pre proccess stage.

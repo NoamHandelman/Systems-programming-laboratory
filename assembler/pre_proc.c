@@ -61,7 +61,7 @@ void *handle_preproc_error(const char *message, char *line, int line_number, Mac
  * @return the path for the am file.
  */
 
-char *exec_preproc(const char *input_filename)
+char *exec_preproc(const char *input_filename, Macro **macro_list)
 {
     FILE *as_file, *am_file = NULL;
     /**
@@ -69,7 +69,11 @@ char *exec_preproc(const char *input_filename)
      */
     char line[INITIAL_BUFFER_SIZE];
     char *am_filename;
-    Macro *macro_list = NULL, *current_macro = NULL;
+    /**
+     *  Macro *macro_list = NULL;
+     */
+
+    Macro *current_macro = NULL;
     int in_macro = 0;
     int should_continue = 1;
     int line_number = 0;
@@ -130,18 +134,18 @@ char *exec_preproc(const char *input_filename)
                     /**
                      * Validate the macro name.
                      */
-                    if (!validate_macro(macro_name, macro_list, line_copy, line_number, input_filename))
+                    if (!validate_macro(macro_name, *macro_list, line_copy, line_number, input_filename))
                     {
                         should_continue = 0;
                     }
-                    current_macro = create_and_add_macro(&macro_list, macro_name);
+                    current_macro = create_and_add_macro(macro_list, macro_name);
 
                     /**
                      * Check if the macro was created successfully, if not exit the program.
                      */
                     if (!current_macro)
                     {
-                        return handle_preproc_error("Failed to create macro", line, line_number, macro_list, am_filename, as_file, am_file);
+                        return handle_preproc_error("Failed to create macro", line, line_number, *macro_list, am_filename, as_file, am_file);
                     }
                     in_macro = 1;
                 }
@@ -173,13 +177,13 @@ char *exec_preproc(const char *input_filename)
                  */
                 if (!add_macro_line(current_macro, line_copy))
                 {
-                    return handle_preproc_error("Failed to add line to macro", line, line_number, macro_list, am_filename, as_file, am_file);
+                    return handle_preproc_error("Failed to add line to macro", line, line_number, *macro_list, am_filename, as_file, am_file);
                 };
             }
             else
             {
                 Macro *macro;
-                macro = find_macro(macro_list, token);
+                macro = find_macro(*macro_list, token);
                 if (macro)
                 {
                     int i;
@@ -202,6 +206,9 @@ char *exec_preproc(const char *input_filename)
 
     fclose(as_file);
     fclose(am_file);
-    free_macros(macro_list);
+    /**
+     *     free_macros(*macro_list);
+
+     */
     return should_continue ? am_filename : NULL;
 }

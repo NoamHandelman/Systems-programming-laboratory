@@ -19,14 +19,14 @@ int get_register(const char *);
 
 int is_valid_instruction(const char *);
 
-int is_valid_symbol(const char *, Symbol **, char *, int, const char *);
+int is_valid_symbol(const char *, Symbol **, char *, int, const char *, Macro **);
 
-void handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *);
+void handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *, Macro **);
 
-void handle_extern(char *, Symbol **, int *, int *, int, const char *, Declaration *);
+void handle_extern(char *, Symbol **, int *, int *, int, const char *, Declaration *, Macro **);
 
 void handle_entry(char *, Symbol **, Declaration **, int *, int, const char *);
 
-void handle_instruction(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *);
+void handle_instruction(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *, Macro **);
 
 #endif
