@@ -145,7 +145,7 @@ Symbol *find_symbol(Symbol *symbol_table, const char *name)
 void free_symbol_table(Symbol *symbol_table)
 {
     Symbol *current = symbol_table;
-    while (current != NULL)
+    while (current)
     {
         Symbol *next = current->next;
         free(current->name);
@@ -224,6 +224,10 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
     }
 }
 
+/**
+ *
+ */
+
 void update_entry_symbols(Symbol **symbol_table, Declaration **entries)
 {
     Declaration *current = *entries;
@@ -267,4 +271,14 @@ Declaration *find_declaration(Declaration *table, const char *name)
         current = current->next;
     }
     return NULL;
+}
+
+void free_machine_code_image(Machine_Code_Image *code_image, int IC)
+{
+    int i;
+    for (i = 0; i < IC; i++)
+    {
+        free(code_image[i].symbol);
+        code_image[i].symbol = NULL;
+    }
 }

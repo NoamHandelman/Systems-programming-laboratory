@@ -64,8 +64,10 @@ void update_symbols_addresses(Symbol **, int);
 typedef struct Machine_Code_Image
 {
     unsigned short value;
-    const char *symbol;
+    char *symbol;
 } Machine_Code_Image;
+
+void free_machine_code_image(Machine_Code_Image *, int);
 
 /**
  * Instruction struct

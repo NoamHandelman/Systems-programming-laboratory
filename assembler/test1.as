@@ -7,7 +7,7 @@ LOOP  : prn #48
 
 ;testdelete
 
-macr END
+macr noam123
  cmp r3, #-6
  bne END
 endmacr 
@@ -15,7 +15,7 @@ endmacr
  inc r6
  mov *r6,K
  sub r1, r4
- END
+ noam123
 
 inc r7
 inc r1

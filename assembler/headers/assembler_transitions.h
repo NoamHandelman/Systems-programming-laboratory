@@ -23,12 +23,12 @@ int exec_first_pass(const char *, Macro **);
  * @return 1 if the second pass was successful, 0 otherwise.
  */
 
-int exec_second_pass(const char *, Symbol *, Machine_Code_Image *, Machine_Code_Image *, int, int, Declaration *, int);
+int exec_second_pass(const char *, Symbol *, Machine_Code_Image *, Machine_Code_Image *, int, int, Declaration *, int, int *);
 
 /**
  * @brief Free all the resources that were allocated during the first and second passes.
  */
 
-void free_all_resources(Symbol *, Declaration *);
+void free_all_resources(Symbol *, Declaration *, Machine_Code_Image *, int);
 
 #endif

@@ -108,7 +108,7 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
         error_found = 0;
     }
 
-    if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol))
+    if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol) || strcmp(symbol, "macr") == 0 || strcmp(symbol, "endmacr") == 0)
     {
         display_error(line, line_number, "Symbol can not be a reserved word", input_filename);
         error_found = 0;
@@ -267,6 +267,18 @@ int get_addressing_mode(const char *operand)
     return 1;
 }
 
+int validate_immediate_value(Operand *operand)
+{
+    if (operand->addressing_mode == 0)
+    {
+        if (operand->value.num < MIN_IMMEDIATE_VALUE || operand->value.num > MAX_IMMEDIATE_VALUE)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename)
 {
     int opcode_index = get_opcode(instr->op_code);
@@ -285,6 +297,12 @@ int validate_instruction(Instruction *instr, char *full_line, int line_number, c
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
             error_found = 0;
         }
+
+        if (!validate_immediate_value(&instr->operands[0]))
+        {
+            display_error(full_line, line_number, "Number out of valid range", input_filename);
+            error_found = 0;
+        }
     }
 
     if (instr->operand_count == 2)
@@ -297,6 +315,12 @@ int validate_instruction(Instruction *instr, char *full_line, int line_number, c
         if (!OP_CODES[opcode_index].dest_operands[instr->operands[1].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
+            error_found = 0;
+        }
+
+        if (!validate_immediate_value(&instr->operands[1]))
+        {
+            display_error(full_line, line_number, "Number out of valid range", input_filename);
             error_found = 0;
         }
     }
@@ -364,6 +388,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         instr->operands[operand_count].addressing_mode = addressing_mode;
         if (addressing_mode == 0)
         {
+
             instr->operands[operand_count].value.num = atoi(token + 1);
         }
         else if (addressing_mode == 2 || addressing_mode == 3)

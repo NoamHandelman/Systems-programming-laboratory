@@ -60,7 +60,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
 
             if (should_continue == -1)
             {
-                free_all_resources(symbol_table, entries);
+                free_all_resources(symbol_table, entries, code_image, IC);
                 return 0;
             }
         }
@@ -69,7 +69,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             handle_extern(final_line, &symbol_table, &externs_count, &should_continue, line_number, input_filename, entries, macro_list);
             if (should_continue == -1)
             {
-                free_all_resources(symbol_table, entries);
+                free_all_resources(symbol_table, entries, code_image, IC);
                 return 0;
             }
         }
@@ -78,7 +78,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             handle_entry(final_line, &symbol_table, &entries, &should_continue, line_number, input_filename);
             if (should_continue == -1)
             {
-                free_all_resources(symbol_table, entries);
+                free_all_resources(symbol_table, entries, code_image, IC);
                 return 0;
             }
         }
@@ -87,7 +87,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             handle_instruction(final_line, &symbol_table, &IC, code_image, &should_continue, line_number, input_filename, macro_list);
             if (should_continue == -1)
             {
-                free_all_resources(symbol_table, entries);
+                free_all_resources(symbol_table, entries, code_image, IC);
                 return 0;
             }
         }
@@ -95,10 +95,10 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
 
     fclose(am_file);
 
-    return exec_second_pass(input_filename, symbol_table, code_image, data_image, IC, DC, entries, externs_count);
+    return exec_second_pass(input_filename, symbol_table, code_image, data_image, IC, DC, entries, externs_count, &should_continue);
 }
 
-int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count)
+int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count, int *should_continue)
 {
     FILE *ent_file, *ext_file;
     char *ob_file_name, *ent_file_name, *ext_file_name;
@@ -196,6 +196,8 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
         fclose(ext_file);
     }
 
+    free_all_resources(symbol_table, entries, code_image, IC);
+
     return 1;
 }
 
@@ -205,8 +207,10 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
  * @param entries The entries table to free.
  */
 
-void free_all_resources(Symbol *symbol_table, Declaration *entries)
+void free_all_resources(Symbol *symbol_table, Declaration *entries, Machine_Code_Image *code_image, int IC)
 {
     free_symbol_table(symbol_table);
     free_declarations(entries);
+
+    free_machine_code_image(code_image, IC);
 }

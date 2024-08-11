@@ -13,6 +13,9 @@
 #define MAX_DATA_NUM 16383
 #define MIN_DATA_NUM -16384
 
+#define MAX_IMMEDIATE_VALUE 2047
+#define MIN_IMMEDIATE_VALUE -2048
+
 int get_opcode(const char *);
 
 int get_register(const char *);
