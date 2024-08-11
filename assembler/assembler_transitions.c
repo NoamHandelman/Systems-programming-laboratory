@@ -61,7 +61,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             if (should_continue == -1)
             {
                 free_all_resources(symbol_table, entries, code_image, IC);
-                return 0;
+                return -1;
             }
         }
         else if (strstr(final_line, ".extern"))
@@ -70,7 +70,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             if (should_continue == -1)
             {
                 free_all_resources(symbol_table, entries, code_image, IC);
-                return 0;
+                return -1;
             }
         }
         else if (strstr(final_line, ".entry"))
@@ -79,7 +79,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             if (should_continue == -1)
             {
                 free_all_resources(symbol_table, entries, code_image, IC);
-                return 0;
+                return -1;
             }
         }
         else
@@ -88,7 +88,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             if (should_continue == -1)
             {
                 free_all_resources(symbol_table, entries, code_image, IC);
-                return 0;
+                return -1;
             }
         }
     }
@@ -109,10 +109,9 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
     if (!ob_file_name)
     {
         fprintf(stderr, "Failed to create file\n");
+
         return 0;
     }
-
-    printf("creating ob file %s\n", ob_file_name);
 
     convert_to_octal(ob_file_name, code_image, IC, data_image, DC);
 
@@ -135,28 +134,20 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
             return 0;
         }
 
-        printf("open ent file %s\n", ent_file_name);
-
         while (current)
         {
             Symbol *symbol = find_symbol(symbol_table, current->name);
             if (!symbol)
             {
-                /**
-                 * Handle other kind of error like this.
-                 */
                 printf("Entry symbol not found: %s\n", current->name);
                 return 0;
             }
-            fprintf(ent_file, "%s 0%d\n", current->name, symbol->address);
+            fprintf(ent_file, "%s %04d\n", current->name, symbol->address);
             current = current->next;
         }
 
         fclose(ent_file);
     }
-
-    printf("ent file created\n");
-    printf("Externs count: %d\n", externs_count);
 
     if (externs_count)
     {
@@ -184,7 +175,7 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
                 {
                     if (code_image[i].symbol && strcmp(code_image[i].symbol, current->name) == 0)
                     {
-                        fprintf(ext_file, "%s 0%d\n", current->name, i + 100);
+                        fprintf(ext_file, "%s %04d\n", current->name, i + MEMORY_START);
                     }
                 }
             }

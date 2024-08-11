@@ -13,7 +13,7 @@
 
 int main(int argc, char *argv[])
 {
-    int i;
+    int i, proccess_status = 1;
 
     char *am_file;
     char *as_file;
@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
         {
             printf("ERROR: Failed to create file path for %s\n", argv[i]);
             free(as_file);
-            continue;
+            return 1;
         }
 
         am_file = exec_preproc(as_file, &macro_list);

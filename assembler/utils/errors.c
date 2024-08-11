@@ -25,3 +25,8 @@ void display_warning(char *line, int line_number, const char *warning_message, c
 {
     printf("WARNING: file %s, at \"%s\" (line %d): %s\n", file_name, line, line_number, warning_message);
 }
+
+void display_system_error(const char *error_message, const char *file_name)
+{
+    printf("ERROR: file %s: %s\n", file_name, error_message);
+}
