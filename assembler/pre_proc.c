@@ -38,17 +38,15 @@ int validate_macro(const char *name, Macro *macro_list, char *line, int line_num
  * @param message The error message to display.
  * @param line The line that caused the error.
  * @param line_number The line number where the error occurred.
- * @param macro_list The list of macros.
  * @param am_filename The name of the am file.
  * @param as_file The file pointer for the as file.
  * @param am_file The file pointer for the am file.
  * @return NULL (to indicate an error occurred).
  */
 
-void *handle_preproc_error(const char *message, char *line, int line_number, Macro *macro_list, char *am_filename, FILE *as_file, FILE *am_file)
+void *handle_preproc_error(const char *message, char *line, int line_number, char *am_filename, FILE *as_file, FILE *am_file)
 {
     display_error(line, line_number, message, am_filename);
-    free_macros(macro_list);
     free(am_filename);
     fclose(as_file);
     fclose(am_file);
@@ -145,7 +143,7 @@ char *exec_preproc(const char *input_filename, Macro **macro_list)
                      */
                     if (!current_macro)
                     {
-                        return handle_preproc_error("Failed to create macro", line, line_number, *macro_list, am_filename, as_file, am_file);
+                        return handle_preproc_error("Failed to create macro", line, line_number, am_filename, as_file, am_file);
                     }
                     in_macro = 1;
                 }
@@ -177,7 +175,7 @@ char *exec_preproc(const char *input_filename, Macro **macro_list)
                  */
                 if (!add_macro_line(current_macro, line_copy))
                 {
-                    return handle_preproc_error("Failed to add line to macro", line, line_number, *macro_list, am_filename, as_file, am_file);
+                    return handle_preproc_error("Failed to add line to macro", line, line_number, am_filename, as_file, am_file);
                 };
             }
             else
@@ -206,9 +204,5 @@ char *exec_preproc(const char *input_filename, Macro **macro_list)
 
     fclose(as_file);
     fclose(am_file);
-    /**
-     *     free_macros(*macro_list);
-
-     */
     return should_continue ? am_filename : NULL;
 }

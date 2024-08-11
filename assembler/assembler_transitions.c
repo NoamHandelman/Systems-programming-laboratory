@@ -35,6 +35,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
     while (fgets(line, sizeof(line), am_file) && IC + DC <= MAX_MEMORY_SIZE - MEMORY_START)
     {
         line_number++;
+        printf("IC IS: %d\n", IC);
         if (strlen(line) > MAX_LINE_LENGTH)
         {
             display_error(line, line_number, "Line is too long", input_filename);

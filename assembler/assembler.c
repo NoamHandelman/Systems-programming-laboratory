@@ -14,7 +14,6 @@
 int main(int argc, char *argv[])
 {
     int i;
-    Macro *macro_list = NULL;
 
     char *am_file;
     char *as_file;
@@ -22,12 +21,12 @@ int main(int argc, char *argv[])
     if (argc < 2)
     {
         printf("ERROR: No files detected\n");
-        free_macros(macro_list);
         return 1;
     }
 
     for (i = 1; i < argc; i++)
     {
+        Macro *macro_list = NULL;
         as_file = create_file(argv[i], ".as");
         if (!as_file)
         {
@@ -39,6 +38,7 @@ int main(int argc, char *argv[])
         am_file = exec_preproc(as_file, &macro_list);
         if (!am_file)
         {
+            free_macros(macro_list);
             printf("Failed to process %s at pre proccess stage\n", argv[i]);
             continue;
         }

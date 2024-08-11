@@ -42,6 +42,22 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
 
     code_image[(*IC)++].value |= (1 << 2);
 
+    if (*IC == 12)
+    {
+        printf("IC 12 -----------");
+        printf("%s", instruction->op_code);
+        printf("%d", instruction->operand_count);
+        if (instruction->operand_count > 0)
+        {
+            printf("%d", instruction->operands[0].addressing_mode);
+        }
+
+        if (instruction->operand_count > 1)
+        {
+            printf("%d", instruction->operands[1].addressing_mode);
+        }
+    }
+
     for (i = 0; i < instruction->operand_count; i++)
     {
         int addressing_mode = instruction->operands[i].addressing_mode;
