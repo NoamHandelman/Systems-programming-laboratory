@@ -208,7 +208,7 @@ int create_and_add_declaration(Declaration **table, char *name)
 void update_symbols_addresses(Symbol **symbol_table, int IC)
 {
     Symbol *current = *symbol_table;
-    while (current != NULL)
+    while (current)
     {
         if (current->is_data)
         {
@@ -217,7 +217,6 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
         }
         else if (!current->is_data && !current->is_external)
         {
-
             current->address += MEMORY_START;
         }
         current = current->next;
@@ -228,29 +227,10 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
  *
  */
 
-void update_entry_symbols(Symbol **symbol_table, Declaration **entries)
-{
-    Declaration *current = *entries;
-    while (current != NULL)
-    {
-        Symbol *symbol = find_symbol(*symbol_table, current->name);
-        if (symbol)
-        {
-
-            symbol->is_entry = 1;
-        }
-        else
-        {
-            fprintf(stderr, "Entry symbol not found: %s\n", current->name);
-        }
-        current = current->next;
-    }
-}
-
 void free_declarations(Declaration *table)
 {
     Declaration *current = table;
-    while (current != NULL)
+    while (current)
     {
         Declaration *next = current->next;
         free(current->name);

@@ -102,10 +102,8 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
 {
     FILE *ent_file, *ext_file;
     char *ob_file_name, *ent_file_name, *ext_file_name;
-    update_entry_symbols(&symbol_table, &entries);
     update_symbols_addresses(&symbol_table, IC);
-    update_symbols_in_code_image(code_image, symbol_table);
-    print_symbol_table(symbol_table);
+    update_symbols_in_code_image(code_image, symbol_table, IC);
 
     ob_file_name = create_file(input_filename, ".ob");
     if (!ob_file_name)

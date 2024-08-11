@@ -90,13 +90,13 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
     }
 }
 
-void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table)
+void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC)
 {
     int i;
     Symbol *current = symbol_table;
     while (current)
     {
-        for (i = 0; i < 2048; i++)
+        for (i = 0; i < IC; i++)
         {
             if (code_image[i].symbol)
             {

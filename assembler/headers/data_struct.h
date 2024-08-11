@@ -113,8 +113,6 @@ typedef struct Declaration
 
 int create_and_add_declaration(Declaration **, char *);
 
-void update_entry_symbols(Symbol **, Declaration **);
-
 void free_declarations(Declaration *);
 
 Declaration *find_declaration(Declaration *, const char *);
