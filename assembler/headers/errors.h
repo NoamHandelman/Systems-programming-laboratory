@@ -15,4 +15,6 @@ void display_error(char *, int, const char *, const char *);
 
 void display_warning(char *, int, const char *, const char *);
 
+void display_system_error(const char *, const char *);
+
 #endif

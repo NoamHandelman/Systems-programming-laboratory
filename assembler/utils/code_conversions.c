@@ -122,25 +122,3 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
     }
 }
 
-void convert_to_octal(char *ob_file_name, Machine_Code_Image *code_image, int IC, Machine_Code_Image *data_image, int DC)
-{
-    int i;
-    int address = MEMORY_START;
-    FILE *output_file = fopen(ob_file_name, "w");
-
-    fprintf(output_file, "%d %d\n", IC, DC);
-
-    for (i = 0; i < IC; i++)
-    {
-        fprintf(output_file, "%04d ", address++);
-        fprintf(output_file, "%05o\n", code_image[i].value & 0x7FFF);
-    }
-
-    for (i = 0; i < DC; i++)
-    {
-        fprintf(output_file, "%04d ", address++);
-        fprintf(output_file, "%05o\n", data_image[i].value & 0x7FFF);
-    }
-
-    fclose(output_file);
-}

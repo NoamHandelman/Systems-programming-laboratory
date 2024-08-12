@@ -16,13 +16,13 @@
  * @return the path for the am file.
  */
 
-char *exec_preproc(const char *, Macro **);
+char *exec_preproc(const char *, Macro **, int *);
 
 /**
  * @brief Handle error in the pre proccess stage.
  */
 
-void *handle_preproc_error(const char *, char *, int, char *, FILE *, FILE *);
+void handle_preproc_error(const char *, char *, int, char *, FILE *, FILE *);
 
 /**
  * @brief Function to validate macro definition.

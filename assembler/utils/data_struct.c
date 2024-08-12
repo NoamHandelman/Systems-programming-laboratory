@@ -212,7 +212,6 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
     {
         if (current->is_data)
         {
-            printf("Updating data symbol: %s\n", current->name);
             current->address += (IC + MEMORY_START);
         }
         else if (!current->is_data && !current->is_external)

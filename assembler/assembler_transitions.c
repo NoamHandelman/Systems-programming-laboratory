@@ -100,89 +100,26 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
 
 int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count, int *should_continue)
 {
-    FILE *ent_file, *ext_file;
-    char *ob_file_name, *ent_file_name, *ext_file_name;
     update_symbols_addresses(&symbol_table, IC);
+
     update_symbols_in_code_image(code_image, symbol_table, IC);
 
-    ob_file_name = create_file(input_filename, ".ob");
-    if (!ob_file_name)
+    if (*should_continue == -1)
     {
-        fprintf(stderr, "Failed to create file\n");
-
-        return 0;
+        free_all_resources(symbol_table, entries, code_image, IC);
+        return -1;
     }
 
-    convert_to_octal(ob_file_name, code_image, IC, data_image, DC);
-
-    printf("converted to octal\n");
+    create_ob_file(code_image, IC, data_image, DC, input_filename);
 
     if (entries)
     {
-        Declaration *current = entries;
-        ent_file_name = create_file(input_filename, ".ent");
-        if (!ent_file_name)
-        {
-            fprintf(stderr, "Failed to create file\n");
-            return 0;
-        }
-
-        ent_file = fopen(ent_file_name, "w");
-        if (!ent_file)
-        {
-            fprintf(stderr, "Failed to open file %s\n", ent_file_name);
-            return 0;
-        }
-
-        while (current)
-        {
-            Symbol *symbol = find_symbol(symbol_table, current->name);
-            if (!symbol)
-            {
-                printf("Entry symbol not found: %s\n", current->name);
-                return 0;
-            }
-            fprintf(ent_file, "%s %04d\n", current->name, symbol->address);
-            current = current->next;
-        }
-
-        fclose(ent_file);
+        create_ent_file(entries, symbol_table, input_filename);
     }
 
     if (externs_count)
     {
-        Symbol *current = symbol_table;
-        int i;
-        ext_file_name = create_file(input_filename, ".ext");
-        if (!ext_file_name)
-        {
-            fprintf(stderr, "Failed to create file\n");
-            return 0;
-        }
-
-        ext_file = fopen(ext_file_name, "w");
-        if (!ext_file)
-        {
-            fprintf(stderr, "Failed to open file %s\n", ext_file_name);
-            return 0;
-        }
-
-        while (current)
-        {
-            if (current->is_external)
-            {
-                for (i = 0; i < IC; i++)
-                {
-                    if (code_image[i].symbol && strcmp(code_image[i].symbol, current->name) == 0)
-                    {
-                        fprintf(ext_file, "%s %04d\n", current->name, i + MEMORY_START);
-                    }
-                }
-            }
-            current = current->next;
-        }
-
-        fclose(ext_file);
+        create_ext_file(symbol_table, code_image, IC, input_filename);
     }
 
     free_all_resources(symbol_table, entries, code_image, IC);
