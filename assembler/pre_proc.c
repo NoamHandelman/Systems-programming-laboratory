@@ -204,5 +204,12 @@ char *exec_preproc(const char *input_filename, Macro **macro_list)
 
     fclose(as_file);
     fclose(am_file);
-    return should_continue ? am_filename : NULL;
+
+    if (!should_continue)
+    {
+        remove(am_filename);
+        return NULL;
+    }
+
+    return am_filename;
 }
