@@ -23,10 +23,6 @@ int is_empty_line(const char *line)
     {
         if (!isspace(*line))
         {
-            if (*line == ';')
-            {
-                return 1;
-            }
             return 0;
         }
         line++;

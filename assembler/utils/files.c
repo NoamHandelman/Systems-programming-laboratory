@@ -21,7 +21,7 @@ char *create_file(const char *filename, const char *extension)
     return file_path;
 }
 
-void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image *data_image, int DC, const char *input_filename)
+void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image *data_image, int DC, const char *input_filename, int *should_continue)
 {
     int i;
     int address = MEMORY_START;
@@ -30,13 +30,18 @@ void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image *
     ob_file_name = create_file(input_filename, ".ob");
     if (!ob_file_name)
     {
-        fprintf(stderr, "Failed to create file\n");
+        display_system_error("Failed to create file path", input_filename);
+        *should_continue = -1;
+        return;
     }
 
     output_file = fopen(ob_file_name, "w");
     if (!output_file)
     {
-        fprintf(stderr, "Failed to open file %s\n", ob_file_name);
+        display_system_error("Failed to open file", ob_file_name);
+        free(ob_file_name);
+        *should_continue = -1;
+        return;
     }
 
     fprintf(output_file, "%d %d\n", IC, DC);
@@ -54,9 +59,14 @@ void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image *
     }
 
     fclose(output_file);
+    if (!(*should_continue))
+    {
+        remove(ob_file_name);
+    }
+    free(ob_file_name);
 }
 
-void create_ent_file(Declaration *entries, Symbol *symbol_table, const char *input_filename)
+void create_ent_file(Declaration *entries, Symbol *symbol_table, const char *input_filename, int *should_continue)
 {
     Declaration *current = entries;
     FILE *ent_file;
@@ -64,13 +74,18 @@ void create_ent_file(Declaration *entries, Symbol *symbol_table, const char *inp
     ent_file_name = create_file(input_filename, ".ent");
     if (!ent_file_name)
     {
-        fprintf(stderr, "Failed to create file\n");
+        display_system_error("Failed to create file path", input_filename);
+        *should_continue = -1;
+        return;
     }
 
     ent_file = fopen(ent_file_name, "w");
     if (!ent_file)
     {
-        fprintf(stderr, "Failed to open file %s\n", ent_file_name);
+        display_system_error("Failed to open file", ent_file_name);
+        free(ent_file_name);
+        *should_continue = -1;
+        return;
     }
 
     while (current)
@@ -78,16 +93,26 @@ void create_ent_file(Declaration *entries, Symbol *symbol_table, const char *inp
         Symbol *symbol = find_symbol(symbol_table, current->name);
         if (!symbol)
         {
-            printf("Entry symbol not found: %s\n", current->name);
+            display_system_error("Failed to find symbol", input_filename);
+            *should_continue = 0;
         }
-        fprintf(ent_file, "%s %04d\n", current->name, symbol->address);
+        else
+        {
+            fprintf(ent_file, "%s %04d\n", current->name, symbol->address);
+        }
         current = current->next;
     }
 
     fclose(ent_file);
+    if (!(*should_continue))
+    {
+        remove(ent_file_name);
+    }
+
+    free(ent_file_name);
 }
 
-void create_ext_file(Symbol *symbol_table, Machine_Code_Image *code_image, int IC, const char *input_filename)
+void create_ext_file(Symbol *symbol_table, Machine_Code_Image *code_image, int IC, const char *input_filename, int *should_continue)
 {
     Symbol *current = symbol_table;
     FILE *ext_file;
@@ -96,13 +121,18 @@ void create_ext_file(Symbol *symbol_table, Machine_Code_Image *code_image, int I
     ext_file_name = create_file(input_filename, ".ext");
     if (!ext_file_name)
     {
-        fprintf(stderr, "Failed to create file\n");
+        display_system_error("Failed to create file path", input_filename);
+        *should_continue = -1;
+        return;
     }
 
     ext_file = fopen(ext_file_name, "w");
     if (!ext_file)
     {
-        fprintf(stderr, "Failed to open file %s\n", ext_file_name);
+        display_system_error("Failed to open file", ext_file_name);
+        free(ext_file_name);
+        *should_continue = -1;
+        return;
     }
 
     while (current)
@@ -121,4 +151,9 @@ void create_ext_file(Symbol *symbol_table, Machine_Code_Image *code_image, int I
     }
 
     fclose(ext_file);
+    if (!(*should_continue))
+    {
+        remove(ext_file_name);
+    }
+    free(ext_file_name);
 }

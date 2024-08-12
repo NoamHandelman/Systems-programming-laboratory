@@ -91,6 +91,8 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
                 return -1;
             }
         }
+
+        printf("current status: %d\n", should_continue);
     }
 
     fclose(am_file);
@@ -100,6 +102,9 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
 
 int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count, int *should_continue)
 {
+
+    printf("First pass status: %d\n", *should_continue);
+
     update_symbols_addresses(&symbol_table, IC);
 
     update_symbols_in_code_image(code_image, symbol_table, IC);
@@ -110,21 +115,23 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
         return -1;
     }
 
-    create_ob_file(code_image, IC, data_image, DC, input_filename);
+    create_ob_file(code_image, IC, data_image, DC, input_filename, should_continue);
 
-    if (entries)
+    if (entries && *should_continue != -1)
     {
-        create_ent_file(entries, symbol_table, input_filename);
+        create_ent_file(entries, symbol_table, input_filename, should_continue);
     }
 
-    if (externs_count)
+    if (externs_count && *should_continue != -1)
     {
-        create_ext_file(symbol_table, code_image, IC, input_filename);
+        create_ext_file(symbol_table, code_image, IC, input_filename, should_continue);
     }
 
     free_all_resources(symbol_table, entries, code_image, IC);
 
-    return 1;
+    printf("Second pass status: %d\n", *should_continue);
+
+    return *should_continue;
 }
 
 /**

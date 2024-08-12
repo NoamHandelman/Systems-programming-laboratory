@@ -3,8 +3,6 @@ MAIN: add r3   , LIST
 LOOP  : prn #48
 
 
-    ;testdelete
-
 ;testdelete
 
 macr noam123

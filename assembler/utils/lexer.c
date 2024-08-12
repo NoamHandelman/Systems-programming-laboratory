@@ -445,7 +445,7 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
 
         if (!is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename, macro_list))
         {
-            should_continue = 0;
+            *should_continue = 0;
         }
         else
         {
@@ -467,13 +467,18 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
 
         if (strcmp(directive, ".data") == 0)
         {
-            *should_continue = parse_data_dir(current, DC, data_image, line_number, input_filename, original_line);
+            if (!parse_data_dir(current, DC, data_image, line_number, input_filename, original_line))
+            {
+                *should_continue = 0;
+            }
         }
 
         else if (strcmp(directive, ".string") == 0)
         {
-
-            *should_continue = parse_string_dir(current, DC, data_image, line_number, input_filename, original_line);
+            if (!parse_string_dir(current, DC, data_image, line_number, input_filename, original_line))
+            {
+                *should_continue = 0;
+            }
         }
         else
         {

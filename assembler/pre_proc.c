@@ -18,7 +18,7 @@ int validate_macro(const char *name, Macro *macro_list, char *line, int line_num
         return 0;
     }
 
-    if (get_opcode(name) >= 0 || is_valid_instruction(name) || get_register(name) >= 0)
+    if (get_opcode(name) >= 0 || is_valid_instruction(name) || get_register(name) >= 0 || strcmp(name, "macr") == 0 || strcmp(name, "endmacr") == 0)
     {
         display_error(line, line_number, "Macro name can not be a reserved word", am_filename);
         return 0;
@@ -108,7 +108,7 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
         char line_copy[INITIAL_BUFFER_SIZE];
         line_number++;
         strcpy(line_copy, line);
-        if (is_empty_line(line))
+        if (is_empty_line(line) || line[0] == ';')
         {
             continue;
         }
@@ -138,18 +138,21 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                     {
                         *proccess_status = 0;
                     }
-                    current_macro = create_and_add_macro(macro_list, macro_name);
-
-                    /**
-                     * Check if the macro was created successfully, if not exit the program.
-                     */
-                    if (!current_macro)
+                    else
                     {
-                        handle_preproc_error("Failed to create macro", line, line_number, am_filename, as_file, am_file);
-                        *proccess_status = -1;
-                        return NULL;
+                        current_macro = create_and_add_macro(macro_list, macro_name);
+
+                        /**
+                         * Check if the macro was created successfully, if not exit the program.
+                         */
+                        if (!current_macro)
+                        {
+                            handle_preproc_error("Failed to create macro", line, line_number, am_filename, as_file, am_file);
+                            *proccess_status = -1;
+                            return NULL;
+                        }
+                        in_macro = 1;
                     }
-                    in_macro = 1;
                 }
                 else
                 {
