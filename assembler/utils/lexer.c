@@ -170,7 +170,7 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int line
             {
                 error_found = 0;
                 expecting_number = 0;
-                display_error(full_line, line_number, "Found invalid token (not a number)", input_filename);
+                display_error(full_line, line_number, "Found invalid token (not a an integer)", input_filename);
             }
         }
         else
