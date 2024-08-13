@@ -40,9 +40,9 @@ int parse_string_dir(char *, int *, Machine_Code_Image *, int, const char *, cha
 
 int get_addressing_mode(const char *);
 
-int validate_instruction(Instruction *, char *, int, const char *);
+void validate_instruction(Instruction *, char *, int, const char *, int *);
 
-Instruction *parse_instruction(const char *, char *, int, const char *, int *);
+Instruction *parse_instruction(const char *, char *, int, const char *, int *, Macro **);
 
 int get_opcode(const char *op)
 {
@@ -83,6 +83,47 @@ int is_valid_instruction(const char *inst)
     return 0;
 }
 
+int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_number, const char *input_filename, Macro **macro_list)
+{
+    int i, error_found = 1;
+
+    if (strlen(symbol) > MAX_SYMBOL_LENGTH)
+    {
+
+        display_error(line, line_number, "Symbol length should be 31 or less", input_filename);
+        error_found = 0;
+    }
+
+    if (find_macro(*macro_list, symbol))
+    {
+        display_error(line, line_number, "Symbol can not be a macro name", input_filename);
+        error_found = 0;
+    }
+
+    if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol) || strcmp(symbol, "macr") == 0 || strcmp(symbol, "endmacr") == 0)
+    {
+        display_error(line, line_number, "Symbol can not be a reserved word", input_filename);
+        error_found = 0;
+    }
+
+    if (!isalpha(symbol[0]))
+    {
+        display_error(line, line_number, "Symbol must start with a letter", input_filename);
+        error_found = 0;
+    }
+
+    for (i = 1; i < strlen(symbol); i++)
+    {
+        if (!isalnum(symbol[i]))
+        {
+            display_error(line, line_number, "Symbol must contains only letters or numbers", input_filename);
+            error_found = 0;
+        }
+    }
+
+    return error_found;
+}
+
 int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int line_number, const char *input_filename, Macro **macro_list)
 {
     int i, error_found = 1;
@@ -99,8 +140,6 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
         display_error(line, line_number, "Symbol already defined", input_filename);
         error_found = 0;
     }
-
-    printf("before find macro\n");
 
     if (find_macro(*macro_list, symbol))
     {
@@ -254,12 +293,12 @@ int get_addressing_mode(const char *operand)
         return 0;
     }
 
-    if (operand[0] == '*')
+    if (operand[0] == '*' && operand[1] == 'r' && strlen(operand) == 3 && isdigit((unsigned char)operand[2]))
     {
         return 2;
     }
 
-    if (operand[0] == 'r')
+    if (operand[0] == 'r' && strlen(operand) == 2 && isdigit((unsigned char)operand[1]))
     {
         return 3;
     }
@@ -267,7 +306,7 @@ int get_addressing_mode(const char *operand)
     return 1;
 }
 
-int validate_immediate_value(Operand *operand)
+int validate_operand(Operand *operand)
 {
     if (operand->addressing_mode == 0)
     {
@@ -276,18 +315,25 @@ int validate_immediate_value(Operand *operand)
             return 0;
         }
     }
+
+    if (operand->addressing_mode == 2 || operand->addressing_mode == 3)
+    {
+        if (operand->value.reg < 0 || operand->value.reg > 7)
+        {
+            return 0;
+        }
+    }
     return 1;
 }
 
-int validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename)
+void validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename, int *should_continue)
 {
     int opcode_index = get_opcode(instr->op_code);
-    int error_found = 1;
 
     if (instr->operand_count != OP_CODES[opcode_index].operands)
     {
         display_error(full_line, line_number, "Invalid number of operands", input_filename);
-        error_found = 0;
+        *should_continue = 0;
     }
 
     if (instr->operand_count == 1)
@@ -295,13 +341,13 @@ int validate_instruction(Instruction *instr, char *full_line, int line_number, c
         if (!OP_CODES[opcode_index].dest_operands[instr->operands[0].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
-            error_found = 0;
+            *should_continue = 0;
         }
 
-        if (!validate_immediate_value(&instr->operands[0]))
+        if (!validate_operand(&instr->operands[0]))
         {
-            display_error(full_line, line_number, "Number out of valid range", input_filename);
-            error_found = 0;
+            display_error(full_line, line_number, "Found invalid operand", input_filename);
+            *should_continue = 0;
         }
     }
 
@@ -310,34 +356,32 @@ int validate_instruction(Instruction *instr, char *full_line, int line_number, c
         if (!OP_CODES[opcode_index].src_operands[instr->operands[0].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid source operand", input_filename);
-            error_found = 0;
+            *should_continue = 0;
         }
         if (!OP_CODES[opcode_index].dest_operands[instr->operands[1].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
-            error_found = 0;
+            *should_continue = 0;
         }
 
-        if (!validate_immediate_value(&instr->operands[1]))
+        if (!validate_operand(&instr->operands[1]))
         {
-            display_error(full_line, line_number, "Number out of valid range", input_filename);
-            error_found = 0;
+            display_error(full_line, line_number, "Found invalid operand", input_filename);
+            *should_continue = 0;
         }
     }
-
-    return error_found;
 }
 
 /**
  * should also valid address mode is ok for each instruction
  */
 
-Instruction *parse_instruction(const char *line, char *full_line, int line_number, const char *input_filename, int *should_continue)
+Instruction *parse_instruction(const char *line, char *full_line, int line_number, const char *input_filename, int *should_continue, Macro **macro_list)
 {
     char line_copy[MAX_LINE_LENGTH];
     char *token;
     Instruction *instr;
-    int operand_count = 0, is_valid_instruction;
+    int operand_count = 0;
 
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     line_copy[MAX_LINE_LENGTH - 1] = '\0';
@@ -381,40 +425,84 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 
     strcpy(instr->op_code, token);
 
-    while ((token = strtok(NULL, " ,")) && operand_count < 2)
+    while (operand_count < 2)
     {
         int addressing_mode;
+        token = strtok(NULL, " ");
+
+        if (!token)
+        {
+            break;
+        }
+
+        printf("Token in loop token: %s\n", token);
+
+        if (operand_count == 1)
+        {
+            if (strcmp(token, ",") != 0)
+            {
+                display_error(full_line, line_number, "Expected comma between operands", input_filename);
+                *should_continue = 0;
+                continue;
+            }
+
+            token = strtok(NULL, " ");
+            if (!token)
+            {
+                display_error(full_line, line_number, "Missing second operand after comma", input_filename);
+                *should_continue = 0;
+                break;
+            }
+        }
+
         addressing_mode = get_addressing_mode(token);
         instr->operands[operand_count].addressing_mode = addressing_mode;
         if (addressing_mode == 0)
         {
-
             instr->operands[operand_count].value.num = atoi(token + 1);
         }
         else if (addressing_mode == 2 || addressing_mode == 3)
         {
             instr->operands[operand_count].value.reg = atoi(token + (addressing_mode == 2 ? 2 : 1));
+            printf("Register: %d\n", instr->operands[operand_count].value.reg);
         }
         else
         {
-            instr->operands[operand_count].value.symbol = (char *)malloc(strlen(token) + 1);
-            if (!instr->operands[operand_count].value.symbol)
+            if (!is_valid_symbol_in_instruction(token, full_line, line_number, input_filename, macro_list))
             {
-                display_error(full_line, line_number, "Failed to allocate memory for symbol", input_filename);
-                *should_continue = -1;
-                free(instr->op_code);
-                free(instr);
-                return NULL;
+                *should_continue = 0;
             }
-            strcpy(instr->operands[operand_count].value.symbol, token);
+            else
+            {
+                instr->operands[operand_count].value.symbol = (char *)malloc(strlen(token) + 1);
+                if (!instr->operands[operand_count].value.symbol)
+                {
+                    display_error(full_line, line_number, "Failed to allocate memory for symbol", input_filename);
+                    *should_continue = -1;
+                    free(instr->op_code);
+                    free(instr);
+                    return NULL;
+                }
+                strcpy(instr->operands[operand_count].value.symbol, token);
+            }
         }
         operand_count++;
     }
     instr->operand_count = operand_count;
+    printf("operand count: %d\n", instr->operand_count);
 
-    is_valid_instruction = validate_instruction(instr, full_line, line_number, input_filename);
+    token = strtok(NULL, " ");
+    if (token)
+    {
+        display_error(full_line, line_number, "Extra forbidden characters found in the end of the line", input_filename);
+        *should_continue = 0;
+    }
 
-    return is_valid_instruction ? instr : NULL;
+    validate_instruction(instr, full_line, line_number, input_filename, should_continue);
+
+    printf("token: %s\n", token);
+
+    return *should_continue ? instr : NULL;
 }
 
 /**
@@ -657,7 +745,7 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
 
     if (token)
     {
-        instruction = parse_instruction(token, line_copy, line_number, input_filename, should_continue);
+        instruction = parse_instruction(token, line_copy, line_number, input_filename, should_continue, macro_list);
         if (!instruction)
             return;
 
