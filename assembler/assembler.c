@@ -12,8 +12,8 @@ int main(int argc, char *argv[])
 {
     int i;
 
-    char *am_file;
-    char *as_file;
+    char *am_file = NULL;
+    char *as_file = NULL;
 
     if (argc < 2)
     {

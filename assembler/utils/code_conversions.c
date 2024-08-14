@@ -20,6 +20,7 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
     int i;
 
     code_image[*IC].value = 0;
+    code_image[*IC].symbol = NULL;
 
     code_image[*IC].value |= (opcode_index << 11);
 
@@ -121,4 +122,3 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
         current = current->next;
     }
 }
-
