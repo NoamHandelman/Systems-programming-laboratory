@@ -143,7 +143,7 @@ void create_ext_file(Symbol *symbol_table, Machine_Code_Image *code_image, int I
             {
                 if (code_image[i].symbol && strcmp(code_image[i].symbol, current->name) == 0)
                 {
-                    fprintf(ext_file, "%s %04d\n", current->name, i + MEMORY_START);
+                    fprintf(ext_file, "%-15s %04d\n", current->name, i + MEMORY_START);
                 }
             }
         }

@@ -1,21 +1,24 @@
+/**
+ * This is the file that implements the two passes of the assembler,
+ * going over the processed file and analyzing the commands accordingly.
+ */
+
 #include "headers/assembler_transitions.h"
-
-/**
- * This is a large enough random number so that we can with a high probability absorb the entire line and make sure that its length is not greater than allowed.
- */
-
-/**
- * @brief Execute the first pass of the assembler.
- * @param input_filename The name of the am file to process.
- * @return 1 if the first pass was successful, 0 otherwise.
- */
 
 int exec_first_pass(const char *input_filename, Macro **macro_list)
 {
     FILE *am_file;
     int IC = 0, DC = 0, line_number = 0, should_continue = 1, externs_count = 0;
+    /**
+     * Initial very big buffer size for the line to check later if line is not in valid length.
+     */
     char line[INITIAL_BUFFER_SIZE];
+
+    /**
+     * The final line that will be processed.
+     */
     char final_line[MAX_LINE_LENGTH + 1];
+
     Symbol *symbol_table = NULL;
     Machine_Code_Image data_image[MAX_MEMORY_SIZE];
     Machine_Code_Image code_image[MAX_MEMORY_SIZE];
@@ -38,7 +41,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
         printf("IC IS: %d\n", IC);
         if (strlen(line) > MAX_LINE_LENGTH)
         {
-            display_error(line, line_number, "Line is too long", input_filename);
+            display_error(line, line_number, "Line is too long, a valid line length is 80", input_filename);
             should_continue = 0;
         }
 
@@ -48,11 +51,17 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
         final_line[MAX_LINE_LENGTH] = '\0';
 
         /**
-         * Adjust the line so it will be easier to parse.
+         * Adjust the line so it will be easier to parse later.
          */
         handle_spaces(final_line);
 
         printf("Line %d: %s\n", line_number, final_line);
+
+        /**
+         * Handle .data or .string directives, .extern, .entry or instructions.
+         * If the proccess failed because of fatal error, we will free all allocated resources and return -1 flag to exit the program.
+         * If the proccess failed because of non fatal error, or the proccess was successful we will continue to the second pass (to check more errors or creating the output files).
+         */
 
         if (strstr(final_line, ".data") || strstr(final_line, ".string"))
         {
