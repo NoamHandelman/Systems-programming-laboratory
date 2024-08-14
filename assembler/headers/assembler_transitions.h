@@ -3,10 +3,6 @@
 
 #include <stdio.h>
 #include <string.h>
-#include "./strings.h"
-#include "./globals.h"
-#include "./lexer.h"
-#include "./code_conversions.h"
 #include "./files.h"
 #include "./errors.h"
 #include "./data_struct.h"
@@ -36,9 +32,13 @@ int exec_first_pass(const char *input_filename, Macro **macro_list);
 int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count, int *should_continue);
 
 /**
- * @brief Free all the resources that were allocated during the first and second passes.
+ * @brief Free memory of resources that were allocated during the first and second passes.
+ * @param symbol_table The symbol table.
+ * @param entries The list of entries.
+ * @param code_image The code image.
+ * @param IC The instruction counter.
  */
 
-void free_all_resources(Symbol *, Declaration *, Machine_Code_Image *, int);
+void free_all_resources(Symbol *symbol_table, Declaration *entries, Machine_Code_Image *code_image, int IC);
 
 #endif

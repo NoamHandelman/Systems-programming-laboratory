@@ -6,10 +6,7 @@
  */
 
 #include "headers/pre_proc.h"
-#include "headers/files.h"
 #include "headers/assembler_transitions.h"
-#include "headers/errors.h"
-#include "headers/data_struct.h"
 
 int main(int argc, char *argv[])
 {

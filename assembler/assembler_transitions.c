@@ -4,6 +4,10 @@
  */
 
 #include "headers/assembler_transitions.h"
+#include "./headers/strings.h"
+#include "./headers/globals.h"
+#include "./headers/lexer.h"
+#include "./headers/code_conversions.h"
 
 int exec_first_pass(const char *input_filename, Macro **macro_list)
 {
@@ -167,15 +171,12 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
 }
 
 /**
- * @brief Free all resources allocated during the assembler execution.
- * @param symbol_table The symbol table to free.
- * @param entries The entries table to free.
+ * Free all allocated resources
  */
 
 void free_all_resources(Symbol *symbol_table, Declaration *entries, Machine_Code_Image *code_image, int IC)
 {
     free_symbol_table(symbol_table);
     free_declarations(entries);
-
     free_machine_code_image(code_image, IC);
 }
