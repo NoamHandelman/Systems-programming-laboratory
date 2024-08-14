@@ -46,8 +46,10 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
     for (i = 0; i < instruction->operand_count; i++)
     {
         int addressing_mode = instruction->operands[i].addressing_mode;
-        code_image[*IC].value = 0;
+        /**
+         * code_image[*IC].value = 0;
         code_image[*IC].symbol = NULL;
+         */
 
         if (addressing_mode == 0)
         {

@@ -67,6 +67,11 @@ typedef struct Machine_Code_Image
     char *symbol;
 } Machine_Code_Image;
 
+typedef struct Machine_Code_Image_Data
+{
+    unsigned short value;
+} Machine_Code_Image_Data;
+
 void free_machine_code_image(Machine_Code_Image *, int);
 
 /**

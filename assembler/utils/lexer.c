@@ -29,14 +29,14 @@ char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-int parse_data_dir(char *, int *, Machine_Code_Image *, int, const char *, char *);
+int parse_data_dir(char *, int *, Machine_Code_Image_Data *, int, const char *, char *);
 
 /**
  * @brief Function to extract each char from the .string directive and add the asci code to the data image.
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-int parse_string_dir(char *, int *, Machine_Code_Image *, int, const char *, char *);
+int parse_string_dir(char *, int *, Machine_Code_Image_Data *, int, const char *, char *);
 
 int get_addressing_mode(const char *);
 
@@ -171,7 +171,7 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
     return error_found;
 }
 
-int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int line_number, const char *input_filename, char *full_line)
+int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int line_number, const char *input_filename, char *full_line)
 {
     char *token;
     char *endptr;
@@ -236,7 +236,7 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image *data_image, int line
     return error_found;
 }
 
-int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image, int line_number, const char *input_filename, char *full_line)
+int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int line_number, const char *input_filename, char *full_line)
 {
     char *line_copy;
     int i, error_found = 1;
@@ -301,24 +301,10 @@ int get_addressing_mode(const char *operand)
         return 0;
     }
 
-    /**
-     *  if (operand[0] == '*' && operand[1] == 'r' && strlen(operand) == 3 && isdigit((unsigned char)operand[2]))
-        {
-            return 2;
-        }
-     */
-
     if (operand[0] == '*' && get_register(operand + 1) >= 0)
     {
         return 2;
     }
-
-    /**
-     * if (operand[0] == 'r' && strlen(operand) == 2 && isdigit((unsigned char)operand[1]))
-    {
-        return 3;
-    }
-     */
 
     if (get_register(operand) >= 0)
     {
@@ -402,7 +388,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 {
     char line_copy[MAX_LINE_LENGTH];
     char *token;
-    Instruction *instr;
+    Instruction *instr = NULL;
     int operand_count = 0;
 
     strncpy(line_copy, line, MAX_LINE_LENGTH);
@@ -538,7 +524,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image *data_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list)
+void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image_Data *data_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list)
 {
     char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
@@ -729,7 +715,7 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
     char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
     char *token;
-    Instruction *instruction;
+    Instruction *instruction = NULL;
 
     char initial_line[MAX_LINE_LENGTH], line_copy[MAX_LINE_LENGTH];
     strncpy(initial_line, line, MAX_LINE_LENGTH);

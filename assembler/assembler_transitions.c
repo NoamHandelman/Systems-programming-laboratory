@@ -24,7 +24,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
     char final_line[MAX_LINE_LENGTH + 1];
 
     Symbol *symbol_table = NULL;
-    Machine_Code_Image data_image[MAX_MEMORY_SIZE];
+    Machine_Code_Image_Data data_image[MAX_MEMORY_SIZE];
     Machine_Code_Image code_image[MAX_MEMORY_SIZE];
     Declaration *entries = NULL;
 
@@ -113,7 +113,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
     return exec_second_pass(input_filename, symbol_table, code_image, data_image, IC, DC, entries, externs_count, &should_continue);
 }
 
-int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image *data_image, int IC, int DC, Declaration *entries, int externs_count, int *should_continue)
+int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image_Data *data_image, int IC, int DC, Declaration *entries, int externs_count, int *should_continue)
 {
 
     printf("First pass status: %d\n", *should_continue);

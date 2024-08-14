@@ -15,7 +15,7 @@
  */
 char *create_file(const char *, const char *);
 
-void create_ob_file(Machine_Code_Image *, int, Machine_Code_Image *, int, const char *, int *);
+void create_ob_file(Machine_Code_Image *, int, Machine_Code_Image_Data *, int, const char *, int *);
 
 void create_ent_file(Declaration *, Symbol *, const char *, int *);
 

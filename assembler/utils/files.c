@@ -21,7 +21,7 @@ char *create_file(const char *filename, const char *extension)
     return file_path;
 }
 
-void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image *data_image, int DC, const char *input_filename, int *should_continue)
+void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image_Data *data_image, int DC, const char *input_filename, int *should_continue)
 {
     int i;
     int address = MEMORY_START;

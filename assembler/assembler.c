@@ -29,7 +29,6 @@ int main(int argc, char *argv[])
         if (!as_file)
         {
             display_system_error("Failed to create file path", argv[i]);
-            free(as_file);
             return 1;
         }
 
@@ -37,6 +36,7 @@ int main(int argc, char *argv[])
         if (!am_file)
         {
             free_macros(macro_list);
+            free(as_file);
             display_system_error("Failed to process file at pre proccess stage", argv[i]);
             if (proccess_status == -1)
             {
