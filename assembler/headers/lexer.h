@@ -1,20 +1,7 @@
 #ifndef LEXER_H
 #define LEXER_H
 
-#include <stdio.h>
-#include <ctype.h>
-#include <string.h>
-#include <stdlib.h>
-#include "../headers/globals.h"
 #include "../headers/data_struct.h"
-#include "../headers/code_conversions.h"
-#include "../headers/errors.h"
-
-#define MAX_DATA_NUM 16383
-#define MIN_DATA_NUM -16384
-
-#define MAX_IMMEDIATE_VALUE 2047
-#define MIN_IMMEDIATE_VALUE -2048
 
 /**
  * @brief Get the opcode index of the instruction.

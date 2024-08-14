@@ -2,7 +2,19 @@
  * This file bundles the functions needed to parse the syntax of a line in the file
  */
 
+#include <stdio.h>
+#include <ctype.h>
+#include <string.h>
+#include <stdlib.h>
 #include "../headers/lexer.h"
+#include "../headers/globals.h"
+#include "../headers/code_conversions.h"
+#include "../headers/errors.h"
+
+#define MAX_DATA_NUM 16383
+#define MIN_DATA_NUM -16384
+#define MAX_IMMEDIATE_VALUE 2047
+#define MIN_IMMEDIATE_VALUE -2048
 
 OP_CODE OP_CODES[] = {
     {"mov", 2, {1, 1, 1, 1}, {0, 1, 1, 1}},

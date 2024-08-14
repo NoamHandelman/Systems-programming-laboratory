@@ -1,4 +1,16 @@
+/**
+ * This files bundles the functions that are responsible for encoding the instructions and the symbols into machine code.
+ */
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 #include "../headers/code_conversions.h"
+#include "../headers/lexer.h"
+#include "../headers/globals.h"
+
+unsigned short encode_addressing_mode(int addressing_mode);
 
 unsigned short encode_addressing_mode(int addressing_mode)
 {
@@ -46,10 +58,6 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
     for (i = 0; i < instruction->operand_count; i++)
     {
         int addressing_mode = instruction->operands[i].addressing_mode;
-        /**
-         * code_image[*IC].value = 0;
-        code_image[*IC].symbol = NULL;
-         */
 
         if (addressing_mode == 0)
         {
