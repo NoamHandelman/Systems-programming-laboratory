@@ -1,3 +1,7 @@
+/**
+ * This file bundles the functions needed to parse the syntax of a line in the file
+ */
+
 #include "../headers/lexer.h"
 
 OP_CODE OP_CODES[] = {
@@ -26,23 +30,97 @@ char *INSTRUCTIONS[] = {".data", ".string", ".extern", ".entry"};
 
 /**
  * @brief Function tp extract the numbers from the .data directive and add them to the data image.
+ * @param line The line to process.
+ * @param DC The data counter.
+ * @param data_image The data image array.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param full_line Copy of full line.
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-int parse_data_dir(char *, int *, Machine_Code_Image_Data *, int, const char *, char *);
+int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int line_number, const char *input_filename, char *full_line);
 
 /**
  * @brief Function to extract each char from the .string directive and add the asci code to the data image.
+ * @param line The line to process.
+ * @param DC The data counter.
+ * @param data_image The data image array.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param full_line Copy of full line.
  * @return 1 if the process was successful, 0 otherwise.
  */
 
-int parse_string_dir(char *, int *, Machine_Code_Image_Data *, int, const char *, char *);
+int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int line_number, const char *input_filename, char *full_line);
 
-int get_addressing_mode(const char *);
+/**
+ * @brief Function to get the addressing mode of an operand.
+ * @param operand The operand to check.
+ * @return The addressing mode of the operand.
+ */
 
-void validate_instruction(Instruction *, char *, int, const char *, int *);
+int get_addressing_mode(const char *operand);
 
-Instruction *parse_instruction(const char *, char *, int, const char *, int *, Macro **);
+/**
+ * @brief Function to check if the instruction is valid.
+ * @param inst The instruction to check.
+ * @param full_line The full line.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param should_continue A flag to indicate if the process should continue.
+ */
+
+void validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename, int *should_continue);
+
+/**
+ * @brief Function to parse an instruction line.
+ * @param line The line to parse.
+ * @param full_line Copy oft the full line.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param should_continue A flag to indicate if the process should continue.
+ * @param macro_list The list of macros from the pre proccess.
+ * @return The parsed instruction if the operation was successful, otherwise return NULL.
+ */
+
+Instruction *parse_instruction(const char *line, char *full_line, int line_number, const char *input_filename, int *should_continue, Macro **macro_list);
+
+/**
+ * @brief Function to check if the operand which is symbol in instruction is valid.
+ * @param symbol The symbol to check.
+ * @param line The line that contains the symbol.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param macro_list The list of macros from the pre proccess.
+ * @return 1 if the symbol is valid as operand, 0 otherwise.
+ */
+
+int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_number, const char *input_filename, Macro **macro_list);
+
+/**
+ * @brief Function to check if the symbol is valid before adding to the symbols table.
+ * @param symbol The symbol to check.
+ * @param symbol_table The symbol table.
+ * @param line The line of the symbol.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param macro_list The list of macros.
+ * @return 1 if the symbol is valid, 0 otherwise.
+ */
+
+int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int line_number, const char *input_filename, Macro **macro_list);
+
+/**
+ * @brief Validate an operand.
+ * @param operand The operand to validate.
+ * @return 1 if the operand is valid, 0 otherwise.
+ */
+int validate_operand(Operand *operand);
+
+/**
+ * @brief Function to return the index of an opcode.
+ */
 
 int get_opcode(const char *op)
 {
@@ -57,6 +135,10 @@ int get_opcode(const char *op)
     return -1;
 }
 
+/**
+ * @brief Function to return the index of a register.
+ */
+
 int get_register(const char *reg)
 {
     int i;
@@ -69,6 +151,10 @@ int get_register(const char *reg)
     }
     return -1;
 }
+
+/**
+ * @brief Function to check if the instruction is valid.
+ */
 
 int is_valid_instruction(const char *inst)
 {
@@ -87,6 +173,10 @@ int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_numb
 {
     int i, error_found = 1;
 
+    /**
+     * Check if the symbol is too long.
+     */
+
     if (strlen(symbol) > MAX_SYMBOL_LENGTH)
     {
 
@@ -94,11 +184,19 @@ int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_numb
         error_found = 0;
     }
 
+    /**
+     * Check if the symbol is already defined as macro.
+     */
+
     if (find_macro(*macro_list, symbol))
     {
         display_error(line, line_number, "Symbol can not be a macro name", input_filename);
         error_found = 0;
     }
+
+    /**
+     * Check if the symbol is a reserved word.
+     */
 
     if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol) || strcmp(symbol, "macr") == 0 || strcmp(symbol, "endmacr") == 0)
     {
@@ -106,11 +204,19 @@ int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_numb
         error_found = 0;
     }
 
+    /**
+     * Check if the symbol starts with a letter.
+     */
+
     if (!isalpha(symbol[0]))
     {
         display_error(line, line_number, "Symbol must start with a letter", input_filename);
         error_found = 0;
     }
+
+    /**
+     * Check if the symbol contains only letters or numbers.
+     */
 
     for (i = 1; i < strlen(symbol); i++)
     {
@@ -128,6 +234,10 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
 {
     int i, error_found = 1;
 
+    /**
+     * Check if the symbol is too long.
+     */
+
     if (strlen(symbol) > MAX_SYMBOL_LENGTH)
     {
 
@@ -135,11 +245,19 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
         error_found = 0;
     }
 
+    /**
+     * Check if the symbol is already defined in the symbols table.
+     */
+
     if (find_symbol(*symbol_table, symbol))
     {
         display_error(line, line_number, "Symbol already defined", input_filename);
         error_found = 0;
     }
+
+    /**
+     * Check if the symbol is already defined as macro.
+     */
 
     if (find_macro(*macro_list, symbol))
     {
@@ -147,17 +265,29 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
         error_found = 0;
     }
 
+    /**
+     * Check if the symbol is a reserved word.
+     */
+
     if (get_opcode(symbol) >= 0 || get_register(symbol) >= 0 || is_valid_instruction(symbol) || strcmp(symbol, "macr") == 0 || strcmp(symbol, "endmacr") == 0)
     {
         display_error(line, line_number, "Symbol can not be a reserved word", input_filename);
         error_found = 0;
     }
 
+    /**
+     * Check if the symbol starts with a letter.
+     */
+
     if (!isalpha(symbol[0]))
     {
         display_error(line, line_number, "Symbol must start with a letter", input_filename);
         error_found = 0;
     }
+
+    /**
+     * Check if the symbol contains only letters or numbers.
+     */
 
     for (i = 1; i < strlen(symbol); i++)
     {
@@ -179,6 +309,10 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int
     int expecting_number = 1;
     int error_found = 1;
 
+    /**
+     * Check if the line starts or ends with a comma.
+     */
+
     if (line[0] == ',' || line[strlen(line) - 1] == ',')
     {
         error_found = 0;
@@ -190,9 +324,16 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int
     {
         if (expecting_number)
         {
+            /**
+             * Check if the token is a number
+             */
+
             value = strtol(token, &endptr, 10);
             if (*endptr == '\0')
             {
+                /**
+                 * Check if the number is in the valid range (number that can be stored in 15 bits)
+                 */
                 if (value < MIN_DATA_NUM || value > MAX_DATA_NUM)
                 {
                     display_error(full_line, line_number, "Number out of valid range", input_filename);
@@ -244,14 +385,26 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, i
 
     printf("initial line : %s\n", line);
 
+    /**
+     * Find the first and last double quote in the line.
+     */
+
     start_quote = strchr(line, '"');
     end_quote = strrchr(line, '"');
+
+    /**
+     * Check if the string starts and ends with a double quote.
+     */
 
     if (!start_quote || !end_quote || start_quote == end_quote)
     {
         display_error(full_line, line_number, "String should start and end with a double quote", input_filename);
         error_found = 0;
     }
+
+    /**
+     * Check if there are unexpected characters before the start and after the end of the string.
+     */
 
     for (i = 0; i < start_quote - line; i++)
     {
@@ -296,26 +449,44 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, i
 
 int get_addressing_mode(const char *operand)
 {
+    /**
+     * Immediate addressing mode
+     */
     if (operand[0] == '#')
     {
         return 0;
     }
+
+    /**
+     * Indirect register
+     */
 
     if (operand[0] == '*' && get_register(operand + 1) >= 0)
     {
         return 2;
     }
 
+    /**
+     * Direct register
+     */
+
     if (get_register(operand) >= 0)
     {
         return 3;
     }
+
+    /**
+     * Direct addressing or invalid addressing mode
+     */
 
     return 1;
 }
 
 int validate_operand(Operand *operand)
 {
+    /**
+     * Check if the operand is a number and in the valid range.
+     */
     if (operand->addressing_mode == 0)
     {
         if (operand->value.num < MIN_IMMEDIATE_VALUE || operand->value.num > MAX_IMMEDIATE_VALUE)
@@ -323,6 +494,10 @@ int validate_operand(Operand *operand)
             return 0;
         }
     }
+
+    /**
+     * Check if the operand is a valid register.
+     */
 
     if (operand->addressing_mode == 2 || operand->addressing_mode == 3)
     {
@@ -338,11 +513,19 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
 {
     int opcode_index = get_opcode(instr->op_code);
 
+    /**
+     * Check if the number of operands is valid.
+     */
+
     if (instr->operand_count != OP_CODES[opcode_index].operands)
     {
         display_error(full_line, line_number, "Invalid number of operands", input_filename);
         *should_continue = 0;
     }
+
+    /**
+     * Validate operands locations in the instruction.
+     */
 
     if (instr->operand_count == 1)
     {
@@ -380,14 +563,10 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
     }
 }
 
-/**
- * should also valid address mode is ok for each instruction
- */
-
 Instruction *parse_instruction(const char *line, char *full_line, int line_number, const char *input_filename, int *should_continue, Macro **macro_list)
 {
     char line_copy[MAX_LINE_LENGTH];
-    char *token;
+    char *token = NULL;
     Instruction *instr = NULL;
     int operand_count = 0;
 
@@ -413,6 +592,10 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         *should_continue = 0;
         return NULL;
     }
+
+    /**
+     * Check if the operation code is valid.
+     */
 
     if (get_opcode(token) == -1)
     {
@@ -440,6 +623,9 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 
         if (!token)
         {
+            /**
+             * No following operands found.
+             */
             break;
         }
 
@@ -447,6 +633,9 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 
         if (operand_count == 1)
         {
+            /**
+             * Check that after the first operand there is a comma, and then the second operand.
+             */
             if (strcmp(token, ",") != 0)
             {
                 display_error(full_line, line_number, "Expected comma between operands", input_filename);
@@ -476,6 +665,9 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         }
         else
         {
+            /**
+             * The operand supposed to be a symbol, check if it is valid, if it is not valid the operand is invalid.
+             */
             if (!is_valid_symbol_in_instruction(token, full_line, line_number, input_filename, macro_list))
             {
                 *should_continue = 0;
@@ -500,12 +692,20 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
     instr->operand_count = operand_count;
     printf("operand count: %d\n", instr->operand_count);
 
+    /**
+     * Check if there are more then 2 operands.
+     */
+
     token = strtok(NULL, " ");
     if (token)
     {
         display_error(full_line, line_number, "Extra forbidden characters found in the end of the line", input_filename);
         *should_continue = 0;
     }
+
+    /**
+     * Validate the instruction, should_continue will be set to 0 if the instruction is invalid.
+     */
 
     validate_instruction(instr, full_line, line_number, input_filename, should_continue);
 
@@ -515,26 +715,25 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 }
 
 /**
- * @brief Main function to process data or string directive.
- * @param line The line to process.
- * @param symbol_table The symbol table.
- * @param DC The data counter.
- * @param data_image The data image array.
- * @param should_continue A flag to indicate if the process should continue.
- * @return 1 if the process was successful, 0 otherwise.
+ * @brief Function to parse a .data or .string line in the file.
  */
 
 void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image_Data *data_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list)
 {
     char symbol_name[MAX_LINE_LENGTH];
     char *current = line;
-    char *token;
-    char *directive;
+    char *token = NULL;
+    char *directive = NULL;
     char original_line[MAX_LINE_LENGTH];
 
     strncpy(original_line, line, MAX_LINE_LENGTH);
 
     token = strtok(current, " ");
+
+    /**
+     * Check if the first token is a symbol, if it is a symbol add it to the symbol table.
+     */
+
     if (token && token[strlen(token) - 1] == ':')
     {
         strncpy(symbol_name, token, strlen(token) - 1);
@@ -562,6 +761,10 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
         directive = token;
         current = strtok(NULL, "");
 
+        /**
+         * Check if the directive is valid and parse the line accordingly.
+         */
+
         if (strcmp(directive, ".data") == 0)
         {
             if (!parse_data_dir(current, DC, data_image, line_number, input_filename, original_line))
@@ -580,19 +783,24 @@ void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_C
         else
         {
             display_error(original_line, line_number, "Invalid directive", input_filename);
+            *should_continue = 0;
         }
     }
 }
 
 void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename, Declaration *entries, Macro **macro_list)
 {
-    char *token;
+    char *token = NULL;
     char symbol_name[MAX_LINE_LENGTH];
     char original_line[MAX_LINE_LENGTH];
 
     strncpy(original_line, line, MAX_LINE_LENGTH);
 
     token = strtok(line, " ");
+
+    /**
+     * Check if the first token is a symbol, if it is a symbol ignore it and display warning.
+     */
 
     if (token && token[strlen(token) - 1] == ':')
     {
@@ -608,8 +816,15 @@ void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *s
             strncpy(symbol_name, token, MAX_LINE_LENGTH);
             symbol_name[MAX_LINE_LENGTH - 1] = '\0';
 
+            /**
+             * Check if the symbol is valid and add it to the symbol table.
+             */
+
             if (is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename, macro_list))
             {
+                /**
+                 * Check if the symbol is already declared as entry.
+                 */
                 if (find_declaration(entries, symbol_name))
                 {
                     display_error(original_line, line_number, "Symbol already declared as entry", input_filename);
@@ -630,18 +845,27 @@ void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *s
             token = strtok(NULL, " ");
             if (token)
             {
+                /**
+                 * Check if there are extra characters after the symbol.
+                 */
                 display_error(original_line, line_number, "Only one symbol is allowed after extern declaration", input_filename);
                 *should_continue = 0;
             }
         }
         else
         {
+            /**
+             * Check for an empty extern declaration.
+             */
             display_error(original_line, line_number, "No symbol provided after extern declaration", input_filename);
             *should_continue = 0;
         }
     }
     else
     {
+        /**
+         * Check if the first token is .extern.
+         */
         display_error(original_line, line_number, "Invalid extern declaration, .extern must be the first token in the line", input_filename);
         *should_continue = 0;
     }
@@ -649,13 +873,17 @@ void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *s
 
 void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int *should_continue, int line_number, const char *input_filename)
 {
-    char *token;
+    char *token = NULL;
     char symbol_name[MAX_LINE_LENGTH];
     char original_line[MAX_LINE_LENGTH];
 
     strncpy(original_line, line, MAX_LINE_LENGTH);
 
     token = strtok(line, " ");
+
+    /**
+     * Check if the first token is a symbol, if it is a symbol ignore it and display warning.
+     */
 
     if (token && token[strlen(token) - 1] == ':')
     {
@@ -671,6 +899,10 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
             Symbol *symbol;
             strncpy(symbol_name, token, MAX_LINE_LENGTH);
             symbol_name[MAX_LINE_LENGTH - 1] = '\0';
+
+            /**
+             * Validate that the symbol not already defined as external.
+             */
 
             symbol = find_symbol(*symbol_table, symbol_name);
 
@@ -693,18 +925,27 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
             token = strtok(NULL, " ");
             if (token)
             {
+                /**
+                 * Check if there are extra forbidden characters after the symbol.
+                 */
                 display_error(original_line, line_number, "Only one symbol is allowed after entry declaration", input_filename);
                 *should_continue = 0;
             }
         }
         else
         {
+            /**
+             * Check for an empty entry declaration.
+             */
             display_error(original_line, line_number, "No symbol provided after entry declaration", input_filename);
             *should_continue = 0;
         }
     }
     else
     {
+        /**
+         * Check if the first token is .entry.
+         */
         display_error(original_line, line_number, "Invalid entry declaration, .entry must be the first token in the line", input_filename);
         *should_continue = 0;
     }
@@ -712,17 +953,19 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
 
 void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list)
 {
-    char symbol_name[MAX_LINE_LENGTH];
-    char *current = line;
-    char *token;
+    char symbol_name[MAX_LINE_LENGTH], initial_line[MAX_LINE_LENGTH], line_copy[MAX_LINE_LENGTH];
+    char *current = line, *token = NULL;
     Instruction *instruction = NULL;
 
-    char initial_line[MAX_LINE_LENGTH], line_copy[MAX_LINE_LENGTH];
     strncpy(initial_line, line, MAX_LINE_LENGTH);
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     initial_line[MAX_LINE_LENGTH - 1] = '\0';
 
     token = strtok(current, " ");
+
+    /**
+     * Check if the first token is a symbol, if it is a valid symbol add it to the symbol table.
+     */
     if (token && token[strlen(token) - 1] == ':')
     {
         strncpy(symbol_name, token, strlen(token) - 1);
@@ -741,6 +984,9 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
         token = strtok(NULL, "");
         if (!token)
         {
+            /**
+             * Validate that there is no line that start with symbol but without any instruction.
+             */
             display_error(line_copy, line_number, "No instruction found after symbol", input_filename);
             *should_continue = 0;
             return;
@@ -754,6 +1000,9 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
 
     if (token)
     {
+        /**
+         * Parse the instruction and encode it.
+         */
         instruction = parse_instruction(token, line_copy, line_number, input_filename, should_continue, macro_list);
         if (!instruction)
             return;

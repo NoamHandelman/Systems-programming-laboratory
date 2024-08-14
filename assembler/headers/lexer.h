@@ -16,20 +16,82 @@
 #define MAX_IMMEDIATE_VALUE 2047
 #define MIN_IMMEDIATE_VALUE -2048
 
-int get_opcode(const char *);
+/**
+ * @brief Get the opcode index of the instruction.
+ * @param op the opcode to get the index of.
+ * @return the opcode index of the instruction if found, otherwise return -1.
+ */
 
-int get_register(const char *);
+int get_opcode(const char *op);
 
-int is_valid_instruction(const char *);
+/**
+ * @brief Get the register index.
+ * @param reg the register to get the index of.
+ * @return the register index if found, otherwise return -1.
+ */
 
-int is_valid_symbol(const char *, Symbol **, char *, int, const char *, Macro **);
+int get_register(const char *reg);
 
-void handle_data_or_string(char *, Symbol **, int *, Machine_Code_Image_Data *, int *, int, const char *, Macro **);
+/**
+ * @brief Check if the instruction is valid.
+ * @param inst the instruction word to check.
+ * @return 1 if the instruction is valid, 0 otherwise.
+ */
 
-void handle_extern(char *, Symbol **, int *, int *, int, const char *, Declaration *, Macro **);
+int is_valid_instruction(const char *inst);
 
-void handle_entry(char *, Symbol **, Declaration **, int *, int, const char *);
+/**
+ * @brief This function parse the line and handle the data or string directives.
+ * @param line The line to parse.
+ * @param symbol_table The symbol table.
+ * @param DC The data counter.
+ * @param data_image The data image array.
+ * @param should_continue A pointer to a variable that indicates about the proccess failure or success status.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param macro_list The list of macros.
+ */
 
-void handle_instruction(char *, Symbol **, int *, Machine_Code_Image *, int *, int, const char *, Macro **);
+void handle_data_or_string(char *line, Symbol **symbol_table, int *DC, Machine_Code_Image_Data *data_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list);
+
+/**
+ * @brief This function handles with declaration of an extern symbol.
+ * @param line The line to parse.
+ * @param symbol_table The symbol table.
+ * @param externs_count The number of externs declarations in the file.
+ * @param should_continue A pointer to a variable that indicates about the proccess failure or success status.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param entries The list of entries.
+ * @param macro_list The list of macros.
+ */
+
+void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *should_continue, int line_number, const char *input_filename, Declaration *entries, Macro **macro_list);
+
+/**
+ * @brief This function handles with declaration of an entry symbol.
+ * @param line The line to parse.
+ * @param symbol_table The symbol table.
+ * @param entries The list of entries.
+ * @param should_continue A pointer to a variable that indicates about the proccess failure or success status.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ */
+
+void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int *should_continue, int line_number, const char *input_filename);
+
+/**
+ * @brief This function handles with instruction line.
+ * @param line The line to parse.
+ * @param symbol_table The symbol table.
+ * @param IC The instruction counter.
+ * @param code_image The code image array.
+ * @param should_continue A pointer to a variable that indicates about the proccess failure or success status.
+ * @param line_number The current line number.
+ * @param input_filename The name of the input file.
+ * @param macro_list The list of macros.
+ */
+
+void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list);
 
 #endif

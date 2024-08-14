@@ -5,7 +5,7 @@ LOOP  : prn #48
 
 ;testdelete
 
-macr noam123
+macr noam123 
  cmp r3, #-6
  bne END
 endmacr 

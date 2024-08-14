@@ -1,4 +1,16 @@
-#include "headers/pre_proc.h"
+/**
+ * This file contains the implementation of the pre proccess stage.
+ */
+
+#include <string.h>
+#include <stdlib.h>
+
+#include "./headers/pre_proc.h"
+#include "./headers/globals.h"
+#include "./headers/strings.h"
+#include "./headers/lexer.h"
+#include "./headers/files.h"
+#include "./headers/errors.h"
 
 /**
  * @brief Function to validate macro definition.
@@ -10,19 +22,45 @@
  * @return 1 if the macro is valid, 0 otherwise (If the name length is bigger then 31, or if the name is a reserved word, or if its already defined).
  */
 
+int validate_macro(const char *name, Macro *macro_list, char *line, int line_number, const char *am_filename);
+
+/**
+ * @brief Handle error in the pre proccess stage.
+ * @param message The error message to display.
+ * @param line The line that caused the error.
+ * @param line_number The line number where the error occurred.
+ * @param am_filename The name of the am file.
+ * @param as_file The file pointer for the as file.
+ * @param am_file The file pointer for the am file.
+ * @param current_macro The current macro that was created.
+ */
+
+void handle_preproc_error(const char *message, char *line, int line_number, char *am_filename, FILE *as_file, FILE *am_file);
+
 int validate_macro(const char *name, Macro *macro_list, char *line, int line_number, const char *am_filename)
 {
+    /**
+     * Check if the macro name is too long.
+     */
     if (strlen(name) > MAX_SYMBOL_LENGTH)
     {
         display_error(line, line_number, "Macro name is too long", am_filename);
         return 0;
     }
 
+    /**
+     * Check if the macro name is a reserved word.
+     */
+
     if (get_opcode(name) >= 0 || is_valid_instruction(name) || get_register(name) >= 0 || strcmp(name, "macr") == 0 || strcmp(name, "endmacr") == 0)
     {
         display_error(line, line_number, "Macro name can not be a reserved word", am_filename);
         return 0;
     }
+
+    /**
+     * Check if the macro is already defined.
+     */
 
     if (find_macro(macro_list, name))
     {
@@ -33,17 +71,6 @@ int validate_macro(const char *name, Macro *macro_list, char *line, int line_num
     return 1;
 }
 
-/**
- * @brief Handle error in the pre proccess stage.
- * @param message The error message to display.
- * @param line The line that caused the error.
- * @param line_number The line number where the error occurred.
- * @param am_filename The name of the am file.
- * @param as_file The file pointer for the as file.
- * @param am_file The file pointer for the am file.
- * @return NULL (to indicate an error occurred).
- */
-
 void handle_preproc_error(const char *message, char *line, int line_number, char *am_filename, FILE *as_file, FILE *am_file)
 {
     display_error(line, line_number, message, am_filename);
@@ -53,27 +80,16 @@ void handle_preproc_error(const char *message, char *line, int line_number, char
     remove(am_filename);
 }
 
-/**
- * @brief The main function for the pre proccess stage.
- * @param input_filename The name of the input file.
- * @return the path for the am file.
- */
-
 char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess_status)
 {
-    FILE *as_file, *am_file = NULL;
+    FILE *as_file = NULL, *am_file = NULL;
     /**
      * In the pre process stage we will hold the line on a very large buffer and only on the firs pass we will valid the line length.
      */
     char line[INITIAL_BUFFER_SIZE];
-    char *am_filename;
-    /**
-     *  Macro *macro_list = NULL;
-     */
-
+    char *am_filename = NULL;
     Macro *current_macro = NULL;
-    int in_macro = 0;
-    int line_number = 0;
+    int in_macro = 0, line_number = 0;
 
     am_filename = create_file(input_filename, ".am");
     if (!am_filename)
@@ -104,14 +120,20 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
 
     while (fgets(line, sizeof(line), as_file))
     {
-        char *token, *macro_name;
+        char *token = NULL, *macro_name = NULL;
         char line_copy[INITIAL_BUFFER_SIZE];
         line_number++;
         strcpy(line_copy, line);
+
+        /**
+         * Skip empty lines and comments lines.
+         */
+
         if (is_empty_line(line) || line[0] == ';')
         {
             continue;
         }
+
         token = strtok(line, " \t\n");
         if (token)
         {
@@ -145,6 +167,7 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                         /**
                          * Check if the macro was created successfully, if not exit the program.
                          */
+
                         if (!current_macro)
                         {
                             handle_preproc_error("Failed to create macro", line, line_number, am_filename, as_file, am_file);
@@ -180,10 +203,10 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                 /**
                  * Add the line to the current macro, if the allocation failed exit the program.
                  */
-                if (!add_macro_line(current_macro, line_copy))
+                if (add_macro_line(current_macro, line_copy))
                 {
                     handle_preproc_error("Failed to add line to macro", line, line_number, am_filename, as_file, am_file);
-                    *proccess_status = 0;
+                    *proccess_status = -1;
                     return NULL;
                 };
             }
@@ -214,9 +237,14 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
     fclose(as_file);
     fclose(am_file);
 
+    /**
+     * Check if the proccess was successful, if not remove the am file and free the allocated resources.
+     */
+
     if (!(*proccess_status))
     {
         remove(am_filename);
+        free(am_filename);
         return NULL;
     }
 

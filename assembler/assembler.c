@@ -1,12 +1,18 @@
 /**
+ * @author Noam Handelman
+ * @date 18 August 2020
+ * The assembler program, the assembler read list of files written in assembly from the command line and create a machine code file from it.
+ */
+
+#include "headers/pre_proc.h"
+#include "headers/assembler_transitions.h"
+
+/**
  * @brief This is the main function of the assembler program, the assembler read list of
  * files written in assembly from the command line and create a machine code file from it.
  * @param argc The number of arguments from the command line (include the executable file name).
  * @param argv The list of the files from the command line.
  */
-
-#include "headers/pre_proc.h"
-#include "headers/assembler_transitions.h"
 
 int main(int argc, char *argv[])
 {
@@ -15,11 +21,19 @@ int main(int argc, char *argv[])
     char *am_file = NULL;
     char *as_file = NULL;
 
+    /**
+     * Check if are no files provided by the user.
+     */
+
     if (argc < 2)
     {
         printf("ERROR: No files detected\n");
         return 1;
     }
+
+    /**
+     * Iterate over the files and process them.
+     */
 
     for (i = 1; i < argc; i++)
     {

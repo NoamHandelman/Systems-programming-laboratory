@@ -163,6 +163,10 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
         create_ext_file(symbol_table, code_image, IC, input_filename, should_continue);
     }
 
+    /**
+     * Free all allocated resources during the first and second passes
+     */
+
     free_all_resources(symbol_table, entries, code_image, IC);
 
     printf("Second pass status: %d\n", *should_continue);
