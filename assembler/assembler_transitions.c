@@ -114,9 +114,21 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
 
     printf("First pass status: %d\n", *should_continue);
 
+    /**
+     * Update each symbol in the symbol table according the current IC
+     */
+
     update_symbols_addresses(&symbol_table, IC);
 
+    /**
+     * Update the value of each element in the code image which has symbol
+     */
+
     update_symbols_in_code_image(code_image, symbol_table, IC);
+
+    /**
+     * Check the current proccess status, if fatal error found exit the program after free all allocated resources
+     */
 
     if (*should_continue == -1)
     {
@@ -124,12 +136,23 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
         return -1;
     }
 
+    /**
+     * Create object file
+     */
+
     create_ob_file(code_image, IC, data_image, DC, input_filename, should_continue);
 
+    /**
+     * If entries table is not empty and create entry file
+     */
     if (entries && *should_continue != -1)
     {
         create_ent_file(entries, symbol_table, input_filename, should_continue);
     }
+
+    /**
+     * If extern count is not 0 create extern file
+     */
 
     if (externs_count && *should_continue != -1)
     {

@@ -277,7 +277,15 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image *data_image, int li
     while (line_copy < end_quote)
     {
         printf("ASCII value of %c: %d\n", *line_copy, *line_copy);
-        data_image[(*DC)++].value = *line_copy++;
+        if (!isprint(*line_copy))
+        {
+            display_error(full_line, line_number, "Fount invalid character in string", input_filename);
+            error_found = 0;
+        }
+        else
+        {
+            data_image[(*DC)++].value = *line_copy++;
+        }
     }
 
     printf("End of string sign: 0\n");
