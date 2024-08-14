@@ -44,7 +44,7 @@ void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image *
         return;
     }
 
-    fprintf(output_file, "%d %d\n", IC, DC);
+    fprintf(output_file, "%5d %d\n", IC, DC);
 
     for (i = 0; i < IC; i++)
     {
@@ -98,7 +98,7 @@ void create_ent_file(Declaration *entries, Symbol *symbol_table, const char *inp
         }
         else
         {
-            fprintf(ent_file, "%s %04d\n", current->name, symbol->address);
+            fprintf(ent_file, "%-31s %04d\n", current->name, symbol->address);
         }
         current = current->next;
     }
@@ -143,7 +143,7 @@ void create_ext_file(Symbol *symbol_table, Machine_Code_Image *code_image, int I
             {
                 if (code_image[i].symbol && strcmp(code_image[i].symbol, current->name) == 0)
                 {
-                    fprintf(ext_file, "%-15s %04d\n", current->name, i + MEMORY_START);
+                    fprintf(ext_file, "%-31s %04d\n", current->name, i + MEMORY_START);
                 }
             }
         }
