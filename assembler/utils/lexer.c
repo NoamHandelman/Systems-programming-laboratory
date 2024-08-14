@@ -293,12 +293,26 @@ int get_addressing_mode(const char *operand)
         return 0;
     }
 
-    if (operand[0] == '*' && operand[1] == 'r' && strlen(operand) == 3 && isdigit((unsigned char)operand[2]))
+    /**
+     *  if (operand[0] == '*' && operand[1] == 'r' && strlen(operand) == 3 && isdigit((unsigned char)operand[2]))
+        {
+            return 2;
+        }
+     */
+
+    if (operand[0] == '*' && get_register(operand + 1) >= 0)
     {
         return 2;
     }
 
-    if (operand[0] == 'r' && strlen(operand) == 2 && isdigit((unsigned char)operand[1]))
+    /**
+     * if (operand[0] == 'r' && strlen(operand) == 2 && isdigit((unsigned char)operand[1]))
+    {
+        return 3;
+    }
+     */
+
+    if (get_register(operand) >= 0)
     {
         return 3;
     }
@@ -471,6 +485,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
             if (!is_valid_symbol_in_instruction(token, full_line, line_number, input_filename, macro_list))
             {
                 *should_continue = 0;
+                display_error(full_line, line_number, "Invalid operand, not found addressing mode", input_filename);
             }
             else
             {
