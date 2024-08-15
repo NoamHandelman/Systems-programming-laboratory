@@ -13,7 +13,7 @@
 void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC);
 
 /**
- * @brief Update the symbols in the code image according the symbols table.
+ * @brief Update the ARE bits of the symbols in the code image array.
  * @param code_image The code image array.
  * @param symbol_table The symbol table.
  * @param IC The instruction counter.

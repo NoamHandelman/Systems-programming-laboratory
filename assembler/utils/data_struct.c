@@ -189,6 +189,27 @@ void print_symbol_table(Symbol *symbol_table)
     }
 }
 
+void update_symbols_addresses(Symbol **symbol_table, int IC)
+{
+    Symbol *current = *symbol_table;
+    while (current)
+    {
+        if (current->is_data)
+        {
+            current->address += (IC + MEMORY_START);
+        }
+        else if (!current->is_data && !current->is_external)
+        {
+            current->address += MEMORY_START;
+        }
+        current = current->next;
+    }
+}
+
+/**
+ * Declaration functions
+ */
+
 int create_and_add_declaration(Declaration **table, char *name)
 {
     Declaration *new_entry = (Declaration *)malloc(sizeof(Declaration));
@@ -243,27 +264,6 @@ int create_and_add_declaration(Declaration **table, char *name)
     return 1;
 }
 
-void update_symbols_addresses(Symbol **symbol_table, int IC)
-{
-    Symbol *current = *symbol_table;
-    while (current)
-    {
-        if (current->is_data)
-        {
-            current->address += (IC + MEMORY_START);
-        }
-        else if (!current->is_data && !current->is_external)
-        {
-            current->address += MEMORY_START;
-        }
-        current = current->next;
-    }
-}
-
-/**
- *
- */
-
 void free_declarations(Declaration *table)
 {
     Declaration *current = table;
@@ -289,6 +289,10 @@ Declaration *find_declaration(Declaration *table, const char *name)
     }
     return NULL;
 }
+
+/**
+ * Machine Code Image functions
+ */
 
 void free_machine_code_image(Machine_Code_Image *code_image, int IC)
 {

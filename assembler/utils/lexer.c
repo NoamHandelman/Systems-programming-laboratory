@@ -11,6 +11,28 @@
 #include "../headers/code_conversions.h"
 #include "../headers/errors.h"
 
+/**
+ * Define how much opcodes exists.
+ */
+
+#define OP_CODES_COUNT 16
+
+/**
+ * Define how much registers exists.
+ */
+
+#define REGISTERS_COUNT 8
+
+/**
+ * Define how much instructions exists.
+ */
+
+#define INSTRUCTIONS_COUNT 4
+
+/**
+ * Define the maximum and minimum values for the data and immediate values.
+ */
+
 #define MAX_DATA_NUM 16383
 #define MIN_DATA_NUM -16384
 #define MAX_IMMEDIATE_VALUE 2047

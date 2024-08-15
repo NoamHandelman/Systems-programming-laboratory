@@ -203,7 +203,7 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                 /**
                  * Add the line to the current macro, if the allocation failed exit the program.
                  */
-                if (add_macro_line(current_macro, line_copy))
+                if (!add_macro_line(current_macro, line_copy))
                 {
                     handle_preproc_error("Failed to add line to macro", line, line_number, am_filename, as_file, am_file);
                     *proccess_status = -1;

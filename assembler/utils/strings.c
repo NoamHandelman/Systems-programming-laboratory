@@ -1,18 +1,35 @@
+/**
+ * The file that responsible for the string manipulation functions.
+ */
+
+#include <ctype.h>
+#include <string.h>
+#include <stdio.h>
 #include "../headers/strings.h"
+#include "../headers/globals.h"
 
-void remove_whitespace_from_edges(char *);
-void add_spaces(char *);
-void remove_extra_spaces(char *);
+/**
+ * @brief Remove the whitespace from the edges of the string.
+ * @param line The line to remove the whitespace from.
+ */
 
-int check_for_extra_chars(char *token_end)
+void remove_whitespace_from_edges(char *line);
+
+/**
+ * @brief Add spaces between the commas in lines that are not .string directive. to simplify line parsing later.
+ * @param line The line to add spaces to.
+ */
+void add_spaces(char *line);
+
+int check_for_extra_chars(char *end_token)
 {
-    while (*token_end != '\0')
+    while (*end_token != '\0')
     {
-        if (!isspace(*token_end))
+        if (!isspace(*end_token))
         {
             return 1;
         }
-        token_end++;
+        end_token++;
     }
     return 0;
 }
@@ -33,7 +50,11 @@ int is_empty_line(const char *line)
 void remove_whitespace_from_edges(char *line)
 {
     char *start = line;
-    char *end;
+    char *end = NULL;
+
+    /**
+     * Remove the whitespace from the start of the line.
+     */
 
     if (*start != '\"')
     {
@@ -42,6 +63,10 @@ void remove_whitespace_from_edges(char *line)
     }
 
     end = start + strlen(start) - 1;
+
+    /**
+     * Remove the whitespace from the end of the line.
+     */
 
     if (*end != '\"')
     {
@@ -55,19 +80,30 @@ void remove_whitespace_from_edges(char *line)
 
 void add_spaces(char *line)
 {
-    char result[1024] = {0};
+    char result[1024];
     int j = 0, i;
     int in_quotes = 0;
+
+    /**
+     * If the line is .entry or .extern directive, we don't need to add spaces.
+     */
 
     if (strstr(line, ".entry") || strstr(line, ".extern"))
         return;
 
     for (i = 0; line[i] != '\0'; i++)
     {
+        /**
+         * Check if we are in quotes to avoid adding spaces between the commas in the .string directive.
+         */
         if (line[i] == '\"')
         {
             in_quotes = !in_quotes;
         }
+
+        /**
+         * Add spaces between the commas.
+         */
 
         if (!in_quotes && line[i] == ',')
         {
@@ -85,59 +121,8 @@ void add_spaces(char *line)
     strcpy(line, result);
 }
 
-void remove_extra_spaces(char *line)
-{
-    char result[1024] = {0};
-    int j = 0, i;
-    int space_found = 0;
-    int in_quotes = 0;
-
-    for (i = 0; line[i] != '\0'; i++)
-    {
-        if (line[i] == '\"')
-        {
-            in_quotes = !in_quotes;
-        }
-
-        if (!in_quotes && line[i] == ':')
-        {
-            while (j > 0 && isspace((unsigned char)result[j - 1]))
-            {
-                j--;
-            }
-            result[j++] = ':';
-
-            if (isspace((unsigned char)line[i + 1]))
-            {
-                result[j++] = ' ';
-                i++;
-                while (isspace((unsigned char)line[i + 1]))
-                {
-                    i++;
-                }
-            }
-        }
-        else if (!in_quotes && isspace((unsigned char)line[i]))
-        {
-            if (!space_found)
-            {
-                result[j++] = ' ';
-                space_found = 1;
-            }
-        }
-        else
-        {
-            result[j++] = line[i];
-            space_found = 0;
-        }
-    }
-    result[j] = '\0';
-    strcpy(line, result);
-}
-
 void handle_spaces(char *line)
 {
     remove_whitespace_from_edges(line);
     add_spaces(line);
-    remove_extra_spaces(line);
 }

@@ -1,4 +1,4 @@
-mov *fgdfgdfG , r1 , r4
+mov *fgdfgdfG , r1 , r4 edhdhdhdhdhdhdhdhdhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhh
 mov * , r1
 mov *fgdfgdfG r1
 mov *fgdfgdfG ,

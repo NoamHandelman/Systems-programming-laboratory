@@ -1,21 +1,34 @@
 #ifndef GLOBALS_H
 #define GLOBALS_H
 
+/**
+ * The maximum length of a line in the assembly file.
+ */
+
 #define MAX_LINE_LENGTH 80
 
-#define OP_CODES_COUNT 16
-
-#define REGISTERS_COUNT 8
-
-#define INSTRUCTIONS_COUNT 4
+/**
+ * The memory size of the machine.
+ */
 
 #define MAX_MEMORY_SIZE 4096
 
+/**
+ * The maximum length of a symbol.
+ */
+
 #define MAX_SYMBOL_LENGTH 31
+
+/**
+ * The start of the memory for the assembler.
+ */
 
 #define MEMORY_START 100
 
-#define INITIAL_BUFFER_SIZE 1024
+/**
+ * Large enough initial buffer size line.
+ */
 
+#define INITIAL_BUFFER_SIZE 1024
 
 #endif
