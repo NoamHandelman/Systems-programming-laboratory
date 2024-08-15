@@ -2,7 +2,7 @@
 
 char *create_file(const char *filename, const char *extension)
 {
-    char *file_path;
+    char *file_path = NULL;
     char *end_pos = strrchr(filename, '.');
 
     size_t filename_length = end_pos ? (end_pos - filename) : strlen(filename);
@@ -26,7 +26,7 @@ void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image_D
     int i;
     int address = MEMORY_START;
     FILE *output_file;
-    char *ob_file_name;
+    char *ob_file_name = NULL;
     ob_file_name = create_file(input_filename, ".ob");
     if (!ob_file_name)
     {
