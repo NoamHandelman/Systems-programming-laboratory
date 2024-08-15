@@ -49,8 +49,6 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
             should_continue = 0;
         }
 
-        printf("length : %lu\n", strlen(line));
-
         strncpy(final_line, line, MAX_LINE_LENGTH);
         final_line[MAX_LINE_LENGTH] = '\0';
 
