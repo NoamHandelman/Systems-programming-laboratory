@@ -602,7 +602,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
     char line_copy[MAX_LINE_LENGTH];
     char *token = NULL;
     Instruction *instr = NULL;
-    int operand_count = 0;
+    int operand_count = 0, i;
 
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     line_copy[MAX_LINE_LENGTH - 1] = '\0';
@@ -615,6 +615,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         return NULL;
     }
 
+    instr->op_code = NULL;
     instr->operand_count = 0;
 
     token = strtok(line_copy, " ");
@@ -713,6 +714,13 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
                 if (!instr->operands[operand_count].value.symbol)
                 {
                     display_error(full_line, line_number, "Failed to allocate memory for symbol", input_filename);
+                    for (i = 0; i < operand_count; i++)
+                    {
+                        if (instr->operands[i].addressing_mode == DIRECT)
+                        {
+                            free(instr->operands[i].value.symbol);
+                        }
+                    }
                     *should_continue = -1;
                     free(instr->op_code);
                     free(instr);
@@ -745,7 +753,23 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 
     printf("token: %s\n", token);
 
-    return *should_continue ? instr : NULL;
+    if (*should_continue)
+    {
+        return instr;
+    }
+    else
+    {
+        for (i = 0; i < instr->operand_count; i++)
+        {
+            if (instr->operands[i].addressing_mode == DIRECT)
+            {
+                free(instr->operands[i].value.symbol);
+            }
+        }
+        free(instr->op_code);
+        free(instr);
+        return NULL;
+    }
 }
 
 /**

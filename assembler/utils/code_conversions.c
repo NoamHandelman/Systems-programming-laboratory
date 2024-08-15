@@ -22,6 +22,26 @@
 
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode);
 
+void free_instruction(Instruction *instruction)
+{
+    int i;
+    if (instruction)
+    {
+        if (instruction->op_code)
+        {
+            free(instruction->op_code);
+        }
+        for (i = 0; i < instruction->operand_count; i++)
+        {
+            if (instruction->operands[i].addressing_mode == DIRECT && instruction->operands[i].value.symbol)
+            {
+                free(instruction->operands[i].value.symbol);
+            }
+        }
+        free(instruction);
+    }
+}
+
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
 {
     unsigned short mask = 0;
@@ -87,7 +107,17 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
         }
         else if (addressing_mode == DIRECT)
         {
-            code_image[*IC].symbol = instruction->operands[i].value.symbol;
+            code_image[*IC].symbol = malloc(strlen(instruction->operands[i].value.symbol) + 1);
+            if (code_image[*IC].symbol)
+            {
+                strcpy(code_image[*IC].symbol, instruction->operands[i].value.symbol);
+            }
+            else
+            {
+                /**
+                 * Handle this situation.
+                 */
+            }
         }
         else if (addressing_mode == INDIRECT_REGISTER || addressing_mode == DIRECT_REGISTER)
         {
@@ -124,6 +154,7 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
         }
         code_image[(*IC)++].value |= THIRD_BIT_MASK;
     }
+    free_instruction(instruction);
 }
 
 void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC)
