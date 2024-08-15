@@ -1,6 +1,6 @@
 MAIN: add r3   , LIST
 
-LOOP  : prn #48
+LOOP: prn #48
 
 
 ;testdelete

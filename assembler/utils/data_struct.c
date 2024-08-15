@@ -299,6 +299,7 @@ void free_machine_code_image(Machine_Code_Image *code_image, int IC)
     int i;
     for (i = 0; i < IC; i++)
     {
+        code_image[i].value = 0;
         free(code_image[i].symbol);
         code_image[i].symbol = NULL;
     }
