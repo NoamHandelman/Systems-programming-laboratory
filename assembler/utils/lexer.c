@@ -466,7 +466,7 @@ int get_addressing_mode(const char *operand)
      */
     if (operand[0] == '#')
     {
-        return 0;
+        return IMMEDIATE;
     }
 
     /**
@@ -475,7 +475,7 @@ int get_addressing_mode(const char *operand)
 
     if (operand[0] == '*' && get_register(operand + 1) >= 0)
     {
-        return 2;
+        return INDIRECT_REGISTER;
     }
 
     /**
@@ -484,14 +484,14 @@ int get_addressing_mode(const char *operand)
 
     if (get_register(operand) >= 0)
     {
-        return 3;
+        return DIRECT_REGISTER;
     }
 
     /**
      * Direct addressing or invalid addressing mode
      */
 
-    return 1;
+    return DIRECT;
 }
 
 int validate_operand(Operand *operand)
@@ -499,7 +499,7 @@ int validate_operand(Operand *operand)
     /**
      * Check if the operand is a number and in the valid range.
      */
-    if (operand->addressing_mode == 0)
+    if (operand->addressing_mode == IMMEDIATE)
     {
         if (operand->value.num < MIN_IMMEDIATE_VALUE || operand->value.num > MAX_IMMEDIATE_VALUE)
         {
@@ -511,7 +511,7 @@ int validate_operand(Operand *operand)
      * Check if the operand is a valid register.
      */
 
-    if (operand->addressing_mode == 2 || operand->addressing_mode == 3)
+    if (operand->addressing_mode == INDIRECT_REGISTER || operand->addressing_mode == DIRECT_REGISTER)
     {
         if (operand->value.reg < 0 || operand->value.reg > 7)
         {
@@ -670,9 +670,9 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         {
             instr->operands[operand_count].value.num = atoi(token + 1);
         }
-        else if (addressing_mode == 2 || addressing_mode == 3)
+        else if (addressing_mode == INDIRECT_REGISTER || addressing_mode == DIRECT_REGISTER)
         {
-            instr->operands[operand_count].value.reg = atoi(token + (addressing_mode == 2 ? 2 : 1));
+            instr->operands[operand_count].value.reg = atoi(token + (addressing_mode == INDIRECT_REGISTER ? 2 : 1));
             printf("Register: %d\n", instr->operands[operand_count].value.reg);
         }
         else

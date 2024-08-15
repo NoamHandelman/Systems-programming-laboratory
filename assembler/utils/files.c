@@ -1,4 +1,16 @@
+/**
+ * The file which contains the implementation of the functions that are responsible for the files handling.
+ */
+
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <stdio.h>
 #include "../headers/files.h"
+#include "../headers/globals.h"
+#include "../headers/errors.h"
+
+#define FIFTEEN_BIT_MASK 0x7FFF
 
 char *create_file(const char *filename, const char *extension)
 {
@@ -49,13 +61,13 @@ void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image_D
     for (i = 0; i < IC; i++)
     {
         fprintf(output_file, "%04d ", address++);
-        fprintf(output_file, "%05o\n", code_image[i].value & 0x7FFF);
+        fprintf(output_file, "%05o\n", code_image[i].value & FIFTEEN_BIT_MASK);
     }
 
     for (i = 0; i < DC; i++)
     {
         fprintf(output_file, "%04d ", address++);
-        fprintf(output_file, "%05o\n", data_image[i].value & 0x7FFF);
+        fprintf(output_file, "%05o\n", data_image[i].value & FIFTEEN_BIT_MASK);
     }
 
     fclose(output_file);

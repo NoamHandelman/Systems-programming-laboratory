@@ -6,6 +6,7 @@
 
 #include "headers/pre_proc.h"
 #include "headers/assembler_transitions.h"
+#include <stdlib.h>
 
 /**
  * @brief This is the main function of the assembler program, the assembler read list of
