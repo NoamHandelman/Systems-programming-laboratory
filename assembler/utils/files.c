@@ -70,7 +70,7 @@ void create_ent_file(Declaration *entries, Symbol *symbol_table, const char *inp
 {
     Declaration *current = entries;
     FILE *ent_file;
-    char *ent_file_name;
+    char *ent_file_name = NULL;
     ent_file_name = create_file(input_filename, ".ent");
     if (!ent_file_name)
     {
@@ -116,7 +116,7 @@ void create_ext_file(Symbol *symbol_table, Machine_Code_Image *code_image, int I
 {
     Symbol *current = symbol_table;
     FILE *ext_file;
-    char *ext_file_name;
+    char *ext_file_name = NULL;
     int i;
     ext_file_name = create_file(input_filename, ".ext");
     if (!ext_file_name)
