@@ -44,7 +44,15 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
     code_image[*IC].value = 0;
     code_image[*IC].symbol = NULL;
 
+    /**
+     * Encode the opcode according its index.
+     */
+
     code_image[*IC].value |= (opcode_index << 11);
+
+    /**
+     * Encode the first word by checking the number of operands.
+     */
 
     if (instruction->operand_count > 0)
     {
@@ -65,6 +73,10 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
 
     code_image[(*IC)++].value |= THIRD_BIT_MASK;
 
+    /**
+     * Encode second and third words if there are operands by iterating the operand of the instruction.
+     */
+
     for (i = 0; i < instruction->operand_count; i++)
     {
         int addressing_mode = instruction->operands[i].addressing_mode;
@@ -83,6 +95,9 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
             {
                 if ((instruction->operands[0].addressing_mode == INDIRECT_REGISTER || instruction->operands[0].addressing_mode == DIRECT_REGISTER) && (instruction->operands[1].addressing_mode == INDIRECT_REGISTER || instruction->operands[1].addressing_mode == DIRECT_REGISTER))
                 {
+                    /**
+                     * Check if both operands are registers.
+                     */
                     code_image[*IC].value |= (instruction->operands[0].value.reg SIX_SHIFT);
                     code_image[*IC].value |= (instruction->operands[1].value.reg THREE_SHIFT);
                     code_image[(*IC)++].value |= THIRD_BIT_MASK;
