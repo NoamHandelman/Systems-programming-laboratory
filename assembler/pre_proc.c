@@ -120,10 +120,28 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
 
     while (fgets(line, sizeof(line), as_file))
     {
-        char *token = NULL, *macro_name = NULL;
-        char line_copy[INITIAL_BUFFER_SIZE];
+        char *token = NULL, *macro_name = NULL, *new_line_pos = NULL;
+        char final_line[MAX_LINE_LENGTH + 1];
+        char line_copy[MAX_LINE_LENGTH + 1];
         line_number++;
-        strcpy(line_copy, line);
+
+        new_line_pos = strchr(line, '\n');
+        if (new_line_pos)
+        {
+            *new_line_pos = '\0';
+        }
+
+        printf("Line length %d: \n", (int)strlen(line));
+
+        if (strlen(line) > MAX_LINE_LENGTH)
+        {
+            display_error(line, line_number, "Line is too long, a valid line length is 80", input_filename);
+            *proccess_status = 0;
+        }
+
+        strncpy(final_line, line, MAX_LINE_LENGTH);
+        final_line[MAX_LINE_LENGTH] = '\0';
+        strcpy(line_copy, final_line);
 
         /**
          * Skip empty lines and comments lines.
@@ -134,7 +152,7 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
             continue;
         }
 
-        token = strtok(line, " \t\n");
+        token = strtok(final_line, " \t\n");
         if (token)
         {
             if (strcmp(token, "macr") == 0)
@@ -219,18 +237,18 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                     int i;
                     for (i = 0; i < macro->line_count; i++)
                     {
-                        fprintf(am_file, "%s", macro->content[i]);
+                        fprintf(am_file, "%s\n", macro->content[i]);
                     }
                 }
                 else
                 {
-                    fprintf(am_file, "%s", line_copy);
+                    fprintf(am_file, "%s\n", line_copy);
                 }
             }
         }
         else if (!in_macro)
         {
-            fprintf(am_file, "%s", line_copy);
+            fprintf(am_file, "%s\n", line_copy);
         }
     }
 

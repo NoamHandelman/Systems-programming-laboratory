@@ -13,14 +13,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
 {
     FILE *am_file;
     int IC = 0, DC = 0, line_number = 0, should_continue = 1, externs_count = 0;
-    /**
-     * Initial very big buffer size for the line to check later if line is not in valid length.
-     */
-    char line[INITIAL_BUFFER_SIZE];
 
-    /**
-     * The final line that will be processed.
-     */
     char final_line[MAX_LINE_LENGTH + 1];
 
     Symbol *symbol_table = NULL;
@@ -39,18 +32,10 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
      * Read the file line by line while not exceed the allowed memory and process it.
      */
 
-    while (fgets(line, sizeof(line), am_file) && IC + DC <= MAX_MEMORY_SIZE - MEMORY_START)
+    while (fgets(final_line, sizeof(final_line), am_file) && IC + DC <= MAX_MEMORY_SIZE - MEMORY_START)
     {
         line_number++;
         printf("IC IS: %d\n", IC);
-        if (strlen(line) > MAX_LINE_LENGTH)
-        {
-            display_error(line, line_number, "Line is too long, a valid line length is 80", input_filename);
-            should_continue = 0;
-        }
-
-        strncpy(final_line, line, MAX_LINE_LENGTH);
-        final_line[MAX_LINE_LENGTH] = '\0';
 
         /**
          * Adjust the line so it will be easier to parse later.
