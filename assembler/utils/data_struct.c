@@ -124,9 +124,26 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
         Symbol *current = *symbol_table;
         while (current->next != NULL)
         {
+            if (strcmp(current->name, name) == 0 && current->is_external && is_external)
+            {
+                printf("Symbol already declared as is_external\n");
+                free(new_symbol->name);
+                free(new_symbol);
+                return 1;
+            }
             current = current->next;
         }
-        current->next = new_symbol;
+        if (strcmp(current->name, name) == 0 && current->is_external && is_external)
+        {
+            printf("Symbol already declared as is_external\n");
+            free(new_symbol->name);
+            free(new_symbol);
+            return 1;
+        }
+        else
+        {
+            current->next = new_symbol;
+        }
     }
 
     return 1;
@@ -201,9 +218,26 @@ int create_and_add_declaration(Declaration **table, char *name)
         Declaration *current = *table;
         while (current->next != NULL)
         {
+            if (strcmp(current->name, name) == 0)
+            {
+                printf("Symbol already declared as entry\n");
+                free(new_entry->name);
+                free(new_entry);
+                return 1;
+            }
             current = current->next;
         }
-        current->next = new_entry;
+        if (strcmp(current->name, name) == 0)
+        {
+            printf("Symbol already declared as entry\n");
+            free(new_entry->name);
+            free(new_entry);
+            return 1;
+        }
+        else
+        {
+            current->next = new_entry;
+        }
     }
 
     return 1;

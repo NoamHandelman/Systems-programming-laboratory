@@ -10,6 +10,7 @@ sub r1, r4
 cmp r3, #-6
 bne END
 add r7, *r6
+.extern L3
 clr K
 sub L3, L3
 .entry MAIN
@@ -19,4 +20,5 @@ STR: .string   "abcd"
 LIST: .data +6 , -9
 .data -100
 K: .data  31
+.extern L3
 .extern L3

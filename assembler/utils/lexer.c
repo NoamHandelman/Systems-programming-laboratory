@@ -832,7 +832,7 @@ void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *s
              * Check if the symbol is valid and add it to the symbol table.
              */
 
-            if (is_valid_symbol(symbol_name, symbol_table, original_line, line_number, input_filename, macro_list))
+            if (is_valid_symbol_in_instruction(symbol_name, original_line, line_number, input_filename, macro_list))
             {
                 /**
                  * Check if the symbol is already declared as entry.
@@ -852,6 +852,10 @@ void handle_extern(char *line, Symbol **symbol_table, int *externs_count, int *s
                     }
                     (*externs_count)++;
                 }
+            }
+            else
+            {
+                *should_continue = 0;
             }
 
             token = strtok(NULL, " ");
