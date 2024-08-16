@@ -43,8 +43,10 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
     int opcode_index = get_opcode(instruction->op_code);
     int i;
 
-    code_image[*IC].value = 0;
-    code_image[*IC].symbol = NULL;
+    /**
+     *   code_image[*IC].value = 0;
+     *  code_image[*IC].symbol = NULL;
+     */
 
     /**
      * Encode the opcode according its index.

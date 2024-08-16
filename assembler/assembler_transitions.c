@@ -17,8 +17,8 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
     char final_line[MAX_LINE_LENGTH + 1];
 
     Symbol *symbol_table = NULL;
-    Machine_Code_Image_Data data_image[MAX_MEMORY_SIZE];
-    Machine_Code_Image code_image[MAX_MEMORY_SIZE];
+    Machine_Code_Image_Data data_image[MAX_MEMORY_SIZE] = {0};
+    Machine_Code_Image code_image[MAX_MEMORY_SIZE] = {0};
     Declaration *entries = NULL;
 
     am_file = fopen(input_filename, "r");
