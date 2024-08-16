@@ -10,7 +10,6 @@ sub r1, r4
 cmp r3, #-6
 bne END
 add r7, *r6
-.extern L3
 clr K
 sub L3, L3
 .entry MAIN
