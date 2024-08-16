@@ -19,6 +19,10 @@ int main(int argc, char *argv[])
 {
     int i;
 
+    /**
+     * Paths for the am and as files.
+     */
+
     char *am_file = NULL;
     char *as_file = NULL;
 
@@ -38,14 +42,25 @@ int main(int argc, char *argv[])
 
     for (i = 1; i < argc; i++)
     {
+        /**
+         * Proccess status flag, 1 for success, 0 for failure, -1 for fatal error.
+         */
         int proccess_status = 1;
         Macro *macro_list = NULL;
         as_file = create_file(argv[i], ".as");
+
+        /**
+         * Check if the path to .as file created successfully, if not exit the program.
+         */
         if (!as_file)
         {
             display_system_error("Failed to create file path", argv[i]);
             return 1;
         }
+
+        /**
+         * Execute the pre proccess stage for the current file, if fatal error ocurred exit the program, if error found in the as file continue to the next files.
+         */
 
         am_file = exec_preproc(as_file, &macro_list, &proccess_status);
         if (!am_file)
@@ -61,6 +76,10 @@ int main(int argc, char *argv[])
         }
 
         printf("Pre proccess stage done successfully for %s\n", argv[i]);
+
+        /**
+         * Execute the assembler stage for the current file, if fatal error ocurred exit the program, if error found in the as file continue to the next files.
+         */
 
         proccess_status = exec_first_pass(am_file, &macro_list);
         free(as_file);

@@ -82,13 +82,13 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
 void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code_Image *code_image, int *should_continue, int line_number, const char *input_filename, Macro **macro_list);
 
 /**
- * @brief Function to check if the operand which is symbol in instruction is valid.
- * @param symbol The symbol to check.
- * @param line The line that contains the symbol.
+ * @brief Function to check if operand which is symbol in instruction, or macro name are valid (Function to validate symbol and macro definition).
+ * @param symbol The symbol or macro to check.
+ * @param line The line that contains the symbol or macro.
  * @param line_number The current line number.
  * @param input_filename The name of the input file.
  * @param macro_list The list of macros from the pre proccess.
- * @return 1 if the symbol is valid as operand, 0 otherwise.
+ * @return 1 if the symbol or macro are valid, 0 otherwise.
  */
 
 int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_number, const char *input_filename, Macro **macro_list);

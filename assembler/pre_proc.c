@@ -38,12 +38,17 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
 {
     FILE *as_file = NULL, *am_file = NULL;
     /**
-     * In the pre process stage we will hold the line on a very large buffer and only on the firs pass we will valid the line length.
+     * Big enough Initial buffer size for the line.
      */
     char line[INITIAL_BUFFER_SIZE];
     char *am_filename = NULL;
     Macro *current_macro = NULL;
-    int in_macro = 0, line_number = 0;
+
+    /**
+     * Flag to indicate if we currently read lines from inside a macro definition.
+     */
+    int in_macro = 0;
+    int line_number = 0;
 
     am_filename = create_file(input_filename, ".am");
     if (!am_filename)
@@ -79,6 +84,10 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
         char line_copy[MAX_LINE_LENGTH + 1];
         line_number++;
 
+        /**
+         * Remove the new line character from the line to validate easily the line length.
+         */
+
         new_line_pos = strchr(line, '\n');
         if (new_line_pos)
         {
@@ -86,6 +95,10 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
         }
 
         printf("Line length %d: \n", (int)strlen(line));
+
+        /**
+         * Validate that the line length is not too long.
+         */
 
         if (strlen(line) > MAX_LINE_LENGTH)
         {
@@ -134,6 +147,10 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                     }
                     else
                     {
+                        /**
+                         * Create and add the macro to the macro list.
+                         */
+
                         current_macro = create_and_add_macro(macro_list, macro_name);
 
                         /**
@@ -146,6 +163,9 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                             *proccess_status = -1;
                             return NULL;
                         }
+                        /**
+                         * Set the in_macro flag to true to indicate that we are currently reading lines from inside a macro definition.
+                         */
                         in_macro = 1;
                     }
                 }
@@ -184,6 +204,9 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
             }
             else
             {
+                /**
+                 * Check if the line is a macro call, if it is a macro call replace it with the macro content.
+                 */
                 Macro *macro;
                 macro = find_macro(*macro_list, token);
                 if (macro)
@@ -219,6 +242,10 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
         free(am_filename);
         return NULL;
     }
+
+    /**
+     * Return the path to the am file that created in the pre-proccess.
+     */
 
     return am_filename;
 }

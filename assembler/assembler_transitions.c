@@ -17,6 +17,10 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
     char final_line[MAX_LINE_LENGTH + 1];
 
     Symbol *symbol_table = NULL;
+
+    /**
+     * Initialize the data and code images.
+     */
     Machine_Code_Image_Data data_image[MAX_MEMORY_SIZE] = {0};
     Machine_Code_Image code_image[MAX_MEMORY_SIZE] = {0};
     Declaration *entries = NULL;
@@ -102,7 +106,7 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
     printf("First pass status: %d\n", *should_continue);
 
     /**
-     * Update each symbol in the symbol table according the current IC
+     * Update the addresses of each symbol in the symbol table according the current IC and the symbol definition
      */
 
     update_symbols_addresses(&symbol_table, IC);

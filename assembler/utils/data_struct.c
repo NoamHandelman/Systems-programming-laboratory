@@ -18,6 +18,11 @@ Macro *create_and_add_macro(Macro **head, const char *name)
     if (!macro)
         return NULL;
 
+    /**
+     * Allocate memory for the macro name and try to copy the name to the new allocated memory and insert the macro to the list,
+     * while initialize its fields.
+     */
+
     macro->name = (char *)malloc(strlen(name) + 1);
     if (!macro->name)
     {
@@ -36,6 +41,9 @@ Macro *create_and_add_macro(Macro **head, const char *name)
 
 int add_macro_line(Macro *macro, const char *line)
 {
+    /**
+     * Allocate memory for the new line and try to copy the line to the new allocated memory and insert the line to the macro content.
+     */
     char **new_line = (char **)realloc(macro->content, sizeof(char *) * (macro->line_count + 1));
     if (!new_line)
     {
@@ -56,6 +64,10 @@ int add_macro_line(Macro *macro, const char *line)
     return 1;
 }
 
+/**
+ * Free the memory allocated for the macros list.
+ */
+
 void free_macros(Macro *head)
 {
     int i;
@@ -74,11 +86,14 @@ void free_macros(Macro *head)
     }
 }
 
+/**
+ * Find a macro in the macros list by the macro name.
+ */
+
 Macro *find_macro(Macro *head, const char *name)
 {
     while (head)
     {
-        printf("Checking macro: %s\n", head->name);
         if (strcmp(head->name, name) == 0)
         {
             return head;
@@ -95,6 +110,9 @@ Macro *find_macro(Macro *head, const char *name)
 int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, int is_external, int is_data)
 {
 
+    /**
+     * Allocate memory for the new symbol and try to copy the name to the new allocated memory and insert the symbol to the symbol table,
+     */
     Symbol *new_symbol = (Symbol *)malloc(sizeof(Symbol));
     if (!new_symbol)
     {
@@ -110,10 +128,20 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
     strcpy(new_symbol->name, name);
 
     new_symbol->address = address;
+    /**
+     * If symbol is not extern, initialize the is_entry field to 1, otherwise initialize the is_external field to 1.
+     */
     new_symbol->is_entry = !is_external;
     new_symbol->is_external = is_external;
+    /**
+     * Flag to indicate if the symbol is declared in .data or .string line or in instruction line.
+     */
     new_symbol->is_data = is_data;
     new_symbol->next = NULL;
+
+    /**
+     * If the symbol table is empty, insert the new symbol to the symbol table, otherwise iterate over the symbol table and insert the new symbol to the end of the list.
+     */
 
     if (*symbol_table == NULL)
     {
@@ -126,6 +154,9 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
         {
             if (strcmp(current->name, name) == 0 && current->is_external && is_external)
             {
+                /**
+                 * If the symbol is already declared as external, ignore the insertion of the new symbol.
+                 */
                 printf("Symbol already declared as is_external\n");
                 free(new_symbol->name);
                 free(new_symbol);
@@ -135,6 +166,9 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
         }
         if (strcmp(current->name, name) == 0 && current->is_external && is_external)
         {
+            /**
+             * If the current last symbol is already declared as external, ignore the insertion of the new symbol.
+             */
             printf("Symbol already declared as is_external\n");
             free(new_symbol->name);
             free(new_symbol);
@@ -148,6 +182,10 @@ int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, 
 
     return 1;
 }
+
+/**
+ * Find a symbol in the symbol table by the symbol name.
+ */
 
 Symbol *find_symbol(Symbol *symbol_table, const char *name)
 {
@@ -163,6 +201,10 @@ Symbol *find_symbol(Symbol *symbol_table, const char *name)
     return NULL;
 }
 
+/**
+ * Free the memory allocated for the symbol table.
+ */
+
 void free_symbol_table(Symbol *symbol_table)
 {
     Symbol *current = symbol_table;
@@ -176,18 +218,8 @@ void free_symbol_table(Symbol *symbol_table)
 }
 
 /**
- * function to print, remove in the end!!!!
+ * Update the addresses of the symbols in the symbol table after the first pass.
  */
-
-void print_symbol_table(Symbol *symbol_table)
-{
-    Symbol *current = symbol_table;
-    while (current != NULL)
-    {
-        printf("name: %s, address: %d, is_entry: %d, is_external: %d\n", current->name, current->address, current->is_entry, current->is_external);
-        current = current->next;
-    }
-}
 
 void update_symbols_addresses(Symbol **symbol_table, int IC)
 {
@@ -196,6 +228,9 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
     {
         if (current->is_data)
         {
+            /**
+             * Make sure that the data part of the memory starts after the code part.
+             */
             current->address += (IC + MEMORY_START);
         }
         else if (!current->is_data && !current->is_external)
@@ -209,6 +244,7 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
 /**
  * Declaration functions
  */
+
 
 int create_and_add_declaration(Declaration **table, char *name)
 {
@@ -241,6 +277,9 @@ int create_and_add_declaration(Declaration **table, char *name)
         {
             if (strcmp(current->name, name) == 0)
             {
+                /**
+                 * If the symbol is already declared as entry, ignore the insertion of the new symbol.
+                 */
                 printf("Symbol already declared as entry\n");
                 free(new_entry->name);
                 free(new_entry);
@@ -250,6 +289,9 @@ int create_and_add_declaration(Declaration **table, char *name)
         }
         if (strcmp(current->name, name) == 0)
         {
+            /**
+             * If the current last symbol is already declared as entry, ignore the insertion of the new symbol.
+             */
             printf("Symbol already declared as entry\n");
             free(new_entry->name);
             free(new_entry);
@@ -264,6 +306,10 @@ int create_and_add_declaration(Declaration **table, char *name)
     return 1;
 }
 
+/**
+ * Free the memory allocated for the declaration table.
+ */
+
 void free_declarations(Declaration *table)
 {
     Declaration *current = table;
@@ -275,6 +321,10 @@ void free_declarations(Declaration *table)
         current = next;
     }
 }
+
+/**
+ * Find a declaration in the declaration table by the declaration name.
+ */
 
 Declaration *find_declaration(Declaration *table, const char *name)
 {
@@ -294,6 +344,10 @@ Declaration *find_declaration(Declaration *table, const char *name)
  * Machine Code Image functions
  */
 
+/**
+ * Free the memory allocated for the machine code image.
+ */
+
 void free_machine_code_image(Machine_Code_Image *code_image, int IC)
 {
     int i;
@@ -309,6 +363,10 @@ void free_machine_code_image(Machine_Code_Image *code_image, int IC)
  * Instruction functions
  */
 
+
+/**
+ * Free the memory allocated for the instruction struct and its associated symbols if exists.
+ */
 void free_instruction(Instruction *instruction)
 {
     int i;

@@ -75,12 +75,20 @@ void remove_whitespace_from_edges(char *line)
     }
     *(end + 1) = '\0';
 
+    /**
+     * Move the line to the start of the string.
+     * The +2 is to include the null terminator.
+     */
+
     memmove(line, start, end - start + 2);
 }
 
 void add_spaces(char *line)
 {
-    char result[1024];
+    /**
+     * 
+     */
+    char result[INITIAL_BUFFER_SIZE];
     int j = 0, i;
     int in_quotes = 0;
 

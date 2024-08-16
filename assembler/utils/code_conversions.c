@@ -24,6 +24,10 @@
 
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode);
 
+/**
+ * Inital masking for the operand addressing mode.
+ */
+
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
 {
     unsigned short mask = 0;
@@ -40,16 +44,14 @@ unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
 
 int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC, char *line_copy, int line_number, const char *input_filename)
 {
+    /**
+     * Get the opcode index of the instruction.
+     */
     int opcode_index = get_opcode(instruction->op_code);
     int i;
 
     /**
-     *   code_image[*IC].value = 0;
-     *  code_image[*IC].symbol = NULL;
-     */
-
-    /**
-     * Encode the opcode according its index.
+     * Encode the opcode according its index in bits 11-14.
      */
 
     code_image[*IC].value |= (opcode_index << 11);
@@ -62,16 +64,25 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
     {
         if (instruction->operand_count == 1)
         {
+            /**
+             * If there is only one operand, encode the addressing mode in bits 3-6.
+             */
             code_image[*IC].value |= (convert_addressing_mode_to_bitmask(instruction->operands[0].addressing_mode) THREE_SHIFT);
         }
         else
         {
+            /**
+             * If there are two operands, encode the addressing mode of the first operand in bits 7-10.
+             */
             code_image[*IC].value |= (convert_addressing_mode_to_bitmask(instruction->operands[0].addressing_mode) << 7);
         }
     }
 
     if (instruction->operand_count > 1)
     {
+        /**
+         * If there are two operands, encode the addressing mode of the second operand in bits 3-6.
+         */
         code_image[*IC].value |= (convert_addressing_mode_to_bitmask(instruction->operands[1].addressing_mode) THREE_SHIFT);
     }
 
@@ -87,10 +98,16 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
 
         if (addressing_mode == IMMEDIATE)
         {
+            /**
+             * If the addressing mode is immediate, encode its value in bits 3-14.
+             */
             code_image[*IC].value |= (instruction->operands[i].value.num THREE_SHIFT);
         }
         else if (addressing_mode == DIRECT)
         {
+            /**
+             * If the addressing mode is direct, keep the symbol name so we will can encode its address in the second pass
+             */
             code_image[*IC].symbol = malloc(strlen(instruction->operands[i].value.symbol) + 1);
             if (code_image[*IC].symbol)
             {
@@ -110,7 +127,7 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
                 if ((instruction->operands[0].addressing_mode == INDIRECT_REGISTER || instruction->operands[0].addressing_mode == DIRECT_REGISTER) && (instruction->operands[1].addressing_mode == INDIRECT_REGISTER || instruction->operands[1].addressing_mode == DIRECT_REGISTER))
                 {
                     /**
-                     * Check if both operands are registers.
+                     * Check if both operands are registers and encode the operands in one machine word.
                      */
                     code_image[*IC].value |= (instruction->operands[0].value.reg SIX_SHIFT);
                     code_image[*IC].value |= (instruction->operands[1].value.reg THREE_SHIFT);
@@ -119,6 +136,9 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
                 }
                 else
                 {
+                    /**
+                     * If there are two operands and one of them is register, encode the register in its place.
+                     */
                     if (i == 0)
                     {
                         printf("First operand is register : %d\n", instruction->operands[i].value.reg);
@@ -132,15 +152,30 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
             }
             else
             {
+                /**
+                 * There is only one operand and is register.
+                 */
                 printf("There is only one operand and is register\n");
                 code_image[*IC].value |= (instruction->operands[i].value.reg THREE_SHIFT);
             }
         }
+        /**
+         * Set initial ARE value for all machine words
+         */
         code_image[(*IC)++].value |= THIRD_BIT_MASK;
     }
+    /**
+     * Free the instruction structure after encoding it.
+     */
     free_instruction(instruction);
     return 1;
 }
+
+/**
+ * Iterate over the symbol table, if the current symbol is found in the code image array update its value with the current symbol address.
+ * If the symbol is an entry, set the second bit of the value to 1.
+ * If the symbol is external, set the first bit of the value to 1.
+ */
 
 void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC)
 {

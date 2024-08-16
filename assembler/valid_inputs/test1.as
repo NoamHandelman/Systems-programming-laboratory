@@ -3,7 +3,7 @@ MAIN: add r3   , LIST
 LOOP: prn #48
 
 
-;testdelete
+;This is a comment line
 
 macr noam123
  cmp r3, #-6
@@ -14,20 +14,12 @@ endmacr
  mov *r6,K
  sub r1, r4
  noam123
-
-inc r7
-inc r1
 dec K
 
- dec K
- jmp LOOP
+jmp LOOP
 END: stop
-.entry END
-     
-         
-
-STR: .string "1234fgfssff-03i"
+STR: .string "abcd"
 LIST: .data 6, -9
- .data -100 , 55
+ .data -100
 K: .data 31
 
