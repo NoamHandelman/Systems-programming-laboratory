@@ -121,18 +121,6 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
 Instruction *parse_instruction(const char *line, char *full_line, int line_number, const char *input_filename, int *should_continue, Macro **macro_list);
 
 /**
- * @brief Function to check if the operand which is symbol in instruction is valid.
- * @param symbol The symbol to check.
- * @param line The line that contains the symbol.
- * @param line_number The current line number.
- * @param input_filename The name of the input file.
- * @param macro_list The list of macros from the pre proccess.
- * @return 1 if the symbol is valid as operand, 0 otherwise.
- */
-
-int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_number, const char *input_filename, Macro **macro_list);
-
-/**
  * @brief Function to check if the symbol is valid before adding to the symbols table.
  * @param symbol The symbol to check.
  * @param symbol_table The symbol table.

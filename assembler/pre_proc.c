@@ -13,18 +13,6 @@
 #include "./headers/errors.h"
 
 /**
- * @brief Function to validate macro definition.
- * @param name The name of the macro.
- * @param macro_list The list of macros.
- * @param line The line that caused the error.
- * @param line_number The line number where the error occurred.
- * @param am_filename The name of the am file.
- * @return 1 if the macro is valid, 0 otherwise (If the name length is bigger then 31, or if the name is a reserved word, or if its already defined).
- */
-
-int validate_macro(const char *name, Macro *macro_list, char *line, int line_number, const char *am_filename);
-
-/**
  * @brief Handle error in the pre proccess stage.
  * @param message The error message to display.
  * @param line The line that caused the error.
@@ -36,40 +24,6 @@ int validate_macro(const char *name, Macro *macro_list, char *line, int line_num
  */
 
 void handle_preproc_error(const char *message, char *line, int line_number, char *am_filename, FILE *as_file, FILE *am_file);
-
-int validate_macro(const char *name, Macro *macro_list, char *line, int line_number, const char *am_filename)
-{
-    /**
-     * Check if the macro name is too long.
-     */
-    if (strlen(name) > MAX_SYMBOL_LENGTH)
-    {
-        display_error(line, line_number, "Macro name is too long", am_filename);
-        return 0;
-    }
-
-    /**
-     * Check if the macro name is a reserved word.
-     */
-
-    if (get_opcode(name) >= 0 || is_valid_instruction(name) || get_register(name) >= 0 || strcmp(name, "macr") == 0 || strcmp(name, "endmacr") == 0)
-    {
-        display_error(line, line_number, "Macro name can not be a reserved word", am_filename);
-        return 0;
-    }
-
-    /**
-     * Check if the macro is already defined.
-     */
-
-    if (find_macro(macro_list, name))
-    {
-        display_error(line, line_number, "Macro name already defined", am_filename);
-        return 0;
-    }
-
-    return 1;
-}
 
 void handle_preproc_error(const char *message, char *line, int line_number, char *am_filename, FILE *as_file, FILE *am_file)
 {
@@ -174,7 +128,7 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
                     /**
                      * Validate the macro name.
                      */
-                    if (!validate_macro(macro_name, *macro_list, line_copy, line_number, input_filename))
+                    if (!is_valid_symbol_in_instruction(macro_name, line_copy, line_number, input_filename, macro_list))
                     {
                         *proccess_status = 0;
                     }
