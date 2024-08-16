@@ -732,7 +732,9 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         else if (addressing_mode == INDIRECT_REGISTER || addressing_mode == DIRECT_REGISTER)
         {
             /**
-             * The operand code is a register
+             * The operand code is a register, if the addressing mode in indirect register, the register should be after the '*' character,
+             * so move 2 chars ahead, else move 1 (to get the register number).
+             *
              */
             instr->operands[operand_count].value.reg = atoi(token + (addressing_mode == INDIRECT_REGISTER ? 2 : 1));
             printf("Register: %d\n", instr->operands[operand_count].value.reg);
