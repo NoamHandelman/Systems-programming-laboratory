@@ -208,14 +208,10 @@ typedef struct OP_CODE
  */
 typedef struct Operand
 {
+
     /**
-     * The type of the operand.
+     * The value of the operand.
      */
-    char *op_type;
-   
-   /**
-    * The value of the operand.
-    */
     union
     {
         int reg;
@@ -233,5 +229,12 @@ typedef struct Instruction
     Operand operands[2];
     int operand_count;
 } Instruction;
+
+/**
+ * @brief Free the memory allocated for the instruction struct.
+ * @param instruction The instruction to free.
+ */
+
+void free_instruction(Instruction *instruction);
 
 #endif

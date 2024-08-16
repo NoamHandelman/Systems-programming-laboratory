@@ -304,3 +304,27 @@ void free_machine_code_image(Machine_Code_Image *code_image, int IC)
         code_image[i].symbol = NULL;
     }
 }
+
+/**
+ * Instruction functions
+ */
+
+void free_instruction(Instruction *instruction)
+{
+    int i;
+    if (instruction)
+    {
+        if (instruction->op_code)
+        {
+            free(instruction->op_code);
+        }
+        for (i = 0; i < instruction->operand_count; i++)
+        {
+            if (instruction->operands[i].addressing_mode == DIRECT && instruction->operands[i].value.symbol)
+            {
+                free(instruction->operands[i].value.symbol);
+            }
+        }
+        free(instruction);
+    }
+}

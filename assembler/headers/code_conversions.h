@@ -10,7 +10,7 @@
  * @param IC The instruction counter.
  */
 
-void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC);
+int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC, char *line_copy, int line_number, const char *input_filename);
 
 /**
  * @brief Update the ARE bits of the symbols in the code image array.

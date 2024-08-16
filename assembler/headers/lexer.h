@@ -4,15 +4,6 @@
 #include "../headers/data_struct.h"
 
 /**
- * Definitions for the addressing modes.
- */
-
-#define IMMEDIATE 0
-#define DIRECT 1
-#define INDIRECT_REGISTER 2
-#define DIRECT_REGISTER 3
-
-/**
  * @brief Get the opcode index of the instruction.
  * @param op the opcode to get the index of.
  * @return the opcode index of the instruction if found, otherwise return -1.

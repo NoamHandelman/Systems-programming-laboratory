@@ -31,4 +31,13 @@
 
 #define INITIAL_BUFFER_SIZE 1024
 
+/**
+ * The addressing mode values.
+ */
+
+#define IMMEDIATE 0
+#define DIRECT 1
+#define INDIRECT_REGISTER 2
+#define DIRECT_REGISTER 3
+
 #endif

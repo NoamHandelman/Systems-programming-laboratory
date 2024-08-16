@@ -7,8 +7,10 @@
 #include <string.h>
 #include <ctype.h>
 #include "../headers/code_conversions.h"
-#include "../headers/lexer.h"
 #include "../headers/globals.h"
+#include "../headers/errors.h"
+#include "../headers/data_struct.h"
+#include "../headers/lexer.h"
 
 #define THREE_SHIFT << 3
 #define SIX_SHIFT << 6
@@ -21,26 +23,6 @@
  */
 
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode);
-
-void free_instruction(Instruction *instruction)
-{
-    int i;
-    if (instruction)
-    {
-        if (instruction->op_code)
-        {
-            free(instruction->op_code);
-        }
-        for (i = 0; i < instruction->operand_count; i++)
-        {
-            if (instruction->operands[i].addressing_mode == DIRECT && instruction->operands[i].value.symbol)
-            {
-                free(instruction->operands[i].value.symbol);
-            }
-        }
-        free(instruction);
-    }
-}
 
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
 {
@@ -56,7 +38,7 @@ unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
     return mask;
 }
 
-void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC)
+int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC, char *line_copy, int line_number, const char *input_filename)
 {
     int opcode_index = get_opcode(instruction->op_code);
     int i;
@@ -114,9 +96,9 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
             }
             else
             {
-                /**
-                 * Handle this situation.
-                 */
+                display_error(line_copy, line_number, "Failed to allocate memory for the symbol in the code image", input_filename);
+                free_instruction(instruction);
+                return -1;
             }
         }
         else if (addressing_mode == INDIRECT_REGISTER || addressing_mode == DIRECT_REGISTER)
@@ -155,6 +137,7 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
         code_image[(*IC)++].value |= THIRD_BIT_MASK;
     }
     free_instruction(instruction);
+    return 1;
 }
 
 void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC)

@@ -602,7 +602,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
     char line_copy[MAX_LINE_LENGTH];
     char *token = NULL;
     Instruction *instr = NULL;
-    int operand_count = 0, i;
+    int operand_count = 0;
 
     strncpy(line_copy, line, MAX_LINE_LENGTH);
     line_copy[MAX_LINE_LENGTH - 1] = '\0';
@@ -714,16 +714,20 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
                 if (!instr->operands[operand_count].value.symbol)
                 {
                     display_error(full_line, line_number, "Failed to allocate memory for symbol", input_filename);
-                    for (i = 0; i < operand_count; i++)
+                    /**
+                     *  for (i = 0; i < operand_count; i++)
                     {
                         if (instr->operands[i].addressing_mode == DIRECT)
                         {
                             free(instr->operands[i].value.symbol);
                         }
                     }
-                    *should_continue = -1;
-                    free(instr->op_code);
+                     free(instr->op_code);
                     free(instr);
+                     */
+
+                    *should_continue = -1;
+                    free_instruction(instr);
                     return NULL;
                 }
                 strcpy(instr->operands[operand_count].value.symbol, token);
@@ -753,13 +757,14 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 
     printf("token: %s\n", token);
 
-    if (*should_continue)
+    if (*should_continue == 1)
     {
         return instr;
     }
     else
     {
-        for (i = 0; i < instr->operand_count; i++)
+        /**
+         *  for (i = 0; i < instr->operand_count; i++)
         {
             if (instr->operands[i].addressing_mode == DIRECT)
             {
@@ -768,6 +773,10 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         }
         free(instr->op_code);
         free(instr);
+         */
+
+        free_instruction(instr);
+
         return NULL;
     }
 }
@@ -1069,6 +1078,10 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
         if (!instruction)
             return;
 
-        encode_instruction(instruction, code_image, IC);
+        /**
+         * Encode the instruction to machine words if the instruction is valid.
+         */
+
+        *should_continue = encode_instruction(instruction, code_image, IC, line_copy, line_number, input_filename);
     }
 }
