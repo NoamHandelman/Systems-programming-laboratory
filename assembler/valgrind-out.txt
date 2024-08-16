@@ -1,0 +1,253 @@
+==4145== Memcheck, a memory error detector
+==4145== Copyright (C) 2002-2015, and GNU GPL'd, by Julian Seward et al.
+==4145== Using Valgrind-3.11.0 and LibVEX; rerun with -h for copyright info
+==4145== Command: ./assembler valid_inputs/test2
+==4145== Parent PID: 4066
+==4145== 
+--4145-- 
+--4145-- Valgrind options:
+--4145--    --tool=memcheck
+--4145--    --leak-check=full
+--4145--    --show-leak-kinds=all
+--4145--    --track-origins=yes
+--4145--    --verbose
+--4145--    --log-file=valgrind-out.txt
+--4145-- Contents of /proc/version:
+--4145--   Linux version 4.4.0-210-generic (buildd@lgw01-amd64-037) (gcc version 5.4.0 20160609 (Ubuntu 5.4.0-6ubuntu1~16.04.12) ) #242-Ubuntu SMP Fri Apr 16 09:57:00 UTC 2021
+--4145-- 
+--4145-- Arch and hwcaps: X86, LittleEndian, x86-mmxext-sse1-sse2-sse3
+--4145-- Page sizes: currently 4096, max supported 4096
+--4145-- Valgrind library directory: /usr/lib/valgrind
+--4145-- Reading syms from /lib/i386-linux-gnu/ld-2.23.so
+--4145--   Considering /lib/i386-linux-gnu/ld-2.23.so ..
+--4145--   .. CRC mismatch (computed fe524f15 wanted dd32455a)
+--4145--   Considering /usr/lib/debug/lib/i386-linux-gnu/ld-2.23.so ..
+--4145--   .. CRC is valid
+--4145-- Reading syms from /home/user/Desktop/systems-programming-laboratory/assembler/assembler
+--4145-- Reading syms from /usr/lib/valgrind/memcheck-x86-linux
+--4145--   Considering /usr/lib/valgrind/memcheck-x86-linux ..
+--4145--   .. CRC mismatch (computed 6036da3f wanted 652e483f)
+--4145--    object doesn't have a symbol table
+--4145--    object doesn't have a dynamic symbol table
+--4145-- Scheduler: using generic scheduler lock implementation.
+--4145-- Reading suppressions file: /usr/lib/valgrind/default.supp
+==4145== embedded gdbserver: reading from /tmp/vgdb-pipe-from-vgdb-to-4145-by-user-on-???
+==4145== embedded gdbserver: writing to   /tmp/vgdb-pipe-to-vgdb-from-4145-by-user-on-???
+==4145== embedded gdbserver: shared mem   /tmp/vgdb-pipe-shared-mem-vgdb-4145-by-user-on-???
+==4145== 
+==4145== TO CONTROL THIS PROCESS USING vgdb (which you probably
+==4145== don't want to do, unless you know exactly what you're doing,
+==4145== or are doing some strange experiment):
+==4145==   /usr/lib/valgrind/../../bin/vgdb --pid=4145 ...command...
+==4145== 
+==4145== TO DEBUG THIS PROCESS USING GDB: start GDB like this
+==4145==   /path/to/gdb ./assembler
+==4145== and then give GDB the following command
+==4145==   target remote | /usr/lib/valgrind/../../bin/vgdb --pid=4145
+==4145== --pid is optional if only one valgrind process is running
+==4145== 
+--4145-- REDIR: 0x4019030 (ld-linux.so.2:strlen) redirected to 0x380490f2 (???)
+--4145-- REDIR: 0x4018df0 (ld-linux.so.2:index) redirected to 0x380490cd (???)
+--4145-- Reading syms from /usr/lib/valgrind/vgpreload_core-x86-linux.so
+--4145--   Considering /usr/lib/valgrind/vgpreload_core-x86-linux.so ..
+--4145--   .. CRC mismatch (computed 5b95c0c4 wanted 39e79efa)
+--4145--    object doesn't have a symbol table
+--4145-- Reading syms from /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so
+--4145--   Considering /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so ..
+--4145--   .. CRC mismatch (computed 4d5a1526 wanted 33571d5b)
+--4145--    object doesn't have a symbol table
+==4145== WARNING: new redirection conflicts with existing -- ignoring it
+--4145--     old: 0x04019030 (strlen              ) R-> (0000.0) 0x380490f2 ???
+--4145--     new: 0x04019030 (strlen              ) R-> (2007.0) 0x0402f410 strlen
+--4145-- Reading syms from /lib/i386-linux-gnu/libc-2.23.so
+--4145--   Considering /lib/i386-linux-gnu/libc-2.23.so ..
+--4145--   .. CRC mismatch (computed ec440dd2 wanted cfe469e8)
+--4145--   Considering /usr/lib/debug/lib/i386-linux-gnu/libc-2.23.so ..
+--4145--   .. CRC is valid
+--4145-- REDIR: 0x40c7590 (libc.so.6:strncasecmp) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40ce220 (libc.so.6:memrchr) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40e0c00 (libc.so.6:wcslen) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40c58c0 (libc.so.6:__GI_strrchr) redirected to 0x402ee00 (__GI_strrchr)
+--4145-- REDIR: 0x40c5880 (libc.so.6:rindex) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40df610 (libc.so.6:__strrchr_sse2_bsf) redirected to 0x402edd0 (rindex)
+--4145-- REDIR: 0x40c5660 (libc.so.6:strlen) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40ce520 (libc.so.6:__strlen_sse2_bsf) redirected to 0x402f370 (strlen)
+--4145-- REDIR: 0x40c0fc0 (libc.so.6:malloc) redirected to 0x402c110 (malloc)
+--4145-- REDIR: 0x40c5830 (libc.so.6:strncpy) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40cfea0 (libc.so.6:__strncpy_ssse3) redirected to 0x402f5f0 (strncpy)
+--4145-- REDIR: 0x40c4bc0 (libc.so.6:strcat) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40d9c10 (libc.so.6:__strcat_ssse3) redirected to 0x402f030 (strcat)
+--4145-- REDIR: 0x40c6430 (libc.so.6:strstr) redirected to 0x4033700 (strstr)
+--4145-- REDIR: 0x40c6b10 (libc.so.6:__GI_memchr) redirected to 0x40306d0 (__GI_memchr)
+--4145-- REDIR: 0x40c7760 (libc.so.6:__GI_memcpy) redirected to 0x4030fb0 (__GI_memcpy)
+--4145-- REDIR: 0x40c4dc0 (libc.so.6:index) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40df500 (libc.so.6:__strchr_sse2_bsf) redirected to 0x402eff0 (index)
+--4145-- REDIR: 0x40c9360 (libc.so.6:strchrnul) redirected to 0x40330b0 (strchrnul)
+--4145-- REDIR: 0x40c71b0 (libc.so.6:__GI_mempcpy) redirected to 0x40332c0 (__GI_mempcpy)
+--4145-- REDIR: 0x40c5070 (libc.so.6:strcpy) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x40ce650 (libc.so.6:__strcpy_ssse3) redirected to 0x402f450 (strcpy)
+--4145-- REDIR: 0x40c4fc0 (libc.so.6:strcmp) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x4184280 (libc.so.6:__strcmp_ssse3) redirected to 0x4030450 (strcmp)
+--4145-- REDIR: 0x40c1530 (libc.so.6:free) redirected to 0x402d2f0 (free)
+--4145-- REDIR: 0x40c6fd0 (libc.so.6:memmove) redirected to 0x4026560 (_vgnU_ifunc_wrapper)
+--4145-- REDIR: 0x417bc80 (libc.so.6:__memmove_ssse3) redirected to 0x4032860 (memmove)
+--4145-- REDIR: 0x40c56a0 (libc.so.6:__GI_strlen) redirected to 0x402f390 (__GI_strlen)
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x804C7B3: update_symbols_in_code_image (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8049657: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== Use of uninitialised value of size 4
+==4145==    at 0x408F22D: _itoa_word (_itoa.c:181)
+==4145==    by 0x4093231: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x408F233: _itoa_word (_itoa.c:181)
+==4145==    by 0x4093231: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x40927B4: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x4092B5D: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x804B97D: create_ext_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80496ED: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x402D31B: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==4145==    by 0x804C197: free_machine_code_image (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8049752: free_all_resources (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8049702: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== 
+==4145== HEAP SUMMARY:
+==4145==     in use at exit: 0 bytes in 0 blocks
+==4145==   total heap usage: 86 allocs, 86 frees, 28,512 bytes allocated
+==4145== 
+==4145== All heap blocks were freed -- no leaks are possible
+==4145== 
+==4145== ERROR SUMMARY: 229 errors from 7 contexts (suppressed: 0 from 0)
+==4145== 
+==4145== 9 errors in context 1 of 7:
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x402D31B: free (in /usr/lib/valgrind/vgpreload_memcheck-x86-linux.so)
+==4145==    by 0x804C197: free_machine_code_image (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8049752: free_all_resources (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8049702: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== 
+==4145== 18 errors in context 2 of 7:
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x804B97D: create_ext_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80496ED: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== 
+==4145== 18 errors in context 3 of 7:
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x4092B5D: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== 
+==4145== 18 errors in context 4 of 7:
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x40927B4: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== 
+==4145== 47 errors in context 5 of 7:
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x408F233: _itoa_word (_itoa.c:181)
+==4145==    by 0x4093231: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== 
+==4145== 47 errors in context 6 of 7:
+==4145== Use of uninitialised value of size 4
+==4145==    at 0x408F22D: _itoa_word (_itoa.c:181)
+==4145==    by 0x4093231: vfprintf (vfprintf.c:1631)
+==4145==    by 0x4099677: fprintf (fprintf.c:32)
+==4145==    by 0x804B6DB: create_ob_file (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x804969D: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== 
+==4145== 72 errors in context 7 of 7:
+==4145== Conditional jump or move depends on uninitialised value(s)
+==4145==    at 0x804C7B3: update_symbols_in_code_image (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8049657: exec_second_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x80495FB: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==    by 0x8048A32: main (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145==  Uninitialised value was created by a stack allocation
+==4145==    at 0x8049233: exec_first_pass (in /home/user/Desktop/systems-programming-laboratory/assembler/assembler)
+==4145== 
+==4145== ERROR SUMMARY: 229 errors from 7 contexts (suppressed: 0 from 0)
