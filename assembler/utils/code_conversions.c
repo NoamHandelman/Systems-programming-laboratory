@@ -214,6 +214,16 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
 }
  */
 
+/**
+ * Iterate over code image, if the current entry has symbol in it is and this symbol 
+ * is found in the symbol data then update its the value in the code image according 
+ * the address of the symbol that found.
+ * If the symbol is an entry, set the second bit of the value to 1.
+ * If the symbol is external, set the first bit of the value to 1.
+ * if the symbol is not found in the symbol table, display an error and return 0.
+ */
+
+
 int update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC, const char *input_filename)
 {
     int i;
