@@ -346,6 +346,12 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int
     int expecting_number = 1;
     int error_found = 1;
 
+    if (!line)
+    {
+        display_error(full_line, line_number, "No found numbers after .data", input_filename);
+        return 0;
+    }
+
     /**
      * Check if the line starts or ends with a comma.
      */
@@ -436,6 +442,12 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, i
     char *start_quote, *end_quote;
 
     printf("initial line : %s\n", line);
+
+    if (!line)
+    {
+        display_error(full_line, line_number, "No found string after .string", input_filename);
+        return 0;
+    }
 
     /**
      * Find the first and last double quote in the line.

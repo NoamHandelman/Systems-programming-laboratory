@@ -161,6 +161,7 @@ typedef struct Machine_Code_Image
      * Possible symbol.
      */
     char *symbol;
+    int line_number;
 } Machine_Code_Image;
 
 typedef struct Machine_Code_Image_Data

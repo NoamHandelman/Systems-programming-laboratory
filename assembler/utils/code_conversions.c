@@ -86,6 +86,7 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
         code_image[*IC].value |= (convert_addressing_mode_to_bitmask(instruction->operands[1].addressing_mode) THREE_SHIFT);
     }
 
+    code_image[*IC].line_number = line_number;
     code_image[(*IC)++].value |= THIRD_BIT_MASK;
 
     /**
@@ -95,6 +96,8 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
     for (i = 0; i < instruction->operand_count; i++)
     {
         int addressing_mode = instruction->operands[i].addressing_mode;
+
+        code_image[*IC].line_number = line_number;
 
         if (addressing_mode == IMMEDIATE)
         {
@@ -177,7 +180,8 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
  * If the symbol is external, set the first bit of the value to 1.
  */
 
-void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC)
+/**
+ * void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC)
 {
     int i;
     Symbol *current = symbol_table;
@@ -207,4 +211,37 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
         }
         current = current->next;
     }
+}
+ */
+
+int update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC, const char *input_filename)
+{
+    int i;
+    for (i = 0; i < IC; i++)
+    {
+        if (code_image[i].symbol)
+        {
+            Symbol *symbol = find_symbol(symbol_table, code_image[i].symbol);
+            if (symbol)
+            {
+                code_image[i].value |= (symbol->address THREE_SHIFT);
+                if (symbol->is_entry)
+                {
+                    code_image[i].value |= (1 << 1);
+                    code_image[i].value &= ~THIRD_BIT_MASK;
+                }
+                if (symbol->is_external)
+                {
+                    code_image[i].value |= (1 << 0);
+                    code_image[i].value &= ~THIRD_BIT_MASK;
+                }
+            }
+            else
+            {
+                display_error(code_image[i].symbol, code_image[i].line_number, "Undefined symbol", input_filename);
+                return 0;
+            }
+        }
+    }
+    return 1;
 }

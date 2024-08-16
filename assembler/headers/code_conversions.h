@@ -17,8 +17,10 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
  * @param code_image The code image array.
  * @param symbol_table The symbol table.
  * @param IC The instruction counter.
+ * @param input_filename The name of the input file.
+ * @return 1 if the symbols were updated successfully, 0 otherwise.
  */
 
-void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC);
+int update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC, const char *input_filename);
 
 #endif

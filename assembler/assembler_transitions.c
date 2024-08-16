@@ -115,7 +115,7 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
      * Update the value of each element in the code image which has symbol
      */
 
-    update_symbols_in_code_image(code_image, symbol_table, IC);
+    *should_continue = update_symbols_in_code_image(code_image, symbol_table, IC, input_filename);
 
     /**
      * Check the current proccess status, if fatal error found exit the program after free all allocated resources

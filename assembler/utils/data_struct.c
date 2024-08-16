@@ -245,7 +245,6 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
  * Declaration functions
  */
 
-
 int create_and_add_declaration(Declaration **table, char *name)
 {
     Declaration *new_entry = (Declaration *)malloc(sizeof(Declaration));
@@ -356,13 +355,13 @@ void free_machine_code_image(Machine_Code_Image *code_image, int IC)
         code_image[i].value = 0;
         free(code_image[i].symbol);
         code_image[i].symbol = NULL;
+        code_image[i].line_number = 0;
     }
 }
 
 /**
  * Instruction functions
  */
-
 
 /**
  * Free the memory allocated for the instruction struct and its associated symbols if exists.
