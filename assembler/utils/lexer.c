@@ -134,13 +134,6 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
 int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int line_number, const char *input_filename, Macro **macro_list);
 
 /**
- * @brief Validate an operand.
- * @param operand The operand to validate.
- * @return 1 if the operand is valid, 0 otherwise.
- */
-int validate_operand(Operand *operand);
-
-/**
  * @brief Function to return the index of an opcode.
  */
 
@@ -327,7 +320,7 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int
 {
     char *token;
     char *endptr;
-    int value;
+    long int value;
     int expecting_number = 1;
     int error_found = 1;
 
@@ -364,7 +357,7 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int
                 else
                 {
                     data_image[(*DC)++].value = value;
-                    printf("Parsed number: %d\n", value);
+                    printf("Parsed number: %ld\n", value);
                 }
                 expecting_number = 0;
             }
@@ -504,33 +497,6 @@ int get_addressing_mode(const char *operand)
     return DIRECT;
 }
 
-int validate_operand(Operand *operand)
-{
-    /**
-     * Check if the operand is a number and in the valid range.
-     */
-    if (operand->addressing_mode == IMMEDIATE)
-    {
-        if (operand->value.num < MIN_IMMEDIATE_VALUE || operand->value.num > MAX_IMMEDIATE_VALUE)
-        {
-            return 0;
-        }
-    }
-
-    /**
-     * Check if the operand is a valid register.
-     */
-
-    if (operand->addressing_mode == INDIRECT_REGISTER || operand->addressing_mode == DIRECT_REGISTER)
-    {
-        if (operand->value.reg < 0 || operand->value.reg > 7)
-        {
-            return 0;
-        }
-    }
-    return 1;
-}
-
 void validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename, int *should_continue)
 {
     int opcode_index = get_opcode(instr->op_code);
@@ -556,12 +522,6 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
             *should_continue = 0;
         }
-
-        if (!validate_operand(&instr->operands[0]))
-        {
-            display_error(full_line, line_number, "Found invalid operand", input_filename);
-            *should_continue = 0;
-        }
     }
 
     if (instr->operand_count == 2)
@@ -574,12 +534,6 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
         if (!OP_CODES[opcode_index].dest_operands[instr->operands[1].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
-            *should_continue = 0;
-        }
-
-        if (!validate_operand(&instr->operands[1]))
-        {
-            display_error(full_line, line_number, "Found invalid operand", input_filename);
             *should_continue = 0;
         }
     }
@@ -679,7 +633,27 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         instr->operands[operand_count].addressing_mode = addressing_mode;
         if (addressing_mode == 0)
         {
-            instr->operands[operand_count].value.num = atoi(token + 1);
+            long int value;
+            char *endptr;
+            value = strtol(token + 1, &endptr, 10);
+            if (*endptr == '\0')
+            {
+                if (value < MIN_IMMEDIATE_VALUE || value > MAX_IMMEDIATE_VALUE)
+                {
+                    display_error(full_line, line_number, "Immediate value is out of the allowed range", input_filename);
+                    *should_continue = 0;
+                }
+                else
+                {
+                    instr->operands[operand_count].value.num = value;
+                    printf("Number: %d\n", instr->operands[operand_count].value.num);
+                }
+            }
+            else
+            {
+                display_error(full_line, line_number, "Invalid number", input_filename);
+                *should_continue = 0;
+            }
         }
         else if (addressing_mode == INDIRECT_REGISTER || addressing_mode == DIRECT_REGISTER)
         {
@@ -702,18 +676,6 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
                 if (!instr->operands[operand_count].value.symbol)
                 {
                     display_error(full_line, line_number, "Failed to allocate memory for symbol", input_filename);
-                    /**
-                     *  for (i = 0; i < operand_count; i++)
-                    {
-                        if (instr->operands[i].addressing_mode == DIRECT)
-                        {
-                            free(instr->operands[i].value.symbol);
-                        }
-                    }
-                     free(instr->op_code);
-                    free(instr);
-                     */
-
                     *should_continue = -1;
                     free_instruction(instr);
                     return NULL;
@@ -751,20 +713,7 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
     }
     else
     {
-        /**
-         *  for (i = 0; i < instr->operand_count; i++)
-        {
-            if (instr->operands[i].addressing_mode == DIRECT)
-            {
-                free(instr->operands[i].value.symbol);
-            }
-        }
-        free(instr->op_code);
-        free(instr);
-         */
-
         free_instruction(instr);
-
         return NULL;
     }
 }
