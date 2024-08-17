@@ -67,7 +67,7 @@ void create_ob_file(Machine_Code_Image *code_image, int IC, Machine_Code_Image_D
         return;
     }
 
-    fprintf(output_file, "%5d %d\n", IC, DC);
+    fprintf(output_file, "%4d %d\n", IC, DC);
 
     /**
      * Iterate over the code image and data image and write the values to the object file in octal base.
