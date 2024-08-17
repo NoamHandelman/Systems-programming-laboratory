@@ -324,6 +324,7 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
         {
             display_error(line, line_number, "Symbol must contains only letters or numbers", input_filename);
             error_found = 0;
+            break;
         }
     }
 
@@ -763,6 +764,8 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
             {
                 *should_continue = 0;
                 display_error(full_line, line_number, "Invalid operand, not found addressing mode", input_filename);
+                free_instruction(instr);
+                return NULL;
             }
             else
             {
@@ -808,6 +811,10 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
     }
 
     return instr;
+    /**
+     *     return *should_continue ? instr : NULL;
+
+     */
 }
 
 /**
