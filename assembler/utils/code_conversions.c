@@ -42,7 +42,7 @@ unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
     return mask;
 }
 
-int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC, char *line_copy, int line_number, const char *input_filename)
+void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC, char *line_copy, int line_number, const char *input_filename, int *should_continue)
 {
     /**
      * Get the opcode index of the instruction.
@@ -120,7 +120,8 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
             {
                 display_error(line_copy, line_number, "Failed to allocate memory for the symbol in the code image", input_filename);
                 free_instruction(instruction);
-                return -1;
+                *should_continue = -1;
+                return;
             }
         }
         else if (addressing_mode == INDIRECT_REGISTER || addressing_mode == DIRECT_REGISTER)
@@ -171,60 +172,9 @@ int encode_instruction(Instruction *instruction, Machine_Code_Image *code_image,
      * Free the instruction structure after encoding it.
      */
     free_instruction(instruction);
-    return 1;
 }
 
-/**
- * Iterate over the symbol table, if the current symbol is found in the code image array update its value with the current symbol address.
- * If the symbol is an entry, set the second bit of the value to 1.
- * If the symbol is external, set the first bit of the value to 1.
- */
-
-/**
- * void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC)
-{
-    int i;
-    Symbol *current = symbol_table;
-    while (current)
-    {
-        for (i = 0; i < IC; i++)
-        {
-            if (code_image[i].symbol)
-            {
-                if (strcmp(code_image[i].symbol, current->name) == 0)
-                {
-                    code_image[i].value |= (current->address THREE_SHIFT);
-
-                    if (current->is_entry)
-                    {
-                        code_image[i].value |= (1 << 1);
-                        code_image[i].value &= ~THIRD_BIT_MASK;
-                    }
-
-                    if (current->is_external)
-                    {
-                        code_image[i].value |= (1 << 0);
-                        code_image[i].value &= ~THIRD_BIT_MASK;
-                    }
-                }
-            }
-        }
-        current = current->next;
-    }
-}
- */
-
-/**
- * Iterate over code image, if the current entry has symbol in it is and this symbol 
- * is found in the symbol data then update its the value in the code image according 
- * the address of the symbol that found.
- * If the symbol is an entry, set the second bit of the value to 1.
- * If the symbol is external, set the first bit of the value to 1.
- * if the symbol is not found in the symbol table, display an error and return 0.
- */
-
-
-int update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC, const char *input_filename)
+void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC, const char *input_filename, int *should_continue)
 {
     int i;
     for (i = 0; i < IC; i++)
@@ -249,9 +199,8 @@ int update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_
             else
             {
                 display_error(code_image[i].symbol, code_image[i].line_number, "Undefined symbol", input_filename);
-                return 0;
+                *should_continue = 0;
             }
         }
     }
-    return 1;
 }

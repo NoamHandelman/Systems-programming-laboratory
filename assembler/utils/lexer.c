@@ -108,10 +108,10 @@ int get_addressing_mode(const char *operand);
  * @param full_line The full line.
  * @param line_number The current line number.
  * @param input_filename The name of the input file.
- * @param should_continue A flag to indicate if the process should continue.
+ * @return 1 if the instruction is valid, 0 otherwise.
  */
 
-void validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename, int *should_continue);
+int validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename);
 
 /**
  * @brief Function to parse an instruction line.
@@ -561,8 +561,9 @@ int get_addressing_mode(const char *operand)
     return DIRECT;
 }
 
-void validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename, int *should_continue)
+int validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename)
 {
+    int error_found = 1;
     int opcode_index = get_opcode(instr->op_code);
 
     /**
@@ -572,7 +573,7 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
     if (instr->operand_count != OP_CODES[opcode_index].operands)
     {
         display_error(full_line, line_number, "Invalid number of operands", input_filename);
-        *should_continue = 0;
+        error_found = 0;
     }
 
     /**
@@ -584,7 +585,7 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
         if (!OP_CODES[opcode_index].dest_operands[instr->operands[0].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
-            *should_continue = 0;
+            error_found = 0;
         }
     }
 
@@ -593,14 +594,16 @@ void validate_instruction(Instruction *instr, char *full_line, int line_number, 
         if (!OP_CODES[opcode_index].src_operands[instr->operands[0].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid source operand", input_filename);
-            *should_continue = 0;
+            error_found = 0;
         }
         if (!OP_CODES[opcode_index].dest_operands[instr->operands[1].addressing_mode])
         {
             display_error(full_line, line_number, "Invalid destination operand", input_filename);
-            *should_continue = 0;
+            error_found = 0;
         }
     }
+
+    return error_found;
 }
 
 /**
@@ -794,22 +797,17 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
     }
 
     /**
-     * Validate the instruction, should_continue will be set to 0 if the instruction is invalid.
+     * Check if the instruction is valid.
      */
 
-    validate_instruction(instr, full_line, line_number, input_filename, should_continue);
-
-    printf("token: %s\n", token);
-
-    if (*should_continue == 1)
+    if (!validate_instruction(instr, full_line, line_number, input_filename))
     {
-        return instr;
-    }
-    else
-    {
+        *should_continue = 0;
         free_instruction(instr);
         return NULL;
     }
+
+    return instr;
 }
 
 /**
@@ -1129,6 +1127,6 @@ void handle_instruction(char *line, Symbol **symbol_table, int *IC, Machine_Code
          * Encode the instruction to machine words if the instruction is valid.
          */
 
-        *should_continue = encode_instruction(instruction, code_image, IC, line_copy, line_number, input_filename);
+        encode_instruction(instruction, code_image, IC, line_copy, line_number, input_filename, should_continue);
     }
 }

@@ -97,6 +97,17 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
 
     fclose(am_file);
 
+    /**
+     * Check if there is memory overflow, if there is we will display an error and exit the program.
+     */
+
+    if (IC + DC > MAX_MEMORY_SIZE - MEMORY_START)
+    {
+        display_system_error("Memory overflow, exceeded the maximum memory size", input_filename);
+        free_all_resources(symbol_table, entries, code_image, IC);
+        return -1;
+    }
+
     return exec_second_pass(input_filename, symbol_table, code_image, data_image, IC, DC, entries, externs_count, &should_continue);
 }
 
@@ -115,7 +126,7 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
      * Update the value of each element in the code image which has symbol
      */
 
-    *should_continue = update_symbols_in_code_image(code_image, symbol_table, IC, input_filename);
+    update_symbols_in_code_image(code_image, symbol_table, IC, input_filename, should_continue);
 
     /**
      * Check the current proccess status, if fatal error found exit the program after free all allocated resources
