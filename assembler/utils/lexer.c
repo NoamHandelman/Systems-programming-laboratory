@@ -249,6 +249,7 @@ int is_valid_symbol_in_instruction(const char *symbol, char *line, int line_numb
         {
             display_error(line, line_number, "Symbol must contains only letters or numbers", input_filename);
             error_found = 0;
+            break;
         }
     }
 
@@ -386,7 +387,6 @@ int parse_data_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, int
                 else
                 {
                     data_image[(*DC)++].value = value;
-                    printf("Parsed number: %ld\n", value);
                 }
 
                 /**
@@ -442,8 +442,6 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, i
     int i, error_found = 1;
     char *start_quote, *end_quote;
 
-    printf("initial line : %s\n", line);
-
     if (!line)
     {
         display_error(full_line, line_number, "No found string after .string", input_filename);
@@ -498,7 +496,6 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, i
     line_copy = start_quote + 1;
     while (line_copy < end_quote)
     {
-        printf("ASCII value of %c: %d\n", *line_copy, *line_copy);
         if (!isprint(*line_copy))
         {
             /**
@@ -513,7 +510,10 @@ int parse_string_dir(char *line, int *DC, Machine_Code_Image_Data *data_image, i
         }
     }
 
-    printf("End of string sign: 0\n");
+    /**
+     * Add also the null terminator to the data image.
+     */
+
     data_image[(*DC)++].value = '\0';
 
     /**
@@ -689,8 +689,6 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
             break;
         }
 
-        printf("Token in loop token: %s\n", token);
-
         if (operand_count == 1)
         {
             /**
@@ -736,7 +734,6 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
                 else
                 {
                     instr->operands[operand_count].value.num = value;
-                    printf("Number: %d\n", instr->operands[operand_count].value.num);
                 }
             }
             else
@@ -753,7 +750,6 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
              *
              */
             instr->operands[operand_count].value.reg = atoi(token + (addressing_mode == INDIRECT_REGISTER ? 2 : 1));
-            printf("Register: %d\n", instr->operands[operand_count].value.reg);
         }
         else
         {
@@ -786,7 +782,6 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
         operand_count++;
     }
     instr->operand_count = operand_count;
-    printf("operand count: %d\n", instr->operand_count);
 
     /**
      * Check if there are more then 2 operands or extra forbidden characters in the end of the line.
@@ -811,10 +806,6 @@ Instruction *parse_instruction(const char *line, char *full_line, int line_numbe
     }
 
     return instr;
-    /**
-     *     return *should_continue ? instr : NULL;
-
-     */
 }
 
 /**
@@ -1033,7 +1024,7 @@ void handle_entry(char *line, Symbol **symbol_table, Declaration **entries, int 
 
             else
             {
-                if (!create_and_add_declaration(entries, symbol_name))
+                if (!create_and_add_declaration(entries, symbol_name, line_number))
                 {
                     display_error(original_line, line_number, "Failed to create and add entry declaration, memory allocation failed", input_filename);
                     *should_continue = -1;

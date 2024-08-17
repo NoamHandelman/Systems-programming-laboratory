@@ -127,7 +127,7 @@ void create_ent_file(Declaration *entries, Symbol *symbol_table, const char *inp
             /**
              * If symbol that declared as entry not found in the symbol table, display an error and set the should_continue flag to 0.
              */
-            display_system_error("Failed to find symbol", input_filename);
+            display_error(current->name, current->line_number, "Undefined symbol", input_filename);
             *should_continue = 0;
         }
         else

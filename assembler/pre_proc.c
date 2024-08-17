@@ -94,8 +94,6 @@ char *exec_preproc(const char *input_filename, Macro **macro_list, int *proccess
             *new_line_pos = '\0';
         }
 
-        printf("Line length %d: \n", (int)strlen(line));
-
         /**
          * Validate that the line length is not too long.
          */

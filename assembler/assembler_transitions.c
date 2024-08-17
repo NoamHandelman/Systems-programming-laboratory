@@ -28,7 +28,7 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
     am_file = fopen(input_filename, "r");
     if (!am_file)
     {
-        printf("ERROR: Failed to open file: %s\n", input_filename);
+        display_system_error("Failed to open file", input_filename);
         return 0;
     }
 
@@ -39,14 +39,11 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
     while (fgets(final_line, sizeof(final_line), am_file) && IC + DC <= MAX_MEMORY_SIZE - MEMORY_START)
     {
         line_number++;
-        printf("IC IS: %d\n", IC);
 
         /**
          * Adjust the line so it will be easier to parse later.
          */
         handle_spaces(final_line);
-
-        printf("Line %d: %s\n", line_number, final_line);
 
         /**
          * Handle .data or .string directives, .extern, .entry or instructions.
@@ -91,8 +88,6 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
                 return -1;
             }
         }
-
-        printf("current status: %d\n", should_continue);
     }
 
     fclose(am_file);
@@ -113,9 +108,6 @@ int exec_first_pass(const char *input_filename, Macro **macro_list)
 
 int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_Code_Image *code_image, Machine_Code_Image_Data *data_image, int IC, int DC, Declaration *entries, int externs_count, int *should_continue)
 {
-
-    printf("First pass status: %d\n", *should_continue);
-
     /**
      * Update the addresses of each symbol in the symbol table according the current IC and the symbol definition
      */
@@ -166,8 +158,6 @@ int exec_second_pass(const char *input_filename, Symbol *symbol_table, Machine_C
      */
 
     free_all_resources(symbol_table, entries, code_image, IC);
-
-    printf("Second pass status: %d\n", *should_continue);
 
     return *should_continue;
 }

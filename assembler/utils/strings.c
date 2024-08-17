@@ -85,9 +85,6 @@ void remove_whitespace_from_edges(char *line)
 
 void add_spaces(char *line)
 {
-    /**
-     * 
-     */
     char result[INITIAL_BUFFER_SIZE];
     int j = 0, i;
     int in_quotes = 0;

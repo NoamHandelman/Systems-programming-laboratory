@@ -14,7 +14,7 @@ prn false1
 jsr r1
 rts too many
 stop operands
-
+.entry UndefinedEntry
 
 
 

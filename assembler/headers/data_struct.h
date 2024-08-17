@@ -119,6 +119,7 @@ void update_symbols_addresses(Symbol **symbol_table, int IC);
 typedef struct Declaration
 {
     char *name;
+    int line_number;
     struct Declaration *next;
 } Declaration;
 
@@ -126,10 +127,11 @@ typedef struct Declaration
  * @brief Function to create and add a declaration to the declaration table.
  * @param table The declaration table.
  * @param name The name of the declaration.
+ * @param line_number The line number where the declaration was found.
  * @return 1 if the declaration was added successfully, 0 otherwise.
  */
 
-int create_and_add_declaration(Declaration **table, char *name);
+int create_and_add_declaration(Declaration **table, char *name, int line_number);
 
 /**
  * @brief Free the memory allocated for the declaration table.

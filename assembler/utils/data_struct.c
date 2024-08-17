@@ -245,10 +245,9 @@ void update_symbols_addresses(Symbol **symbol_table, int IC)
  * Declaration functions
  */
 
-int create_and_add_declaration(Declaration **table, char *name)
+int create_and_add_declaration(Declaration **table, char *name, int line_number)
 {
     Declaration *new_entry = (Declaration *)malloc(sizeof(Declaration));
-    printf("Creating decl struct for symbol: %s\n", name);
     if (!new_entry)
     {
         return 0;
@@ -263,6 +262,7 @@ int create_and_add_declaration(Declaration **table, char *name)
 
     strcpy(new_entry->name, name);
 
+    new_entry->line_number = line_number;
     new_entry->next = NULL;
 
     if (*table == NULL)
@@ -316,6 +316,8 @@ void free_declarations(Declaration *table)
     {
         Declaration *next = current->next;
         free(current->name);
+        current->name = NULL;
+        current->line_number = 0;
         free(current);
         current = next;
     }

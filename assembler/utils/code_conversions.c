@@ -145,7 +145,6 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
                      */
                     if (i == 0)
                     {
-                        printf("First operand is register : %d\n", instruction->operands[i].value.reg);
                         code_image[*IC].value |= (instruction->operands[i].value.reg SIX_SHIFT);
                     }
                     else
@@ -159,7 +158,6 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
                 /**
                  * There is only one operand and is register.
                  */
-                printf("There is only one operand and is register\n");
                 code_image[*IC].value |= (instruction->operands[i].value.reg THREE_SHIFT);
             }
         }
