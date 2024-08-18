@@ -13,7 +13,7 @@ prn -500000
 jmp OUT
 bne r1
 red #1
-        ;comment not in the start
+        ;comment not in the start of the line
 jsr r1
 rts op1 op2
 stop #17
