@@ -1,0 +1,19 @@
+This file gathers assumptions and explanations according to which this project was
+written, When some of the assumptions are based on what is written in the course
+forum and some are based on the original instructions in the course booklet 
+(it is important to note that it was not possible to reach all the threads in 
+the forum).
+
+1. The restrictions on label name and macro name are the same.
+2. This is not an error if a label is defined more than once as an entry.
+3. This is not an error if a label is defined more than once as an extern.
+4. The machine code image is given a fixed size which is the memory size of the machine on which the project is based (4096).
+5. The alignment in the ent and ext files is done according to the length of the longest possible label (which is 31).
+6. The main documentation of the functions is in the header files.
+7.The reserved words that cannot appear as a label or macro name are: all operation 
+names, all register names, the four instruction names (.entry, .extern, .string, 
+.data) and macr, endmacr.
+
+Thanks for reading,
+Noam Handelman, 
+322299090
