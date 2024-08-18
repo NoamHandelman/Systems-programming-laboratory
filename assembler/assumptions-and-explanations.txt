@@ -15,6 +15,10 @@ names, all register names, the four instruction names (.entry, .extern, .string,
 .data) and macr, endmacr.
 8. Comment line is valid only if the ; is the first token in the line.
 
+notice: 
+- All the valid input and output files are in the file valid_inputs.
+- All the files that contain errors are in the invalid_inputs file.
+
 Thanks for reading,
 Noam Handelman, 
 322299090
