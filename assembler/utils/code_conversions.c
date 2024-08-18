@@ -25,7 +25,7 @@
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode);
 
 /**
- * Inital masking for the operand addressing mode.
+ * Inital masking for the operand's addressing mode.
  */
 
 unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
@@ -41,6 +41,10 @@ unsigned short convert_addressing_mode_to_bitmask(int addressing_mode)
         mask = 8;
     return mask;
 }
+
+/**
+ * Encode the  instruction parts to machine code and add it to the code image.
+ */
 
 void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image, int *IC, char *line_copy, int line_number, const char *input_filename, int *should_continue)
 {
@@ -172,6 +176,10 @@ void encode_instruction(Instruction *instruction, Machine_Code_Image *code_image
     free_instruction(instruction);
 }
 
+/**
+ * Update ARE bits for each symbol in the code image array according to the symbol attributes
+ */
+
 void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol_table, int IC, const char *input_filename, int *should_continue)
 {
     int i;
@@ -185,17 +193,26 @@ void update_symbols_in_code_image(Machine_Code_Image *code_image, Symbol *symbol
                 code_image[i].value |= (symbol->address THREE_SHIFT);
                 if (symbol->is_entry)
                 {
+                    /**
+                     * If the symbol is entry we turn on the second bit of the ARE bits
+                     */
                     code_image[i].value |= (1 << 1);
                     code_image[i].value &= ~THIRD_BIT_MASK;
                 }
                 if (symbol->is_external)
                 {
+                    /**
+                     * If the symbol is external we turn on the first bit of the ARE bits
+                     */
                     code_image[i].value |= (1 << 0);
                     code_image[i].value &= ~THIRD_BIT_MASK;
                 }
             }
             else
             {
+                /**
+                 * There is undefined symbol in the code image.
+                 */
                 display_error(code_image[i].symbol, code_image[i].line_number, "Undefined symbol", input_filename);
                 *should_continue = 0;
             }

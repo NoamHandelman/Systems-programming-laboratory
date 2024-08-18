@@ -12,6 +12,10 @@
  * Macro functions
  */
 
+/**
+ * Create and add a macro to the macros list.
+ */
+
 Macro *create_and_add_macro(Macro **head, const char *name)
 {
     Macro *macro = (Macro *)malloc(sizeof(Macro));
@@ -38,6 +42,10 @@ Macro *create_and_add_macro(Macro **head, const char *name)
 
     return macro;
 }
+
+/**
+ * Add line to the macro content.
+ */
 
 int add_macro_line(Macro *macro, const char *line)
 {
@@ -105,6 +113,10 @@ Macro *find_macro(Macro *head, const char *name)
 
 /**
  * Symbol functions
+ */
+
+/**
+ * Create and add a symbol to the symbol table.
  */
 
 int create_and_add_symbol(Symbol **symbol_table, const char *name, int address, int is_external, int is_data)
