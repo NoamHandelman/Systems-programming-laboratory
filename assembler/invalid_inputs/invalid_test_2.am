@@ -1,9 +1,11 @@
 .entry UndefinedLabel1
 .extern fn1
 .string abcd"
+jmp fakeoperand
 .data 5 , 6, 7, 8,9
 prn #100
-BADLABEL: mov #123456, r7
+LABEL: mov #123456, r7
+lea LABEL ,
 cmp *r3, *r4
 clr BADLABEL
 inc #90
