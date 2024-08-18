@@ -1,17 +1,9 @@
-macr goodmacro
-.data 5 , 6, 7, 8,9
-prn #100
-endmacr
-
 .entry UndefinedLabel1
 .extern fn1
-
 .string abcd"
-
-jmp fakeoperand
-goodmacro
-LABEL: mov #123456, r7
-lea LABEL ,
+.data 5 , 6, 7, 8,9
+prn #100
+BADLABEL: mov #123456, r7
 cmp *r3, *r4
 clr BADLABEL
 inc #90
@@ -24,5 +16,3 @@ jsr *r0
 not *r10
 stop r4
 rts
-
-
