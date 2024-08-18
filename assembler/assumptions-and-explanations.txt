@@ -13,6 +13,7 @@ the forum).
 7.The reserved words that cannot appear as a label or macro name are: all operation 
 names, all register names, the four instruction names (.entry, .extern, .string, 
 .data) and macr, endmacr.
+8. Comment line is valid only if the ; is the first token in the line.
 
 Thanks for reading,
 Noam Handelman, 
