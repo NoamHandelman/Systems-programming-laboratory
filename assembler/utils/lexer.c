@@ -146,11 +146,6 @@ int is_valid_symbol(const char *symbol, Symbol **symbol_table, char *line, int l
 int get_opcode(const char *op)
 {
     int i;
-    printf("%d\n", MIN_DATA_NUM);
-    printf("%d\n", MAX_DATA_NUM);
-    printf("%d\n", MIN_IMMEDIATE_VALUE);
-    printf("%d\n", MAX_IMMEDIATE_VALUE);
-
     for (i = 0; i < OP_CODES_COUNT; i++)
     {
         if (strcmp(op, OP_CODES[i].opcode) == 0)
