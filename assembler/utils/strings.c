@@ -21,6 +21,10 @@ void remove_whitespace_from_edges(char *line);
  */
 void add_spaces(char *line);
 
+/**
+ * Check if there are forbidden characters in the line
+ */
+
 int check_for_extra_chars(char *end_token)
 {
     while (*end_token != '\0')
@@ -34,6 +38,10 @@ int check_for_extra_chars(char *end_token)
     return 0;
 }
 
+/**
+ * Check if the line is empty.
+ */
+
 int is_empty_line(const char *line)
 {
     while (*line != '\0')
@@ -46,6 +54,10 @@ int is_empty_line(const char *line)
     }
     return 1;
 }
+
+/**
+ * Remove all whitespace from the edges of the string.
+ */
 
 void remove_whitespace_from_edges(char *line)
 {
@@ -82,6 +94,10 @@ void remove_whitespace_from_edges(char *line)
 
     memmove(line, start, end - start + 2);
 }
+
+/**
+ * Add spaces between the commas in the line to simplify the parsing of it later.
+ */
 
 void add_spaces(char *line)
 {
@@ -125,6 +141,10 @@ void add_spaces(char *line)
     result[j] = '\0';
     strcpy(line, result);
 }
+
+/**
+ * The function that centralizes space handling for the line.
+ */
 
 void handle_spaces(char *line)
 {

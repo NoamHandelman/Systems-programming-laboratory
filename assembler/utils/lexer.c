@@ -567,6 +567,10 @@ int get_addressing_mode(const char *operand)
     return DIRECT;
 }
 
+/**
+ * Validate instruction structure (operation code and operands)
+ */
+
 int validate_instruction(Instruction *instr, char *full_line, int line_number, const char *input_filename)
 {
     int error_found = 1;
